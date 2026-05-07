@@ -4,8 +4,10 @@ An app that predicts your next crash out before it happens.
 
 ## Overview
 
-**Bestie, Are You Good?** analyzes mood patterns, behavior, and activity signals to estimate when you might be approaching a crash out.  
-The project combines mood tracking, behavioral insights, and predictive analytics into a simple and interactive experience.
+**Bestie, Are You Good?** analyzes app usage (specifically TikTok), behavior, and activity signals to estimate when you might be approaching a crash out.
+We also randomly tell you no from time to time because... why not?
+
+The project combines app usage, behavioral insights, and predictive analytics into a simple and interactive experience.
 
 The goal is not medical diagnosis or therapy, but self-awareness, pattern recognition, and a little humor.
 
