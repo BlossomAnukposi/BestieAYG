@@ -13,14 +13,12 @@ The goal is not medical diagnosis or therapy, but self-awareness, pattern recogn
 
 ## Features
 
-- Mood tracking
 - Crash out prediction system
 - Behavioral pattern analysis
 - Timeline/history view
 - Notifications and warnings
 - User profiles and personalization
 - Analytics dashboard
-- Real-time emotional stability score
 
 ---
 
