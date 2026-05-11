@@ -1,0 +1,27 @@
+{
+  "version": "2.6.2",
+  "summary": {
+    "title": "Threat Model",
+    "owner": "Josephine",
+    "description": "",
+    "id": 0
+  },
+  "detail": {
+    "contributors": [],
+    "diagrams": [
+      {
+        "id": 0,
+        "title": "Context Diagram (DFD level 0)",
+        "diagramType": "Generic",
+        "placeholder": "New generic diagram description",
+        "thumbnail": "./public/content/images/thumbnail.jpg",
+        "version": "2.6.2",
+        "cells": [],
+        "description": "Context Diagram to provide an overview of our app BAYG."
+      }
+    ],
+    "diagramTop": 1,
+    "reviewer": "",
+    "threatTop": 0
+  }
+}
