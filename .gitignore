@@ -1,27 +1,62 @@
-# Compiled class file
-*.class
+# TouchGrass — .gitignore
+# Android + Kotlin + Gradle + Android Studio + Secrets
 
-# Log file
+# ─── SECRET FILES (MOST IMPORTANT) ───────────────────────────────────────────
+# These files contain API keys, passwords and secrets — NEVER commit them
+local.properties
+secrets.properties
+keystore.properties
+*.keystore
+*.jks
+google-services.json
+
+# ─── GRADLE BUILD OUTPUTS ────────────────────────────────────────────────────
+.gradle/
+build/
+**/build/
+captures/
+
+# ─── ANDROID STUDIO IDE FILES ────────────────────────────────────────────────
+.idea/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+Thumbs.db
+
+# ─── LOCAL ANDROID CONFIGS ───────────────────────────────────────────────────
+# local.properties already listed above — also covers sdk.dir and ndk.dir
+*.hprof
+
+# ─── DEPENDENCY CACHES ───────────────────────────────────────────────────────
+.gradle
+/local.properties
+
+# ─── APK / AAB OUTPUTS ───────────────────────────────────────────────────────
+# Debug APKs are built by CI, no need to commit them
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# ─── TEST OUTPUTS ────────────────────────────────────────────────────────────
+/app/build/reports/
+/app/build/test-results/
+
+# ─── PROGUARD / R8 ───────────────────────────────────────────────────────────
+/app/proguard/
+
+# ─── LOGS ────────────────────────────────────────────────────────────────────
 *.log
+lint-results*
 
-# BlueJ files
-*.ctxt
+# ─── BACKUP FILES ────────────────────────────────────────────────────────────
+*.orig
+*.bak
+*.swp
+*~
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
-
-# Kotlin Gradle plugin data, see https://kotlinlang.org/docs/whatsnew20.html#new-directory-for-kotlin-data-in-gradle-projects
-.kotlin/
+# ─── OS FILES ────────────────────────────────────────────────────────────────
+.DS_Store
+Desktop.ini
+Thumbs.db
