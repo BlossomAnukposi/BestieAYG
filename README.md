@@ -1,6 +1,6 @@
 # Bestie, Are You Good?
 
-An app that predicts your next crash out before it happens.
+An Android app that predicts your next crash out before it happens.
 
 ## Overview
 
