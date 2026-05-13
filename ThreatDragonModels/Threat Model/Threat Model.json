@@ -4627,7 +4627,8 @@
               "threats": []
             }
           }
-        ]
+        ],
+        "description": "Level 1 DFD"
       }
     ],
     "diagramTop": 2,
