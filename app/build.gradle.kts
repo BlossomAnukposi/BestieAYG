@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("io.gitlab.arturbosch.detekt") version "1.23.8"
 }
 
 android {
