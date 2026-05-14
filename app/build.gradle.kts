@@ -1,6 +1,15 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     id("io.gitlab.arturbosch.detekt") version "1.23.8"
+}
+
+// Load local.properties to read API key securely
+val localProps = Properties()
+val localPropsFile = rootProject.file("local.properties")
+if (localPropsFile.exists()) {
+    localProps.load(localPropsFile.inputStream())
 }
 
 android {
@@ -19,6 +28,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        // Inject API key into BuildConfig (if missing, use empty string to avoid build failures)
+        val apiKey = localProps.getProperty("OPENWEATHER_API_KEY") ?: ""
+        buildConfigField("String", "OPENWEATHER_API_KEY", "\"$apiKey\"")
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
@@ -45,4 +62,13 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // Retrofit & Networking
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    
+    // Coroutines (required for suspend functions)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
 }
