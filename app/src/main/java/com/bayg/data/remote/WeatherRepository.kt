@@ -6,6 +6,8 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.HttpException
+import java.io.IOException
 
 /**
  * WeatherRepository — handles all communication with the OpenWeather API.
@@ -59,7 +61,11 @@ class WeatherRepository {
                 apiKey = apiKey
             )
             Result.success(response)
-        } catch (e: Exception) {
+        } catch (e: IOException) {
+            // Network error (e.g. no internet)
+            Result.failure(e)
+        } catch (e: HttpException) {
+            // HTTP error (e.g. 404 Not Found, 401 Unauthorized)
             Result.failure(e)
         }
     }

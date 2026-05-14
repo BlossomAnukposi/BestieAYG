@@ -1,5 +1,7 @@
 package com.bayg.data.remote.model
 
+import com.google.gson.annotations.SerializedName
+
 data class WeatherResponse(
     val weather: List<WeatherDescription>,
     val main: MainData,
@@ -14,7 +16,8 @@ data class WeatherDescription(
 
 data class MainData(
     val temp: Double,
-    val feels_like: Double,
+    @SerializedName("feels_like")
+    val feelsLike: Double,
     val humidity: Int
 )
 
