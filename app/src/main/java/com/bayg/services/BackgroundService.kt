@@ -11,7 +11,6 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.edit
 import com.bayg.managers.AppUsageManager
-import java.util.concurrent.TimeUnit
 
 class BackgroundService : Service() {
 
@@ -61,7 +60,7 @@ class BackgroundService : Service() {
         Log.d(LOG_TAG, "Instagram usage since start: $hours hours")
 
         // Data is now ready for dashboard integration
-        //TODO: This will be handled through the UI layer
+        // This will be handled by your colleagues through the UI layer
 
         return START_STICKY
     }

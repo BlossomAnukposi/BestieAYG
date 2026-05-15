@@ -9,7 +9,7 @@ import android.app.usage.UsageStatsManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import java.util.concurrent.TimeUnit
+import android.util.Log
 
 class PermissionManager(private val activity: AppCompatActivity) {
 
@@ -18,6 +18,7 @@ class PermissionManager(private val activity: AppCompatActivity) {
 
     companion object {
         private const val PERMISSION_CHECK_WINDOW_MS = 1000L
+        private const val LOG_TAG = "PermissionManager"
     }
 
     fun initialize(
@@ -63,6 +64,7 @@ class PermissionManager(private val activity: AppCompatActivity) {
             )
             stats.isNotEmpty()
         } catch (e: SecurityException) {
+            Log.e(LOG_TAG, "Security exception - Usage Stats permission not granted", e)
             false
         }
     }
