@@ -3,10 +3,16 @@ package com.bayg.managers
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.util.Log
+import java.util.concurrent.TimeUnit
 
 class AppUsageManager(private val context: Context) {
 
     private val usageStatsManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+
+    companion object {
+        private const val INSTAGRAM_PACKAGE = "com.instagram.android"
+        private const val LOG_TAG = "AppUsageManager"
+    }
 
     /**
      * Gets the total foreground time Instagram was used between startTime and endTime
@@ -23,7 +29,7 @@ class AppUsageManager(private val context: Context) {
             val instagramStats = stats["com.instagram.android"]
             instagramStats?.totalTimeInForeground ?: 0L
         } catch (e: Exception) {
-            Log.e("AppUsageManager", "Error getting Instagram usage stats", e)
+            Log.e(LOG_TAG, "Error getting Instagram usage stats", e)
             0L
         }
     }

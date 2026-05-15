@@ -5,14 +5,20 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.provider.Settings
+import android.app.usage.UsageStatsManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import java.util.concurrent.TimeUnit
 
 class PermissionManager(private val activity: AppCompatActivity) {
 
     private var locationPermissionLauncher: ActivityResultLauncher<Array<String>>? = null
     private var usageStatsLauncher: ActivityResultLauncher<Intent>? = null
+
+    companion object {
+        private const val PERMISSION_CHECK_WINDOW_MS = 1000L
+    }
 
     fun initialize(
         locationPermissionLauncher: ActivityResultLauncher<Array<String>>,
@@ -48,10 +54,15 @@ class PermissionManager(private val activity: AppCompatActivity) {
     fun hasUsageStatsPermission(): Boolean {
         // This is a special permission, must be checked manually
         return try {
-            val usageStatsManager = activity.getSystemService(Context.USAGE_STATS_SERVICE) as android.app.usage.UsageStatsManager
-            val stats = usageStatsManager.queryAndAggregateUsageStats(System.currentTimeMillis() - 1000, System.currentTimeMillis())
+            val usageStatsManager =
+                activity.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+            val currentTime = System.currentTimeMillis()
+            val stats = usageStatsManager.queryAndAggregateUsageStats(
+                currentTime - PERMISSION_CHECK_WINDOW_MS,
+                currentTime
+            )
             stats.isNotEmpty()
-        } catch (e: Exception) {
+        } catch (e: SecurityException) {
             false
         }
     }

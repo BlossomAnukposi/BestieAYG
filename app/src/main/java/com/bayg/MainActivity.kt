@@ -58,10 +58,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onLocationPermissionGranted() {
-        //TODO: Add location logic later here
+        // Location logic will be added later
     }
 
     private fun onUsageStatsPermissionGranted() {
-        //TODO: Add usage stats logic later here
+        // Usage stats logic will be added later
     }
 }
