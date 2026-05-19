@@ -20,6 +20,9 @@
     <!-- Required for the app to make any API calls -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Read the user's local calendar (no Google Sign-In required) -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
