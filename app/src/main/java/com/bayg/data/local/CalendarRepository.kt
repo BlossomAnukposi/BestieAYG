@@ -7,11 +7,17 @@ import java.io.IOException
 
 class CalendarRepository(private val context: Context) {
 
+    companion object {
+        private const val HOURS_IN_DAY = 24
+        private const val MINUTES_IN_HOUR = 60
+        private const val SECONDS_IN_MINUTE = 60
+        private const val MILLIS_IN_SECOND = 1000L
+    }
     fun getUpcomingEvents(daysAhead: Int = 7): Result<List<CalendarEvent>> {
         val events = mutableListOf<CalendarEvent>()
 
         val now = System.currentTimeMillis()
-        val endTime = now + (daysAhead * 24 * 60 * 60 * 1000L)
+        val endTime = now + (daysAhead * HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MILLIS_IN_SECOND)
 
         val projection = arrayOf(
             CalendarContract.Events._ID,
@@ -21,7 +27,8 @@ class CalendarRepository(private val context: Context) {
             CalendarContract.Events.ALL_DAY
         )
 
-        val selection = "${CalendarContract.Events.DTSTART} >= ? AND ${CalendarContract.Events.DTSTART} <= ?"
+        val dtStart = CalendarContract.Events.DTSTART
+        val selection = "$dtStart >= ? AND $dtStart <= ?"
         val selectionArgs = arrayOf(now.toString(), endTime.toString())
         val sortOrder = "${CalendarContract.Events.DTSTART} ASC"
 
