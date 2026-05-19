@@ -1,8 +1,10 @@
 import java.util.Properties
 
 plugins {
+plugins {
     alias(libs.plugins.android.application)
     id("io.gitlab.arturbosch.detekt") version "1.23.8"
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 // Load local.properties to read API key securely
@@ -28,7 +30,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        
+
         // Inject API key into BuildConfig (if missing, use empty string to avoid build failures)
         val apiKey = localProps.getProperty("OPENWEATHER_API_KEY") ?: ""
         buildConfigField("String", "OPENWEATHER_API_KEY", "\"$apiKey\"")
@@ -59,7 +61,9 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-    testImplementation(libs.junit)
+    implementation("androidx.navigation:navigation-compose:2.9.8")
+    implementation("androidx.compose.material3:material3:1.3.1")
+    implementation("androidx.activity:activity-compose:1.9.0")    testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
@@ -68,7 +72,7 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-    
+
     // Coroutines (required for suspend functions)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
 }

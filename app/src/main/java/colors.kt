@@ -1,0 +1,16 @@
+import androidx.compose.ui.graphics.Color
+
+val Black        = Color(0xFF0A0A0A)
+val White        = Color(0xFFF5F5F0)
+val Grey         = Color(0xFF4D4D4D)
+val TextGrey     = Color(0xFF666666)
+val CardGrey     = Color(0xFF191919)
+val OutlineGrey  = Color(0xFF2A2A2A)
+val Green        = Color(0xFFC8FF57)
+val DarkGreen    = Color(0xFF272E16)
+val GreenBlack   = Color(0xFF13140C)
+val BlueBlack    = Color(0xFF0A0B0A)
+val DarkRed      = Color(0xFF432525)
+val LightRed     = Color(0xFFFF5C5C)
+val LightOrange  = Color(0xFFFF942E)
+val DarkOrange   = Color(0xFF432F1C)
