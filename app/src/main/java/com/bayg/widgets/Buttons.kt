@@ -48,7 +48,7 @@ fun GreenButton(navController: NavController, route: String, text: String, heigh
     ) { Text(text,
         color = MaterialTheme.bayg.black,
         fontSize = 17.sp,
-        fontWeight = FontWeight(700),
+        fontWeight = FontWeight.Bold,
     ) }
 }
 
@@ -65,7 +65,7 @@ fun GreenArrowButton(navController: NavController, route: String) {
             text = "←",
             style = TextStyle(
                 fontSize = 22.sp,
-                fontWeight = FontWeight(700),
+                fontWeight = FontWeight.Bold,
                 color = MaterialTheme.bayg.green,
             )
         )

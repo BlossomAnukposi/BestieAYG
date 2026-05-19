@@ -6,21 +6,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
-@Immutable
-data class BAYGColors(
-    val green: Color,
-    val black: Color,
-    val darkGreen: Color,
-    val card: Color,
-    val textGrey: Color,
-    val white: Color,
-    val outline: Color,
-    val lightRed: Color,
-    val darkRed: Color,
-    val lightOrange: Color,
-    val darkOrange: Color,
-)
-
 val LocalBAYGColors = staticCompositionLocalOf<BAYGColors> {
     error("No BAYGColors provided")
 }

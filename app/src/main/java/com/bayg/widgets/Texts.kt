@@ -33,7 +33,7 @@ fun Title(text: String, colour: Color) {
         text = text,
         style = TextStyle(
             fontSize = 96.sp,
-            fontWeight = FontWeight(700),
+            fontWeight = FontWeight.Bold,
             color = colour,
         ),
     )
@@ -43,13 +43,13 @@ fun Title(text: String, colour: Color) {
  * font size: 56dp
  */
 @Composable
-fun Heading1(text: String, colour: Color, modifierHeight: Dp = 100.dp) {
+fun Heading1(text: String, colour: Color) {
     Text(
         text = text,
         style = TextStyle(
             fontSize = 56.sp,
             lineHeight = 44.24.sp,
-            fontWeight = FontWeight(700),
+            fontWeight = FontWeight.Bold,
             color = colour,
         ),
     )
@@ -64,7 +64,7 @@ fun Heading2(text: String, colour: Color) {
         text = text,
         style = TextStyle(
             fontSize = 48.sp,
-            fontWeight = FontWeight(700),
+            fontWeight = FontWeight.Bold,
             color = colour,
         ),
     )
@@ -79,7 +79,7 @@ fun Heading3(text: String, colour: Color) {
         text = text,
         style = TextStyle(
             fontSize = 36.sp,
-            fontWeight = FontWeight(700),
+            fontWeight = FontWeight.Bold,
             color = colour,
         ),
     )
@@ -94,7 +94,7 @@ fun Heading4(text: String, colour: Color) {
         text = text,
         style = TextStyle(
             fontSize = 28.sp,
-            fontWeight = FontWeight(700),
+            fontWeight = FontWeight.Bold,
             color = colour,
         ),
     )
@@ -107,7 +107,7 @@ fun Subtitle(text: String) {
         text = text,
         style = TextStyle(
             fontSize = 18.sp,
-            fontWeight = FontWeight(400),
+            fontWeight = FontWeight.Normal,
             color = MaterialTheme.bayg.textGrey,
         ),
     )
@@ -119,7 +119,7 @@ fun Paragraph(text: String, color: Color = MaterialTheme.bayg.white, bold: Boole
         text = text,
         style = TextStyle(
             fontSize = 16.sp,
-            fontWeight = if(bold) FontWeight(600) else FontWeight(400),
+            fontWeight = if(bold) FontWeight.Bold else FontWeight.Normal,
             color = color,
         ),
     )
@@ -131,7 +131,7 @@ fun Caption(text: String, width: Dp = 0.dp, align: TextAlign = TextAlign.Start) 
         text = text,
         style = TextStyle(
             fontSize = 12.sp,
-            fontWeight = FontWeight(400),
+            fontWeight = FontWeight.Normal,
             color = MaterialTheme.bayg.textGrey,
             textAlign = align
         ),

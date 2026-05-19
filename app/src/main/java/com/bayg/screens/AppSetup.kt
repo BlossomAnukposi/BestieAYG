@@ -48,21 +48,26 @@ import com.bayg.widgets.Subtitle
 import com.bayg.widgets.ToggleCard
 import kotlin.math.roundToInt
 
+private const val SECONDS_IN_MINUTE = 60
+
 private fun formatMinutes(value: Float): String {
     val m = value.roundToInt()
-    return if (m < 60) "$m min"
+    return if (m < SECONDS_IN_MINUTE) "$m min"
     else {
-        val h = m / 60
-        val rem = m % 60
+        val h = m / SECONDS_IN_MINUTE
+        val rem = m % SECONDS_IN_MINUTE
         if (rem == 0) "$h h" else "$h h $rem min"
     }
 }
 
+private const val DEFAULT_APP_LIMIT = 60f
+private const val DEFAULT_BLOCK_TIME = 30f
+
 @Composable
 fun AppSetup(navController: NavController) {
     var isPreset by remember { mutableStateOf(true) }
-    var limitValue by remember { mutableFloatStateOf(60f) }
-    var blockValue by remember { mutableFloatStateOf(30f) }
+    var limitValue by remember { mutableFloatStateOf(DEFAULT_APP_LIMIT) }
+    var blockValue by remember { mutableFloatStateOf(DEFAULT_BLOCK_TIME) }
     var customKeywords by remember { mutableStateOf(listOf<String>()) }
 
     Column(
@@ -115,6 +120,10 @@ fun AppSetup(navController: NavController) {
     }
 }
 
+private const val APP_LIMIT_OPTIONS_COUNT = 5
+
+private const val THREE_HOURS_LIMIT = 180f
+
 @Composable
 fun AppLimitSection(isPreset: Boolean, value: Float, onValueChange: (Float) -> Unit) {
     GreyOutlinedCard(120.dp) {
@@ -129,12 +138,17 @@ fun AppLimitSection(isPreset: Boolean, value: Float, onValueChange: (Float) -> U
             }
             if (!isPreset) {
                 Column(Modifier.fillMaxWidth()) {
-                    LimitSlider(MaterialTheme.bayg.green, value, 5, 0f..180f, onValueChange)
+                    LimitSlider(MaterialTheme.bayg.green, value,
+                        APP_LIMIT_OPTIONS_COUNT, 0f..THREE_HOURS_LIMIT, onValueChange)
                 }
             }
         }
     }
 }
+
+private const val BLOCK_TIME_OPTIONS_COUNT = 47
+
+private const val FOUR_HOURS_LIMIT = 240f
 
 @Composable
 fun AppBlockSection(isPreset: Boolean, value: Float, onValueChange: (Float) -> Unit) {
@@ -149,7 +163,8 @@ fun AppBlockSection(isPreset: Boolean, value: Float, onValueChange: (Float) -> U
             }
             if (!isPreset) {
                 Column(Modifier.fillMaxWidth()) {
-                    LimitSlider(MaterialTheme.bayg.lightRed, value, 47, 0f..240f, onValueChange)
+                    LimitSlider(MaterialTheme.bayg.lightRed, value,
+                        BLOCK_TIME_OPTIONS_COUNT, 0f..FOUR_HOURS_LIMIT, onValueChange)
                 }
             }
         }

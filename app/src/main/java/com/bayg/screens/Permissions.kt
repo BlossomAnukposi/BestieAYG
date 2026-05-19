@@ -33,6 +33,8 @@ import com.bayg.widgets.Subtitle
 import com.bayg.widgets.Toggle
 import org.intellij.lang.annotations.JdkConstants
 
+private const val PROGRESS_BAR_67_PERCENT = 0.67f
+
 @Composable
 fun Permissions(navController: NavController) {
     Column(
@@ -51,7 +53,7 @@ fun Permissions(navController: NavController) {
                 GreenArrowButton(navController, "signIn")
                 Caption("Step 2 of 3")
             }
-            ProgressBar(MaterialTheme.bayg.green, 0.67f)
+            ProgressBar(MaterialTheme.bayg.green, PROGRESS_BAR_67_PERCENT)
         }
 
         // SECTION TWO

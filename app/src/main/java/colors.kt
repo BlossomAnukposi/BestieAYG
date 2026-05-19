@@ -1,3 +1,4 @@
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
 val Black        = Color(0xFF0A0A0A)
@@ -14,3 +15,18 @@ val DarkRed      = Color(0xFF432525)
 val LightRed     = Color(0xFFFF5C5C)
 val LightOrange  = Color(0xFFFF942E)
 val DarkOrange   = Color(0xFF432F1C)
+
+@Immutable
+data class BAYGColors(
+    val green: Color,
+    val black: Color,
+    val darkGreen: Color,
+    val card: Color,
+    val textGrey: Color,
+    val white: Color,
+    val outline: Color,
+    val lightRed: Color,
+    val darkRed: Color,
+    val lightOrange: Color,
+    val darkOrange: Color,
+)

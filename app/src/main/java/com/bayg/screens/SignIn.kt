@@ -29,6 +29,8 @@ import com.bayg.widgets.Paragraph
 import com.bayg.widgets.ProgressBar
 import com.bayg.widgets.Subtitle
 
+private const val PROGRESS_BAR_34_PERCENT = 0.33f
+
 @Composable
 fun SignIn(navController: NavController) {
     Column(
@@ -47,7 +49,7 @@ fun SignIn(navController: NavController) {
                 GreenArrowButton(navController, "onboardingStart")
                 Caption("Step 1 of 3")
             }
-            ProgressBar(MaterialTheme.bayg.green, 0.33f)
+            ProgressBar(MaterialTheme.bayg.green, PROGRESS_BAR_34_PERCENT)
         }
 
         // Section Two
