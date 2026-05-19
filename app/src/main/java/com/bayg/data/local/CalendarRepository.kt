@@ -43,9 +43,10 @@ class CalendarRepository(private val context: Context) {
 
             cursor?.use {
                 while (it.moveToNext()) {
+                    val titleIndex = it.getColumnIndexOrThrow(CalendarContract.Events.TITLE)
                     val event = CalendarEvent(
                         id = it.getLong(it.getColumnIndexOrThrow(CalendarContract.Events._ID)),
-                        title = it.getString(it.getColumnIndexOrThrow(CalendarContract.Events.TITLE)) ?: "Untitled Event",
+                        title = it.getString(titleIndex) ?: "Untitled Event",
                         startTime = it.getLong(it.getColumnIndexOrThrow(CalendarContract.Events.DTSTART)),
                         endTime = it.getLong(it.getColumnIndexOrThrow(CalendarContract.Events.DTEND)),
                         isAllDay = it.getInt(it.getColumnIndexOrThrow(CalendarContract.Events.ALL_DAY)) == 1
