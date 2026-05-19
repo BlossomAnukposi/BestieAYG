@@ -41,8 +41,10 @@ class PermissionManager(private val activity: ComponentActivity) {
     }
 
     fun requestUsageStatsPermission() {
-        val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
-        usageStatsLauncher?.launch(intent)
+        if (!hasUsageStatsPermission()) {
+            val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+            usageStatsLauncher?.launch(intent)
+        }
     }
 
     fun hasLocationPermission(): Boolean {
