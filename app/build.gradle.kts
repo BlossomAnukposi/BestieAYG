@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     id("io.gitlab.arturbosch.detekt") version "1.23.8"
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {
@@ -42,6 +43,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation("androidx.navigation:navigation-compose:2.9.8")
+    implementation("androidx.compose.material3:material3:1.3.1")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
