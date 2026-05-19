@@ -7,11 +7,11 @@ import android.content.pm.PackageManager
 import android.provider.Settings
 import android.app.usage.UsageStatsManager
 import androidx.activity.result.ActivityResultLauncher
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import android.util.Log
+import androidx.activity.ComponentActivity
 
-class PermissionManager(private val activity: AppCompatActivity) {
+class PermissionManager(private val activity: ComponentActivity) {
 
     private var locationPermissionLauncher: ActivityResultLauncher<Array<String>>? = null
     private var usageStatsLauncher: ActivityResultLauncher<Intent>? = null
