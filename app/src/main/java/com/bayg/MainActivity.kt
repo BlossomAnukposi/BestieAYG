@@ -63,7 +63,7 @@ class MainActivity : ComponentActivity() {
                     composable("signIn") { SignIn(navController) }
                     composable("permissions") { Permissions(navController) }
                     composable("appSetup") { AppSetup(navController) }
-                    composable( "dashboard") { Dashboard(navController) }
+                    composable( "dashboard") { Dashboard() }
                 }
             }
         }

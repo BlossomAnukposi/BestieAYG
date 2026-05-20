@@ -15,9 +15,7 @@ import androidx.navigation.NavController
  * Keep this minimal can be replaced with real Dashboard UI later.
  */
 @Composable
-fun Dashboard(navController: NavController) {
-
-    @Suppress("UNUSED_VALUE") //Otherwise it does not pass the PR checks. The navController needs to remain for later user! Hence the suppress.
+fun Dashboard() {
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(
