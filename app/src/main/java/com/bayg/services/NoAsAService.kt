@@ -14,6 +14,9 @@ object NoAsAService {
     private const val CONNECT_TIMEOUT_MS = 10_000
     private const val READ_TIMEOUT_MS = 10_000
 
+    private const val HTTP_SUCCESS_MIN = 200
+    private const val HTTP_SUCCESS_MAX = 299
+
     suspend fun fetchMessage(): String = withContext(Dispatchers.IO) {
         var conn: HttpURLConnection? = null
         try {
@@ -26,7 +29,7 @@ object NoAsAService {
             }
 
             val code = conn.responseCode
-            val stream = if (code in 200..299) conn.inputStream else conn.errorStream
+            val stream = if (code in HTTP_SUCCESS_MIN..HTTP_SUCCESS_MAX) conn.inputStream else conn.errorStream
             val body = stream.bufferedReader().use { it.readText() }
 
             return@withContext extractMessage(body)
