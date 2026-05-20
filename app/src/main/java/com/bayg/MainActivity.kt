@@ -12,7 +12,9 @@ import com.bayg.screens.AppSetup
 import com.bayg.screens.OnboardingStart
 import com.bayg.screens.Permissions
 import com.bayg.screens.SignIn
+import com.bayg.screens.Dashboard
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.LaunchedEffect
 import com.bayg.permissions.PermissionManager
 
 class MainActivity : ComponentActivity() {
@@ -61,7 +63,7 @@ class MainActivity : ComponentActivity() {
                     composable("signIn") { SignIn(navController) }
                     composable("permissions") { Permissions(navController) }
                     composable("appSetup") { AppSetup(navController) }
-                    composable(route = "dashboard") { AppSetup(navController) }
+                    composable( "dashboard") { Dashboard(navController) }
                 }
             }
         }
