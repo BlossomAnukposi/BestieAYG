@@ -1,26 +1,35 @@
 package com.bayg.screens
 
-
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
+import com.bayg.services.NoAsAService
 
-/**
- * Temporary blank dashboard screen used as the start destination.
- * Keep this minimal can be replaced with real Dashboard UI later.
- */
 @Composable
 fun Dashboard() {
+    val messageState = produceState(initialValue = "Loading...") {
+        value = try {
+            NoAsAService.fetchMessage()
+        } catch (e: Exception) {
+            "Error: ${e.message ?: "unknown"}"
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(
-            text = "This is the dashboard page!",
-            style = MaterialTheme.typography.bodyLarge
-        )
+        val current = messageState.value
+        if (current == "Loading...") {
+            CircularProgressIndicator()
+        } else {
+            Text(
+                text = current,
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
     }
 }
