@@ -12,7 +12,9 @@ import com.bayg.screens.AppSetup
 import com.bayg.screens.OnboardingStart
 import com.bayg.screens.Permissions
 import com.bayg.screens.SignIn
+import com.bayg.screens.Dashboard
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.LaunchedEffect
 import com.bayg.permissions.PermissionManager
 
 class MainActivity : ComponentActivity() {
@@ -56,21 +58,23 @@ class MainActivity : ComponentActivity() {
             BAYGTheme {
                 val navController = rememberNavController()
 
-                NavHost(navController = navController, startDestination = "onboardingStart") {
-                    composable("onboardingStart") {OnboardingStart(navController)}
-                    composable("signIn") {SignIn(navController)}
-                    composable("permissions") {Permissions(navController)}
-                    composable("appSetup") {AppSetup(navController)}
+                NavHost(navController = navController, startDestination = "dashboard") {
+                    composable("onboardingStart") { OnboardingStart(navController) }
+                    composable("signIn") { SignIn(navController) }
+                    composable("permissions") { Permissions(navController) }
+                    composable("appSetup") { AppSetup(navController) }
+                    composable( "dashboard") { Dashboard() }
                 }
             }
         }
     }
 
-    private fun onLocationPermissionGranted() {
-        // Location logic will be added later
+        private fun onLocationPermissionGranted() {
+            // Location logic will be added later
+        }
+
+        private fun onUsageStatsPermissionGranted() {
+            // Usage stats logic will be added later
+        }
     }
 
-    private fun onUsageStatsPermissionGranted() {
-        // Usage stats logic will be added later
-    }
-}
