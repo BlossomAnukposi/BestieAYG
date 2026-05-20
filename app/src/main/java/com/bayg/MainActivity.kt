@@ -14,7 +14,6 @@ import com.bayg.screens.Permissions
 import com.bayg.screens.SignIn
 import com.bayg.screens.Dashboard
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.LaunchedEffect
 import com.bayg.permissions.PermissionManager
 
 class MainActivity : ComponentActivity() {
