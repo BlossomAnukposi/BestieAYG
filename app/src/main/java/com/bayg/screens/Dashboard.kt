@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 
 /**
  * Temporary blank dashboard screen used as the start destination.
@@ -17,9 +16,12 @@ import androidx.navigation.NavHostController
  */
 @Composable
 fun Dashboard(navController: NavController) {
+
+    @Suppress("UNUSED_VALUE") //Otherwise it does not pass the PR checks. The navController needs to remain for later user! Hence the suppress.
+
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(
-            text = "This is the dahsboard page!",
+            text = "This is the dashboard page!",
             style = MaterialTheme.typography.bodyLarge
         )
     }
