@@ -56,21 +56,23 @@ class MainActivity : ComponentActivity() {
             BAYGTheme {
                 val navController = rememberNavController()
 
-                NavHost(navController = navController, startDestination = "onboardingStart") {
-                    composable("onboardingStart") {OnboardingStart(navController)}
-                    composable("signIn") {SignIn(navController)}
-                    composable("permissions") {Permissions(navController)}
-                    composable("appSetup") {AppSetup(navController)}
+                NavHost(navController = navController, startDestination = "dashboard") {
+                    composable("onboardingStart") { OnboardingStart(navController) }
+                    composable("signIn") { SignIn(navController) }
+                    composable("permissions") { Permissions(navController) }
+                    composable("appSetup") { AppSetup(navController) }
+                    composable(route = "dashboard") { AppSetup(navController) }
                 }
             }
         }
     }
 
-    private fun onLocationPermissionGranted() {
-        // Location logic will be added later
+        private fun onLocationPermissionGranted() {
+            // Location logic will be added later
+        }
+
+        private fun onUsageStatsPermissionGranted() {
+            // Usage stats logic will be added later
+        }
     }
 
-    private fun onUsageStatsPermissionGranted() {
-        // Usage stats logic will be added later
-    }
-}
