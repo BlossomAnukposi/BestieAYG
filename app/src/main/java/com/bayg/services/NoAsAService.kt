@@ -13,7 +13,6 @@ object NoAsAService {
     private const val ENDPOINT = "https://noasaservice.lol/api/get"
     private const val CONNECT_TIMEOUT_MS = 10_000
     private const val READ_TIMEOUT_MS = 10_000
-
     private const val HTTP_SUCCESS_MIN = 200
     private const val HTTP_SUCCESS_MAX = 299
 
