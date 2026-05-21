@@ -3,8 +3,6 @@ package com.bayg
 import android.annotation.SuppressLint
 import android.content.Intent
 import BAYGTheme
-import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -73,18 +71,17 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        findViewById<androidx.cardview.widget.CardView>(R.id.tile_touch_grass)
-            .setOnClickListener {
-                startActivity(Intent(this, TouchGrassActivity::class.java))
-            }
+//        findViewById<androidx.cardview.widget.CardView>(R.id.tile_touch_grass)
+//            .setOnClickListener {
+//                startActivity(Intent(this, TouchGrassActivity::class.java))
+//            }
     }
 
-        private fun onLocationPermissionGranted() {
-            // Location logic will be added later
-        }
-
-        private fun onUsageStatsPermissionGranted() {
-            // Usage stats logic will be added later
-        }
+    private fun onLocationPermissionGranted() {
+        // Location logic will be added later
     }
 
+    private fun onUsageStatsPermissionGranted() {
+        // Usage stats logic will be added later
+    }
+}
