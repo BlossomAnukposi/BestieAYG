@@ -46,8 +46,8 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_tree"
-                android:tint="#4CAF50"
-                android:contentDescription="Park"/>
+                android:contentDescription="Park"
+                app:tint="#4CAF50" />
         </FrameLayout>
 
         <!-- Park info -->
@@ -101,9 +101,9 @@
             android:layout_height="36dp"
             android:background="@drawable/bg_circle_green_dark"
             android:src="@drawable/ic_arrow_right"
-            android:tint="#ADFF6C"
             android:padding="8dp"
-            android:contentDescription="Open in Google Maps"/>
+            android:contentDescription="Open in Google Maps"
+            app:tint="#ADFF6C" />
 
     </LinearLayout>
 
