@@ -1,5 +1,7 @@
 package com.bayg
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import BAYGTheme
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -47,6 +49,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -67,6 +70,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        findViewById<androidx.cardview.widget.CardView>(R.id.tile_touch_grass)
+            .setOnClickListener {
+                startActivity(Intent(this, TouchGrassActivity::class.java))
+            }
     }
 
         private fun onLocationPermissionGranted() {
