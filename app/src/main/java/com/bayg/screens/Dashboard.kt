@@ -24,6 +24,7 @@ import com.bayg.services.NoAsAService
 @Composable
 fun Dashboard() {
     val context = LocalContext.current
+    val SPACING_VAL = 16
 
     val messageState = produceState(initialValue = "Loading...") {
         value = try {
@@ -40,7 +41,7 @@ fun Dashboard() {
         } else {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(SPACING_VAL.dp)
             ) {
                 Text(
                     text = current,
