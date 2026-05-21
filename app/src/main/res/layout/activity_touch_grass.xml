@@ -129,8 +129,8 @@
                         android:layout_height="40dp"
                         android:layout_marginEnd="14dp"
                         android:src="@drawable/ic_weather_sun"
-                        android:tint="#ADFF6C"
-                        android:contentDescription="Weather icon"/>
+                        android:contentDescription="Weather icon"
+                        app:tint="#ADFF6C" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -248,8 +248,8 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:src="@drawable/ic_tree"
-                    android:tint="#3D6B42"
-                    android:contentDescription="No parks found"/>
+                    android:contentDescription="No parks found"
+                    app:tint="#3D6B42" />
 
                 <TextView
                     android:layout_width="wrap_content"
