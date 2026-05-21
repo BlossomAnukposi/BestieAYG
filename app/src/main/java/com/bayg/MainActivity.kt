@@ -3,6 +3,8 @@ package com.bayg
 import android.annotation.SuppressLint
 import android.content.Intent
 import BAYGTheme
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
