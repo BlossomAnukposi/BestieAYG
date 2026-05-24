@@ -20,6 +20,12 @@
     <!-- Required for the app to make any API calls -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Read the user's local calendar (no Google Sign-In required) -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+
+    <!-- NO-AS-A-SERVICE Network permission -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -38,6 +44,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+        android:name=".TouchGrassActivity"
+        android:exported="false" />
     </application>
 
 </manifest>
