@@ -15,6 +15,7 @@ import com.bayg.screens.OnboardingStart
 import com.bayg.screens.Permissions
 import com.bayg.screens.SignIn
 import com.bayg.screens.Dashboard
+import com.bayg.screens.ProfileSettings
 import androidx.activity.result.contract.ActivityResultContracts
 import com.bayg.permissions.PermissionManager
 
@@ -60,12 +61,13 @@ class MainActivity : ComponentActivity() {
             BAYGTheme {
                 val navController = rememberNavController()
 
-                NavHost(navController = navController, startDestination = "onboardingStart") {
+                NavHost(navController = navController, startDestination = "ProfileSettings") {
                     composable("onboardingStart") { OnboardingStart(navController) }
                     composable("signIn") { SignIn(navController) }
                     composable("permissions") { Permissions(navController, permissionManager) }
                     composable("appSetup") { AppSetup(navController) }
                     composable( "dashboard") { Dashboard() }
+                    composable("ProfileSettings") { ProfileSettings(navController) }
                 }
             }
         }
