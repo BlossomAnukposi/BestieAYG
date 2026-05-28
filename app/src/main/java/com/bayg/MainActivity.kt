@@ -1,5 +1,7 @@
 package com.bayg
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import BAYGTheme
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,7 +14,10 @@ import com.bayg.screens.AppSetup
 import com.bayg.screens.OnboardingStart
 import com.bayg.screens.Permissions
 import com.bayg.screens.SignIn
+import com.bayg.screens.Dashboard
+import com.bayg.screens.ProfileSettings
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.LaunchedEffect
 import com.bayg.permissions.PermissionManager
 
 class MainActivity : ComponentActivity() {
@@ -45,6 +50,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -56,14 +62,21 @@ class MainActivity : ComponentActivity() {
             BAYGTheme {
                 val navController = rememberNavController()
 
-                NavHost(navController = navController, startDestination = "onboardingStart") {
-                    composable("onboardingStart") {OnboardingStart(navController)}
-                    composable("signIn") {SignIn(navController)}
-                    composable("permissions") {Permissions(navController)}
-                    composable("appSetup") {AppSetup(navController)}
+                NavHost(navController = navController, startDestination = "ProfileSettings") {
+                    composable("onboardingStart") { OnboardingStart(navController) }
+                    composable("signIn") { SignIn(navController) }
+                    composable("permissions") { Permissions(navController, permissionManager) }
+                    composable("appSetup") { AppSetup(navController) }
+                    composable( "dashboard") { Dashboard() }
+                    composable("ProfileSettings") { ProfileSettings(navController) }
                 }
             }
         }
+
+//        findViewById<androidx.cardview.widget.CardView>(R.id.tile_touch_grass)
+//            .setOnClickListener {
+//                startActivity(Intent(this, TouchGrassActivity::class.java))
+//            }
     }
 
     private fun onLocationPermissionGranted() {
