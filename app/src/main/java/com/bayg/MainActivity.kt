@@ -3,6 +3,8 @@ package com.bayg
 import android.annotation.SuppressLint
 import android.content.Intent
 import BAYGTheme
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -27,13 +29,8 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         when {
-            permissions[android.Manifest.permission.ACCESS_FINE_LOCATION] ?: false -> {
-                onLocationPermissionGranted()
-            }
-            permissions[android.Manifest.permission.ACCESS_COARSE_LOCATION] ?: false -> {
-                onLocationPermissionGranted()
-            }
-            else -> { /* denied */ }
+            permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false -> onLocationPermissionGranted()
+            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false -> onLocationPermissionGranted()
         }
     }
 
@@ -45,13 +42,19 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // NEW — launcher for Accessibility Settings
-    // When the user returns from the settings screen we check if they enabled it.
     private val accessibilityLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { _ ->
         if (permissionManager.hasAccessibilityPermission()) {
             onAccessibilityPermissionGranted()
+        }
+    }
+
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            scheduleScreenTimeWorker()
         }
     }
 
@@ -61,12 +64,17 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         permissionManager = PermissionManager(this)
-        // Pass all three launchers — accessibilityLauncher is the new addition
         permissionManager.initialize(
             locationPermissionLauncher,
             usageStatsLauncher,
-            accessibilityLauncher   // NEW
+            accessibilityLauncher
         )
+
+        // Register notification channel early (no-op if already exists)
+        TouchGrassNotifier.createChannel(this)
+
+        // Request notification permission on Android 13+, then schedule worker
+        requestNotificationPermissionAndSchedule()
 
         setContent {
             BAYGTheme {
@@ -84,20 +92,36 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun requestNotificationPermissionAndSchedule() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            scheduleScreenTimeWorker()
+        }
+    }
+
+    private fun scheduleScreenTimeWorker() {
+        if (permissionManager.hasUsageStatsPermission()) {
+            ScreenTimeWorker.schedule(this)
+        }
+        // If usage stats aren't granted yet, schedule() is called again
+        // inside onUsageStatsPermissionGranted() below.
+    }
+
     private fun onLocationPermissionGranted() {
-        // Location logic — unchanged
+        // Location logic will be added later
     }
 
     private fun onUsageStatsPermissionGranted() {
-        // Now that usage stats are granted, nudge user to also enable accessibility
+        // Start the screen time worker now that we can read usage stats
+        ScreenTimeWorker.schedule(this)
+
         if (!permissionManager.hasAccessibilityPermission()) {
             permissionManager.requestAccessibilityPermission()
         }
     }
 
-    // NEW
     private fun onAccessibilityPermissionGranted() {
-        // Both permissions are now active — the InstagramBlockerService
-        // will automatically start monitoring. Nothing else to do here.
+        // Instagram blocker is now active — nothing else needed
     }
 }
