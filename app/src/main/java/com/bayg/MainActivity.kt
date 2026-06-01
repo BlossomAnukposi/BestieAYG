@@ -17,7 +17,6 @@ import com.bayg.screens.SignIn
 import com.bayg.screens.Dashboard
 import com.bayg.screens.ProfileSettings
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.LaunchedEffect
 import com.bayg.permissions.PermissionManager
 
 class MainActivity : ComponentActivity() {
@@ -29,24 +28,30 @@ class MainActivity : ComponentActivity() {
     ) { permissions ->
         when {
             permissions[android.Manifest.permission.ACCESS_FINE_LOCATION] ?: false -> {
-                // Fine location granted
                 onLocationPermissionGranted()
             }
             permissions[android.Manifest.permission.ACCESS_COARSE_LOCATION] ?: false -> {
-                // Coarse location granted
                 onLocationPermissionGranted()
             }
-            else -> {
-                // Permission denied
-            }
+            else -> { /* denied */ }
         }
     }
 
     private val usageStatsLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
-    ) { result ->
+    ) { _ ->
         if (permissionManager.hasUsageStatsPermission()) {
             onUsageStatsPermissionGranted()
+        }
+    }
+
+    // NEW — launcher for Accessibility Settings
+    // When the user returns from the settings screen we check if they enabled it.
+    private val accessibilityLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { _ ->
+        if (permissionManager.hasAccessibilityPermission()) {
+            onAccessibilityPermissionGranted()
         }
     }
 
@@ -56,7 +61,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         permissionManager = PermissionManager(this)
-        permissionManager.initialize(locationPermissionLauncher, usageStatsLauncher)
+        // Pass all three launchers — accessibilityLauncher is the new addition
+        permissionManager.initialize(
+            locationPermissionLauncher,
+            usageStatsLauncher,
+            accessibilityLauncher   // NEW
+        )
 
         setContent {
             BAYGTheme {
@@ -67,23 +77,27 @@ class MainActivity : ComponentActivity() {
                     composable("signIn") { SignIn(navController) }
                     composable("permissions") { Permissions(navController, permissionManager) }
                     composable("appSetup") { AppSetup(navController) }
-                    composable( "dashboard") { Dashboard() }
+                    composable("dashboard") { Dashboard() }
                     composable("ProfileSettings") { ProfileSettings(navController) }
                 }
             }
         }
-
-//        findViewById<androidx.cardview.widget.CardView>(R.id.tile_touch_grass)
-//            .setOnClickListener {
-//                startActivity(Intent(this, TouchGrassActivity::class.java))
-//            }
     }
 
     private fun onLocationPermissionGranted() {
-        // Location logic will be added later
+        // Location logic — unchanged
     }
 
     private fun onUsageStatsPermissionGranted() {
-        // Usage stats logic will be added later
+        // Now that usage stats are granted, nudge user to also enable accessibility
+        if (!permissionManager.hasAccessibilityPermission()) {
+            permissionManager.requestAccessibilityPermission()
+        }
+    }
+
+    // NEW
+    private fun onAccessibilityPermissionGranted() {
+        // Both permissions are now active — the InstagramBlockerService
+        // will automatically start monitoring. Nothing else to do here.
     }
 }
