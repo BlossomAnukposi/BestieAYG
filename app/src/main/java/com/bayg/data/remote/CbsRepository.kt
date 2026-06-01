@@ -8,6 +8,12 @@ import java.io.IOException
 
 class CbsRepository {
 
+    companion object {
+        // Average daily social media usage in the Netherlands in minutes.
+        // Source: Newcom National Social Media Research 2024
+        const val NL_AVERAGE_SOCIAL_MEDIA_MINUTES = 138
+    }
+
     private val httpClient = OkHttpClient.Builder().build()
 
     private val retrofit = Retrofit.Builder()
@@ -27,5 +33,14 @@ class CbsRepository {
         } catch (e: IOException) {
             Result.failure(e)
         }
+    }
+
+    // Example output: "You: 2h 45min · vs NL Average: 2h 18min"
+    fun formatComparison(userMinutes: Int): String {
+        val userHours = userMinutes / 60
+        val userMins = userMinutes % 60
+        val nlHours = NL_AVERAGE_SOCIAL_MEDIA_MINUTES / 60
+        val nlMins = NL_AVERAGE_SOCIAL_MEDIA_MINUTES % 60
+        return "You: ${userHours}h ${userMins}min vs NL Average: ${nlHours}h ${nlMins}min"
     }
 }
