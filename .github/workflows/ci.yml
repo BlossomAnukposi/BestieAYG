@@ -44,6 +44,10 @@ jobs:
         run: |
           echo "OPENWEATHER_API_KEY=${{ secrets.OPENWEATHER_API_KEY }}" >> local.properties
 
+      - name: Decode google-services.json
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 -d > app/google-services.json
+
       - name: Run Android Lint
         run: ./gradlew lint
 
@@ -89,6 +93,10 @@ jobs:
         run: |
           echo "OPENWEATHER_API_KEY=${{ secrets.OPENWEATHER_API_KEY }}" >> local.properties
 
+      - name: Decode google-services.json
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 -d > app/google-services.json
+
       - name: Run Detekt
         run: ./gradlew detekt
 
@@ -133,6 +141,10 @@ jobs:
       - name: Create local.properties with secrets
         run: |
           echo "OPENWEATHER_API_KEY=${{ secrets.OPENWEATHER_API_KEY }}" >> local.properties
+
+      - name: Decode google-services.json
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 -d > app/google-services.json
 
       - name: Run Unit Tests
         run: ./gradlew test
@@ -180,6 +192,10 @@ jobs:
       - name: Create local.properties with secrets
         run: |
           echo "OPENWEATHER_API_KEY=${{ secrets.OPENWEATHER_API_KEY }}" >> local.properties
+
+      - name: Decode google-services.json
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 -d > app/google-services.json
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug
