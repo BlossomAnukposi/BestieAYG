@@ -3,7 +3,9 @@ package com.bayg.widgets
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,15 +29,16 @@ import androidx.compose.ui.unit.sp
 import bayg
 
 @Composable
-fun GreyOutlinedCard(height: Dp = 94.dp, content: @Composable () -> Unit) {
+fun GreyOutlinedCard(minHeight: Dp = 94.dp, content: @Composable () -> Unit) {
     OutlinedCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.bayg.card),
         border = BorderStroke(1.dp, MaterialTheme.bayg.outline),
         shape = RoundedCornerShape(size = 5.dp),
         modifier = Modifier
-            .size(width = 334.dp, height = height)
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(16.dp).defaultMinSize(minHeight = minHeight)) {
             content()
         }
     }

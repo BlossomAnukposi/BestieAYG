@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_park.xml
+    Single park card row for the Touch Grass RecyclerView.
+
+    Used by: ParkAdapter.kt (create this adapter class)
+    Parent:  activity_touch_grass.xml → rv_parks
+
+    Wire-up in ParkAdapter.ViewHolder:
+      tv_park_name.text     = park.name            // e.g. "Noorderpark"
+      tv_park_distance.text = park.distanceLabel   // e.g. "0.8 km · ~10 min walk"
+      chip_closest.visibility = if (isFirst) View.VISIBLE else View.GONE
+      btn_open_maps.setOnClickListener {
+          val uri = Uri.parse("geo:${park.lat},${park.lon}?q=${Uri.encode(park.name)}")
+          context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+      }
+-->
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="#132418"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <!-- Tree icon bubble -->
+        <FrameLayout
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_circle_green_dark"
+            android:layout_marginEnd="14dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_tree"
+                android:contentDescription="Park"
+                app:tint="#4CAF50" />
+        </FrameLayout>
+
+        <!-- Park info -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- Park name -->
+            <TextView
+                android:id="@+id/tv_park_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Park Name"
+                android:textColor="#E8F5E9"
+                android:textSize="15sp"
+                android:fontFamily="sans-serif-medium"/>
+
+            <!-- Distance + walk/bike estimate -->
+            <TextView
+                android:id="@+id/tv_park_distance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.0 km · ~0 min walk"
+                android:textColor="#6BAD72"
+                android:textSize="13sp"
+                android:layout_marginTop="2dp"/>
+
+            <!-- "Closest" badge — visible only on first item -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_closest"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:text="Closest"
+                android:textColor="#ADFF6C"
+                android:textSize="11sp"
+                app:chipBackgroundColor="#1E3D23"
+                app:chipCornerRadius="8dp"
+                app:chipMinHeight="28dp"
+                app:chipStrokeWidth="0dp"
+                android:layout_marginTop="6dp"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+
+        <!-- Open in Google Maps arrow button -->
+        <ImageButton
+            android:id="@+id/btn_open_maps"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_circle_green_dark"
+            android:src="@drawable/ic_arrow_right"
+            android:padding="8dp"
+            android:contentDescription="Open in Google Maps"
+            app:tint="#ADFF6C" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
