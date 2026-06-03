@@ -82,17 +82,25 @@ dependencies {
 
     // Coroutines (required for suspend functions)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+    // .await() bridge for Firebase Task<T> on coroutines.
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
 
     // ViewModel + Compose integration
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.3")
 
-    // Firebase — BoM aligns all Firebase artifact versions, so the
-    // individual firebase-* dependencies below are intentionally version-less.
+    // Firebase. The BoM aligns all firebase-* versions, so the deps
+    // below intentionally omit a version.
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.appcheck.playintegrity)
     debugImplementation(libs.firebase.appcheck.debug)
+
+    // Security primitives. Keystore-backed EncryptedSharedPreferences and
+    // BiometricPrompt re-unlock (Class 3 only).
+    implementation(libs.androidx.security.crypto)
+    implementation(libs.androidx.biometric)
+    implementation(libs.androidx.fragment.ktx)
 }
