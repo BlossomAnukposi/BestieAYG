@@ -35,12 +35,22 @@ class CbsRepository {
         }
     }
 
-    // Example output: "You: 2h 45min · vs NL Average: 2h 18min"
-    fun formatComparison(userMinutes: Int): String {
+    // Formats a combined comparison string using:
+    // - userMinutes: the user's actual daily Instagram usage (from AppUsageManager)
+    // - socialNetworkPercent: live % of Dutch people on social networks (from CBS OData API)
+    // - NL_AVERAGE_SOCIAL_MEDIA_MINUTES: hardcoded NL daily average (Newcom 2024)
+    // Example output: "You: 2h 45min vs NL Average: 2h 18min, 79.5% of Dutch people use social networks"
+    fun formatComparison(userMinutes: Int, socialNetworkPercent: Double? = null): String {
         val userHours = userMinutes / 60
         val userMins = userMinutes % 60
         val nlHours = NL_AVERAGE_SOCIAL_MEDIA_MINUTES / 60
         val nlMins = NL_AVERAGE_SOCIAL_MEDIA_MINUTES % 60
-        return "You: ${userHours}h ${userMins}min vs NL Average: ${nlHours}h ${nlMins}min"
+        val timeComparison = "You: ${userHours}h ${userMins}min vs NL Average: ${nlHours}h ${nlMins}min"
+        val percentPart = if (socialNetworkPercent != null) {
+            ", ${socialNetworkPercent}% of Dutch people use social networks"
+        } else {
+            ""
+        }
+        return "$timeComparison$percentPart"
     }
 }
