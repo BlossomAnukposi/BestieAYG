@@ -16,15 +16,13 @@
     <!-- Background service -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <!-- Required for the app to make any API calls -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- Read the user's local calendar (no Google Sign-In required) -->
     <uses-permission android:name="android.permission.READ_CALENDAR" />
-
-    <!-- NO-AS-A-SERVICE Network permission -->
-    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -46,8 +44,15 @@
         </activity>
 
         <activity
-        android:name=".TouchGrassActivity"
-        android:exported="false" />
+            android:name=".TouchGrassActivity"
+            android:exported="false" />
+
+        <!-- Foreground service that periodically reads UsageStatsManager. -->
+        <!-- foregroundServiceType="dataSync" is required for targetSdk >= 34 (Android 14+). -->
+        <service
+            android:name=".services.BackgroundService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
     </application>
 
 </manifest>
