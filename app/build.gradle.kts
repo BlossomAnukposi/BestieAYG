@@ -2,9 +2,10 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.google.services)
     id("io.gitlab.arturbosch.detekt") version "1.23.8"
     id("org.jetbrains.kotlin.plugin.compose")
+    id("com.google.devtools.ksp")
+    id("com.google.gms.google-services")
 }
 
 // Load local.properties to read API key securely
@@ -67,6 +68,7 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.9.0")
     implementation(libs.play.services.location)
     implementation(libs.play.services.maps)
+    implementation(libs.androidx.room.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -82,17 +84,35 @@ dependencies {
 
     // Coroutines (required for suspend functions)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
+
+    // Room ORM
+    val roomVersion = "2.8.4"
+    ksp("androidx.room:room-compiler:$roomVersion")
+    implementation("androidx.room:room-runtime:$roomVersion")
+    annotationProcessor("androidx.room:room-compiler:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
+    testImplementation("androidx.room:room-testing:$roomVersion")
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:34.14.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+
+    // Firebase & Room sync
+    implementation("androidx.work:work-runtime-ktx:2.9.1")
 
     // ViewModel + Compose integration
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.3")
+}
 
-    // Firebase — BoM aligns all Firebase artifact versions, so the
-    // individual firebase-* dependencies below are intentionally version-less.
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.firestore)
-    implementation(libs.firebase.appcheck.playintegrity)
-    debugImplementation(libs.firebase.appcheck.debug)
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
+configurations.all {
+    exclude(group = "com.intellij", module = "annotations")
 }
