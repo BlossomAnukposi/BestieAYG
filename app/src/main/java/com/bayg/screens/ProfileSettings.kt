@@ -47,6 +47,53 @@ fun ProfileSettings(navController: NavController) {
     var notificationsEnabled by remember { mutableStateOf(true) }
 
     val scrollState = rememberScrollState()
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import bayg
+import com.bayg.widgets.Caption
+import com.bayg.widgets.GreenArrowButton
+import com.bayg.widgets.GreenButton
+import com.bayg.widgets.GreyOutlinedCard
+import com.bayg.widgets.Heading2
+import com.bayg.widgets.Heading3
+import com.bayg.widgets.Paragraph
+import com.bayg.widgets.Subtitle
+import com.bayg.widgets.LimitSlider
+import kotlin.math.roundToInt
+
+private const val DEFAULT_SCREEN_TIME_MINUTES = 60f
+private const val MAX_SCREEN_TIME_MINUTES = 180f
+private const val DEFAULT_BLOCK_THRESHOLD_MINUTES = 15f
+private const val MAX_BLOCK_THRESHOLD_MINUTES = 120f
+
+private fun formatMinutes(value: Float): String {
+    val m = value.roundToInt()
+    return if (m < 60) "$m min"
+    else {
+        val h = m / 60
+        val rem = m % 60
+        if (rem == 0) "$h h" else "$h h $rem min"
+    }
+}
+
+@Composable
+fun ProfileSettings(navController: NavController) {
+    var username by remember { mutableStateOf("Your name") }
+    var email by remember { mutableStateOf("you@example.com") }
+    var showPasswordDialog by remember { mutableStateOf(false) }
+    var passwordMasked by remember { mutableStateOf("••••••••") }
+
+    var screenTime by remember { mutableFloatStateOf(DEFAULT_SCREEN_TIME_MINUTES) }
+    var blockThreshold by remember { mutableFloatStateOf(DEFAULT_BLOCK_THRESHOLD_MINUTES) }
+
+    // Keywords state
+    var keywords by remember { mutableStateOf(listOf("Exam", "Deadline")) }
+    var showAddKeywordDialog by remember { mutableStateOf(false) }
+    var newKeywordInput by remember { mutableStateOf("") }
+
+    // Make content scrollable and leave space at bottom so Save button doesn't overlap
+    val scrollState = rememberScrollState()
+    val bottomContentPadding = 120.dp // leave space for fixed button
 
     Column(
         modifier = Modifier
