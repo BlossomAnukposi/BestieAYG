@@ -61,12 +61,12 @@ class MainActivity : ComponentActivity() {
             BAYGTheme {
                 val navController = rememberNavController()
 
-                NavHost(navController = navController, startDestination = "ProfileSettings") {
+                NavHost(navController = navController, startDestination = "dashboard") {
                     composable("onboardingStart") { OnboardingStart(navController) }
                     composable("signIn") { SignIn(navController) }
                     composable("permissions") { Permissions(navController, permissionManager) }
                     composable("appSetup") { AppSetup(navController) }
-                    composable( "dashboard") { Dashboard() }
+                    composable("dashboard") { Dashboard(navController) }
                     composable("ProfileSettings") { ProfileSettings(navController) }
                 }
             }

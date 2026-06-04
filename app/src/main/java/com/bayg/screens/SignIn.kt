@@ -80,6 +80,6 @@ fun SignIn(navController: NavController) {
             .fillMaxSize()
             .padding(bottom = 50.dp)
     ) {
-        GreenButton(navController, "permissions", "Create an Account")
+        GreenButton(navController, "permissions", "Create an Account", color = MaterialTheme.bayg.white)
     }
 }
