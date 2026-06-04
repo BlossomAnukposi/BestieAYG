@@ -1,9 +1,7 @@
 package com.bayg.screens
 
-import android.util.Log
-import android.widget.Button
+import android.content.Intent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,9 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -28,10 +24,16 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
 import androidx.compose.ui.graphics.drawscope.Stroke
-import com.bayg.widgets.Caption
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
+import com.bayg.TouchGrassActivity
+import com.bayg.services.NoAsAService
 import com.bayg.widgets.GreenButton
 import com.bayg.widgets.Heading3
 import com.bayg.widgets.Heading4
@@ -39,42 +41,66 @@ import com.bayg.widgets.Paragraph
 import com.bayg.widgets.SmallInfoCard
 import com.bayg.widgets.Subtitle
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
 @Composable
 fun Dashboard(navController: NavController) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.bayg.black)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 22.dp)
-                .padding(top = 54.dp, bottom = 110.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            TopUsageCard(navController)
-            Spacer(modifier = Modifier.height(42.dp))
-
-            InfoCardsRow()
-            Spacer(modifier = Modifier.height(34.dp))
-
-            Subtitle("Run 14km at a comfortable pace")
-            Spacer(modifier = Modifier.height(54.dp))
-
-            GreenButton(navController, "touchgrass", "Touch Grass")
+    val context = LocalContext.current
+    val messageState = produceState(initialValue = "Loading...") {
+        value = try {
+            NoAsAService.fetchMessage()
+        } catch (e: Exception) {
+            "Error: ${e.message ?: "unknown"}"
         }
+    }
 
-        Box(
-            contentAlignment = Alignment.BottomCenter,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            NavBar(navController)
+    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.bayg.black)) {
+        val current = messageState.value
+        if (current == "Loading...") {
+            CircularProgressIndicator()
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 22.dp)
+                    .padding(top = 54.dp, bottom = 110.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                TopUsageCard(navController)
+                Spacer(modifier = Modifier.height(42.dp))
+
+                InfoCardsRow()
+                Spacer(modifier = Modifier.height(34.dp))
+
+                Column (horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "“${current}”",
+                        style = TextStyle(
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight(400),
+                            fontStyle = FontStyle.Italic,
+                            color = MaterialTheme.bayg.green,
+                            textAlign = TextAlign.Center,
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(54.dp))
+
+                    GreenButton(
+                        onClick = {
+                            context.startActivity(Intent(context, TouchGrassActivity::class.java))
+                        },
+                        "🌿 Touch Grass", color = MaterialTheme.bayg.white
+                    )
+                }
+            }
+
+            Box(
+                contentAlignment = Alignment.BottomCenter,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                NavBar(navController)
+            }
         }
     }
 }

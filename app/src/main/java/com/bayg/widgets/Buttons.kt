@@ -53,6 +53,22 @@ fun GreenButton(navController: NavController, route: String, text: String, heigh
 }
 
 @Composable
+fun GreenButton(onClick: () -> Unit, text: String, height: Dp = 56.dp, color: Color = MaterialTheme.bayg.green) {
+    Button(
+        onClick,
+        colors = ButtonDefaults.buttonColors(containerColor = color),
+        shape = RoundedCornerShape(size = 5.dp),
+        modifier = Modifier
+            .width(334.dp)
+            .height(height)
+    ) { Text(text,
+        color = MaterialTheme.bayg.black,
+        fontSize = 17.sp,
+        fontWeight = FontWeight.Bold,
+    ) }
+}
+
+@Composable
 fun GreenArrowButton(navController: NavController, route: String) {
     TextButton(
         onClick = {navController.navigate(route)},
@@ -135,5 +151,21 @@ fun Toggle(checkedValue: Boolean) {
             uncheckedTrackColor = MaterialTheme.bayg.textGrey
         ),
         modifier = Modifier.width(36.dp)
+    )
+}
+
+@Composable
+fun PermissionToggle(isGranted: Boolean, onToggle: () -> Unit) {
+    Switch(
+        checked = isGranted,
+        onCheckedChange = { onToggle() },
+        colors = SwitchDefaults.colors(
+            checkedThumbColor = MaterialTheme.bayg.black,
+            uncheckedThumbColor = MaterialTheme.bayg.card,
+            checkedTrackColor = MaterialTheme.bayg.green,
+            uncheckedTrackColor = MaterialTheme.bayg.textGrey
+        ),
+        modifier = Modifier.width(36.dp),
+        enabled = !isGranted // Disable toggle once permission is granted (optional)
     )
 }

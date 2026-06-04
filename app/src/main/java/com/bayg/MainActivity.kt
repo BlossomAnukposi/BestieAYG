@@ -1,5 +1,7 @@
 package com.bayg
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import BAYGTheme
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -13,6 +15,7 @@ import com.bayg.screens.OnboardingStart
 import com.bayg.screens.Permissions
 import com.bayg.screens.SignIn
 import com.bayg.screens.Dashboard
+import com.bayg.screens.ProfileSettings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
 import com.bayg.permissions.PermissionManager
@@ -47,6 +50,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -61,20 +65,25 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController = navController, startDestination = "dashboard") {
                     composable("onboardingStart") { OnboardingStart(navController) }
                     composable("signIn") { SignIn(navController) }
-                    composable("permissions") { Permissions(navController) }
+                    composable("permissions") { Permissions(navController, permissionManager) }
                     composable("appSetup") { AppSetup(navController) }
                     composable("dashboard") { Dashboard(navController) }
+                    composable("ProfileSettings") { ProfileSettings(navController) }
                 }
             }
         }
+
+//        findViewById<androidx.cardview.widget.CardView>(R.id.tile_touch_grass)
+//            .setOnClickListener {
+//                startActivity(Intent(this, TouchGrassActivity::class.java))
+//            }
     }
 
-        private fun onLocationPermissionGranted() {
-            // Location logic will be added later
-        }
-
-        private fun onUsageStatsPermissionGranted() {
-            // Usage stats logic will be added later
-        }
+    private fun onLocationPermissionGranted() {
+        // Location logic will be added later
     }
 
+    private fun onUsageStatsPermissionGranted() {
+        // Usage stats logic will be added later
+    }
+}
