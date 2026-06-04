@@ -19,6 +19,7 @@ import com.bayg.screens.ProfileSettings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
 import com.bayg.permissions.PermissionManager
+import com.bayg.services.storage.sync.SyncWorker
 
 class MainActivity : ComponentActivity() {
 
@@ -58,6 +59,9 @@ class MainActivity : ComponentActivity() {
         permissionManager = PermissionManager(this)
         permissionManager.initialize(locationPermissionLauncher, usageStatsLauncher)
 
+        SyncWorker.schedule(this)
+        SyncWorker.runOnce(this)
+
         setContent {
             BAYGTheme {
                 val navController = rememberNavController()
@@ -68,7 +72,7 @@ class MainActivity : ComponentActivity() {
                     composable("permissions") { Permissions(navController, permissionManager) }
                     composable("appSetup") { AppSetup(navController) }
                     composable("dashboard") { Dashboard(navController) }
-                    composable("ProfileSettings") { ProfileSettings(navController) }
+                    composable("settings") { ProfileSettings(navController) }
                 }
             }
         }
