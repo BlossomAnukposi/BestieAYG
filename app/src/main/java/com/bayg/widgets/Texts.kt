@@ -7,9 +7,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import bayg
@@ -90,7 +93,6 @@ fun Heading4(text: String, colour: Color) {
     )
 }
 
-
 @Composable
 fun Subtitle(text: String) {
     Text(
@@ -104,11 +106,11 @@ fun Subtitle(text: String) {
 }
 
 @Composable
-fun Paragraph(text: String, color: Color = MaterialTheme.bayg.white, bold: Boolean = false) {
+fun Paragraph(text: String, color: Color = MaterialTheme.bayg.white, bold: Boolean = false, fontSize: TextUnit = 16.sp) {
     Text(
         text = text,
         style = TextStyle(
-            fontSize = 16.sp,
+            fontSize = fontSize,
             fontWeight = if(bold) FontWeight.Bold else FontWeight.Normal,
             color = color,
         ),
@@ -137,14 +139,15 @@ fun Caption(text: String, color: Color) {
  * Original overload: Caption with Dp width and TextAlign
  */
 @Composable
-fun Caption(text: String, width: Dp = 0.dp, align: TextAlign = TextAlign.Start) {
+fun Caption(text: String, width: Dp = 0.dp, align: TextAlign = TextAlign.Start, fontStyle: FontStyle = FontStyle.Normal) {
     Text(
         text = text,
         style = TextStyle(
             fontSize = 12.sp,
             fontWeight = FontWeight.Normal,
             color = MaterialTheme.bayg.textGrey,
-            textAlign = align
+            textAlign = align,
+            fontStyle = fontStyle
         ),
         softWrap = true,
         modifier = if (width > 0.dp) { Modifier.width(width) } else Modifier
