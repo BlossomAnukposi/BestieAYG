@@ -1,11 +1,18 @@
 package com.bayg.widgets
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -19,8 +26,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -149,5 +160,53 @@ fun SelectableCard(text: String, initialSelected: Boolean = false) {
             ),
             modifier = Modifier.padding(10.dp)
         )
+    }
+}
+
+@Composable
+fun SmallInfoCard(
+    number: String,
+    title: String,
+    body: List<String>,
+    footer: String
+) {
+    Box(
+        modifier = Modifier
+            .width(200.dp)
+            .height(150.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(MaterialTheme.bayg.card)
+            .padding(16.dp)
+    ) {
+        Column {
+            Row(verticalAlignment = Alignment.Top) {
+                Box(
+                    modifier = Modifier
+                        .size(58.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF2B2B2B)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Heading4(number, MaterialTheme.bayg.lightRed)
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+                Paragraph(title, bold = true, fontSize = 20.sp)
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            for (text in body.take(2)) {
+                Text(
+                    text,
+                    color = MaterialTheme.bayg.white,
+                    fontSize = 13.sp,
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = 12.sp
+                )
+            }
+
+            Caption(footer, fontStyle = FontStyle.Italic)
+        }
     }
 }
