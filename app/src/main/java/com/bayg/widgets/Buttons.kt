@@ -137,3 +137,19 @@ fun Toggle(checkedValue: Boolean) {
         modifier = Modifier.width(36.dp)
     )
 }
+
+@Composable
+fun PermissionToggle(isGranted: Boolean, onToggle: () -> Unit) {
+    Switch(
+        checked = isGranted,
+        onCheckedChange = { onToggle() },
+        colors = SwitchDefaults.colors(
+            checkedThumbColor = MaterialTheme.bayg.black,
+            uncheckedThumbColor = MaterialTheme.bayg.card,
+            checkedTrackColor = MaterialTheme.bayg.green,
+            uncheckedTrackColor = MaterialTheme.bayg.textGrey
+        ),
+        modifier = Modifier.width(36.dp),
+        enabled = !isGranted // Disable toggle once permission is granted (optional)
+    )
+}

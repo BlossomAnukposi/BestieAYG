@@ -613,7 +613,7 @@
             },
             "attrs": {
               "text": {
-                "text": "Google Calendar"
+                "text": "Android Local Calendar"
               },
               "body": {
                 "stroke": "#333333",
@@ -709,8 +709,8 @@
             "id": "258c9ac1-ee86-4078-ade7-21443177c971",
             "data": {
               "type": "tm.Actor",
-              "name": "Google Calendar",
-              "description": "External - google.com",
+              "name": "Android Local Calendar",
+              "description": "On-device - Android CalendarContract",
               "isTrustBoundary": false,
               "outOfScope": true,
               "reasonOutOfScope": "External service (calendar.google.com). We do not control Google's infrastructure. Only how our app requests and handles calendar event data is in scope.",
@@ -1324,6 +1324,170 @@
               "cell": "877ae1b0-cc08-4fe7-b08f-db4cb90d5cb7",
               "port": "bcd1c4f5-e0e4-443d-b668-4ecef1455b7b"
             }
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "NL average screen time data",
+              "description": "",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "NL average screen time data"
+            ],
+            "id": "f34f4060-4867-4ee8-99ef-ea8dd1051cbb",
+            "source": {
+              "cell": "f2539d15-b5d0-480d-9cd4-1d2d5f227ab7",
+              "port": "b69f0a44-2563-4e43-8d17-078a5c74c583"
+            },
+            "target": {
+              "cell": "922df735-91af-49dd-80e3-bcc0b95d7837",
+              "port": "b75262f5-60bf-4663-a361-7e6967be538e"
+            },
+            "vertices": []
+          },
+          {
+            "position": {
+              "x": 860,
+              "y": 380
+            },
+            "size": {
+              "width": 112.5,
+              "height": 60
+            },
+            "attrs": {
+              "text": {
+                "text": "CBS StatLine"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": "4 3"
+              }
+            },
+            "visible": true,
+            "shape": "actor",
+            "ports": {
+              "groups": {
+                "top": {
+                  "position": "top",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "position": "right",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "bottom": {
+                  "position": "bottom",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "left": {
+                  "position": "left",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                }
+              },
+              "items": [
+                {
+                  "group": "top",
+                  "id": "b69f0a44-2563-4e43-8d17-078a5c74c583"
+                },
+                {
+                  "group": "right",
+                  "id": "a0334e32-9dd7-4a37-8a19-3ef61599e12f"
+                },
+                {
+                  "group": "bottom",
+                  "id": "d0ef339a-5082-44b4-9927-37ba86b20d58"
+                },
+                {
+                  "group": "left",
+                  "id": "43bb3cb7-4690-4a23-aa09-b2d716a2ce81"
+                }
+              ]
+            },
+            "id": "f2539d15-b5d0-480d-9cd4-1d2d5f227ab7",
+            "zIndex": 11,
+            "data": {
+              "type": "tm.Actor",
+              "name": "CBS StatLine",
+              "description": "External - opendata.cbs.nl",
+              "isTrustBoundary": false,
+              "outOfScope": true,
+              "reasonOutOfScope": "External government open data service (opendata.cbs.nl). We do not control CBS's infrastructure or the accuracy of their published statistics. Only how our app fetches and displays the Dutch national average data is in scope.",
+              "hasOpenThreats": false,
+              "providesAuthentication": false,
+              "threats": []
+            }
           }
         ],
         "description": "Context Diagram to provide an overview of our app BAYG."
@@ -1371,7 +1535,8 @@
                 "5d068fce-0c8c-4d1d-9bb0-5679fbd38f17",
                 "0ecd6c82-a2c9-4627-a544-59ce4c23a086",
                 "dade2af5-f23c-40c6-be90-c8b71ef2c124",
-                "47df9152-1b2b-42ee-b8a5-c6ba84f90439"
+                "47df9152-1b2b-42ee-b8a5-c6ba84f90439",
+                "702ee57e-4004-4971-bcb3-816d25ac3a70"
               ],
               "containedElements": [
                 "984fc639-35f6-46e6-bb75-1267aabcf8ae",
@@ -1632,7 +1797,7 @@
             },
             "attrs": {
               "text": {
-                "text": "Park Open Source Data"
+                "text": "OpenStreetMap / Overpass API"
               },
               "body": {
                 "stroke": "#333333",
@@ -1728,7 +1893,7 @@
             "id": "7fb6b094-f269-45ff-91ec-e4e587fce1e9",
             "data": {
               "type": "tm.Actor",
-              "name": "Park Open Source Data",
+              "name": "OpenStreetMap / Overpass API",
               "description": "",
               "isTrustBoundary": false,
               "outOfScope": false,
@@ -1983,7 +2148,7 @@
             },
             "attrs": {
               "text": {
-                "text": "Google Calendar"
+                "text": "Android Local Calendar"
               },
               "body": {
                 "stroke": "#333333",
@@ -2079,8 +2244,8 @@
             "id": "78c9038a-a9b9-45ca-91b6-421669877bb7",
             "data": {
               "type": "tm.Actor",
-              "name": "Google Calendar",
-              "description": "",
+              "name": "Android Local Calendar",
+              "description": "On-device - Android CalendarContract",
               "isTrustBoundary": false,
               "outOfScope": false,
               "reasonOutOfScope": "",
@@ -3740,6 +3905,60 @@
             ]
           },
           {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "NL average screen time data",
+              "description": "",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": [
+                "75cebe9d-f979-4e66-b980-ba99db88c8bb"
+              ]
+            },
+            "labels": [
+              "NL average screen time data"
+            ],
+            "id": "702ee57e-4004-4971-bcb3-816d25ac3a70",
+            "source": {
+              "cell": "d460d429-cfa0-4daa-9035-57ccffcf17aa",
+              "port": "d87af25e-3b04-4308-b3ab-1c0d3d41369b"
+            },
+            "target": {
+              "cell": "ffe3d3af-2d75-4fc0-94fc-d1f20bed9966",
+              "port": "dc94475c-3544-4daa-83cb-20102704377d"
+            },
+            "vertices": [
+              {
+                "x": 490,
+                "y": 730
+              }
+            ]
+          },
+          {
             "position": {
               "x": 1080,
               "y": 210
@@ -4782,6 +5001,123 @@
                 "button-remove"
               ],
               "name": null
+            }
+          },
+          {
+            "position": {
+              "x": 120,
+              "y": 850
+            },
+            "size": {
+              "width": 112.5,
+              "height": 60
+            },
+            "attrs": {
+              "text": {
+                "text": "CBS StatLine"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "actor",
+            "ports": {
+              "groups": {
+                "top": {
+                  "position": "top",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "position": "right",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "bottom": {
+                  "position": "bottom",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "left": {
+                  "position": "left",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                }
+              },
+              "items": [
+                {
+                  "group": "top",
+                  "id": "d87af25e-3b04-4308-b3ab-1c0d3d41369b"
+                },
+                {
+                  "group": "right",
+                  "id": "4fe1e6a6-a63a-4283-a786-d319c982f294"
+                },
+                {
+                  "group": "bottom",
+                  "id": "28c26cb2-ccba-425a-a0fd-ed6e786538db"
+                },
+                {
+                  "group": "left",
+                  "id": "08900884-bbae-4609-98fa-0ce0a1fabf47"
+                }
+              ]
+            },
+            "id": "d460d429-cfa0-4daa-9035-57ccffcf17aa",
+            "zIndex": 21,
+            "data": {
+              "type": "tm.Actor",
+              "name": "CBS StatLine",
+              "description": "",
+              "isTrustBoundary": false,
+              "outOfScope": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "providesAuthentication": false,
+              "threats": []
             }
           }
         ],

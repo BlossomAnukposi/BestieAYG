@@ -16,6 +16,7 @@
     <!-- Background service -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <!-- Required for the app to make any API calls -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -41,6 +42,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".TouchGrassActivity"
+            android:exported="false" />
+
+        <!-- Foreground service that periodically reads UsageStatsManager. -->
+        <!-- foregroundServiceType="dataSync" is required for targetSdk >= 34 (Android 14+). -->
+        <service
+            android:name=".services.BackgroundService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
     </application>
 
 </manifest>

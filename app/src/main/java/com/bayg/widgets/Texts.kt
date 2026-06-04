@@ -1,22 +1,12 @@
 package com.bayg.widgets
 
-import android.graphics.fonts.Font
-import android.icu.number.IntegerWidth
-import android.icu.text.CaseMap
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.R
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -125,6 +115,27 @@ fun Paragraph(text: String, color: Color = MaterialTheme.bayg.white, bold: Boole
     )
 }
 
+/**
+ * Overload: Caption with Color as second argument
+ */
+@Composable
+fun Caption(text: String, color: Color) {
+    Text(
+        text = text,
+        style = TextStyle(
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Normal,
+            color = color,
+            textAlign = TextAlign.Start
+        ),
+        softWrap = true,
+        modifier = Modifier
+    )
+}
+
+/**
+ * Original overload: Caption with Dp width and TextAlign
+ */
 @Composable
 fun Caption(text: String, width: Dp = 0.dp, align: TextAlign = TextAlign.Start) {
     Text(
@@ -136,6 +147,6 @@ fun Caption(text: String, width: Dp = 0.dp, align: TextAlign = TextAlign.Start) 
             textAlign = align
         ),
         softWrap = true,
-        modifier = if (width > 0.dp) {Modifier.width(width)} else Modifier
+        modifier = if (width > 0.dp) { Modifier.width(width) } else Modifier
     )
 }
