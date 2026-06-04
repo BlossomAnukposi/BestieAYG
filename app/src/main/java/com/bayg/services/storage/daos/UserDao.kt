@@ -20,9 +20,19 @@ interface UserDao {
     @Query("SELECT * FROM users WHERE email = :email LIMIT 1")
     suspend fun getByEmail(email: String): User?
 
+    /**
+     * IMPORTANT! Make sure you call SyncWorker.runOnce everytime you have made an insert or update
+     * call from the Room Dao. This reduces the chances of abusers taking advantage of
+     * sync time
+     */
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(user: User): Long
 
+    /**
+     * IMPORTANT! Make sure you call SyncWorker.runOnce everytime you have made an insert or update
+     * call from the Room Dao. This reduces the chances of abusers taking advantage of
+     * sync time
+     */
     @Update
     suspend fun update(user: User)
 

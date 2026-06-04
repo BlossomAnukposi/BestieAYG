@@ -16,6 +16,7 @@ import com.bayg.screens.Dashboard
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
 import com.bayg.permissions.PermissionManager
+import com.bayg.services.storage.sync.SyncWorker
 
 class MainActivity : ComponentActivity() {
 
@@ -53,6 +54,9 @@ class MainActivity : ComponentActivity() {
 
         permissionManager = PermissionManager(this)
         permissionManager.initialize(locationPermissionLauncher, usageStatsLauncher)
+
+        SyncWorker.schedule(this)
+        SyncWorker.runOnce(this)
 
         setContent {
             BAYGTheme {

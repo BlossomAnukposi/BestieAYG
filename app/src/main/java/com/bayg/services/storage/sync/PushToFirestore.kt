@@ -24,13 +24,15 @@ class PushToFirestore (db: AppDatabase) : SyncRepository(db) {
     }
 
     suspend fun pushBlockEvent(event: BlockEvent) {
-        Firebase.firestore.collection("block_events").add(
-            mapOf(
-                "blockDurationMinutes" to event.blockDurationMinutes,
-                "triggeredAt" to event.triggeredAt,
-                "userId" to event.userId
+        Firebase.firestore.collection("block_events")
+            .add(
+                mapOf(
+                    "blockDurationMinutes" to event.blockDurationMinutes,
+                    "triggeredAt" to event.triggeredAt,
+                    "userId" to event.userId
+                )
             )
-        ).await()
+            .await()
     }
 
     suspend fun pushStreak(streak: Streak) {

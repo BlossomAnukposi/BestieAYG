@@ -19,6 +19,26 @@ interface BlockEventDao {
     """)
     suspend fun getBlockEventsInRange(userId: String, fromMs: Long, toMs: Long): List<BlockEvent>
 
+    @Query("""
+        SELECT * FROM block_events
+        WHERE userId = :userId
+          AND syncedAt IS NULL
+        ORDER BY triggeredAt ASC
+    """)
+    suspend fun getUnsyncedBlockEvents(userId: String): List<BlockEvent>
+
+    @Query("""
+        UPDATE block_events
+        SET syncedAt = :syncedAt
+        WHERE id = :eventId
+    """)
+    suspend fun markSynced(eventId: Long, syncedAt: Long)
+
+    /**
+     * IMPORTANT! Make sure you call SyncWorker.runOnce everytime you have made an insert or update
+     * call from the Room Dao. This reduces the chances of abusers taking advantage of
+     * sync time
+     */
     @Insert
     suspend fun insert(event: BlockEvent): Long
 

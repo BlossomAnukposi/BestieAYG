@@ -47,8 +47,8 @@ fun NavButton(name: String, route: String, navController: NavController) {
         "Settings" to Pair
             (com.bayg.R.drawable.settings, com.bayg.R.drawable.settingsgreen))
 
-    if(!types.keys.contains(name)) {
-        throw IllegalArgumentException("Invalid type provided")
+    require(types.keys.contains(name)) {
+        "Invalid type provided"
     }
 
     Column (

@@ -21,6 +21,7 @@ data class BlockEvent(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val firebaseId: String = "",
+    val syncedAt: Long? = null,
     val userId: String,
     val triggeredAt: Long = System.currentTimeMillis(),
     val blockDurationMinutes: Int,
