@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity() {
                     composable("signIn") { SignIn(navController) }
                     composable("permissions") { Permissions(navController, permissionManager) }
                     composable("appSetup") { AppSetup(navController) }
-                    composable("dashboard") { Dashboard() }
+                    composable("dashboard") { Dashboard(navController) }
                     composable("settings") { ProfileSettings(navController) }
                 }
             }
