@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -63,7 +62,6 @@ fun ProfileSettings(navController: NavController) {
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
-        // Profile card unchanged (single card)
         OutlinedCard(
             modifier = Modifier
                 .fillMaxWidth()
@@ -147,7 +145,7 @@ fun ProfileSettings(navController: NavController) {
             )
         }
 
-        // ===== BEHAVIOUR: single card with rows and dividers =====
+        // ===== BEHAVIOUR =====
         SectionHeader("Behaviour")
 
         SectionCard {
@@ -170,7 +168,7 @@ fun ProfileSettings(navController: NavController) {
             )
         }
 
-        // ===== ACCOUNT: single card with rows and dividers =====
+        // ===== ACCOUNT =====
         SectionHeader("Account")
 
         SectionCard {
@@ -196,7 +194,7 @@ fun ProfileSettings(navController: NavController) {
 }
 
 @Composable
-private fun SectionHeader(title: String) {
+fun SectionHeader(title: String) {
     Text(
         text = title,
         fontSize = 16.sp,
@@ -208,7 +206,7 @@ private fun SectionHeader(title: String) {
 
 /** A card wrapper that applies the darker outline and internal padding, used per-section */
 @Composable
-private fun SectionCard(content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit) {
+fun SectionCard(content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit) {
     OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -230,7 +228,7 @@ private fun SectionCard(content: @Composable androidx.compose.foundation.layout.
 
 /** A single clickable setting row with optional value and right arrow */
 @Composable
-private fun SettingItem(
+fun SettingItem(
     label: String,
     value: String?,
     destructive: Boolean = false,
@@ -265,7 +263,7 @@ private fun SettingItem(
 }
 
 @Composable
-private fun SettingItemToggle(
+fun SettingItemToggle(
     label: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
@@ -292,7 +290,7 @@ private fun SettingItemToggle(
 }
 
 @Composable
-private fun AccountSecurityInfo() {
+fun AccountSecurityInfo() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
