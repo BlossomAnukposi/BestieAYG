@@ -27,8 +27,6 @@ data class UserSettings(
 
     val dailyLimitMinutes: Int = 45,
     val blockDurationMinutes: Int = 30,
-    val preEventLimitMinutes: Int = 20,
-    val preEventLookAheadDays: Int = 3,
 
     val touchGrassModeEnabled: Boolean = true,
     val locationEnabled: Boolean = true,

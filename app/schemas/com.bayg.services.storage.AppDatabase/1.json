@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "b47bf75715773758acd9d2cb08d2480b",
+    "identityHash": "32083224a884e7a141d7eee49eb129ae",
     "entities": [
       {
         "tableName": "users",
@@ -64,7 +64,7 @@
       },
       {
         "tableName": "user_settings",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userId` TEXT NOT NULL, `dailyLimitMinutes` INTEGER NOT NULL, `blockDurationMinutes` INTEGER NOT NULL, `preEventLimitMinutes` INTEGER NOT NULL, `preEventLookAheadDays` INTEGER NOT NULL, `touchGrassModeEnabled` INTEGER NOT NULL, `locationEnabled` INTEGER NOT NULL, `notificationsEnabled` INTEGER NOT NULL, FOREIGN KEY(`userId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userId` TEXT NOT NULL, `dailyLimitMinutes` INTEGER NOT NULL, `blockDurationMinutes` INTEGER NOT NULL, `touchGrassModeEnabled` INTEGER NOT NULL, `locationEnabled` INTEGER NOT NULL, `notificationsEnabled` INTEGER NOT NULL, FOREIGN KEY(`userId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -87,18 +87,6 @@
           {
             "fieldPath": "blockDurationMinutes",
             "columnName": "blockDurationMinutes",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "preEventLimitMinutes",
-            "columnName": "preEventLimitMinutes",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "preEventLookAheadDays",
-            "columnName": "preEventLookAheadDays",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -300,7 +288,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b47bf75715773758acd9d2cb08d2480b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '32083224a884e7a141d7eee49eb129ae')"
     ]
   }
 }

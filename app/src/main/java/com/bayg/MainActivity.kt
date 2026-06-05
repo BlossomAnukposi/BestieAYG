@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
                     composable("permissions") { Permissions(navController, permissionManager) }
                     composable("appSetup") { AppSetup(navController) }
                     composable("dashboard") { Dashboard(navController) }
-                    composable("settings") { ProfileSettings(navController) }
+                    composable("settings") { ProfileSettings(navController, userId = "WHcFiXf6hfZkPhMamSsd") }
                 }
             }
         }
