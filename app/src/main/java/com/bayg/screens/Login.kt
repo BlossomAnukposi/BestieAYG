@@ -18,11 +18,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import bayg
+import com.bayg.auth.AuthNavigation
 import com.bayg.auth.AuthViewModel
 import com.bayg.widgets.BaygOutlinedTextField
 import com.bayg.widgets.GreenArrowButton
@@ -35,12 +37,14 @@ import com.bayg.widgets.Subtitle
 fun Login(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     LaunchedEffect(authViewModel.signInSucceeded, authViewModel.signInNeedsVerification) {
         when {
             authViewModel.signInSucceeded -> {
                 authViewModel.resetSignInState()
-                navController.navigate("dashboard") {
+                val destination = AuthNavigation.resolvePostSignInDestination(context)
+                navController.navigate(destination) {
                     popUpTo("onboardingStart") { inclusive = true }
                 }
             }
@@ -97,11 +101,22 @@ fun Login(navController: NavController, authViewModel: AuthViewModel = viewModel
             Text(message, color = MaterialTheme.bayg.lightRed)
         }
 
+        authViewModel.infoMessage?.let { message ->
+            Text(message, color = MaterialTheme.bayg.textGrey)
+        }
+
         GreenButton(
             onClick = { authViewModel.signIn(email, password) },
             text = if (authViewModel.isLoading) "Signing in..." else "Log in",
             enabled = !authViewModel.isLoading,
         )
+
+        TextButton(
+            onClick = { authViewModel.sendPasswordReset(email) },
+            enabled = !authViewModel.isLoading,
+        ) {
+            Text("Forgot password?", color = MaterialTheme.bayg.textGrey)
+        }
 
         TextButton(onClick = { navController.navigate("signUp") }) {
             Text("New here? Create an account", color = MaterialTheme.bayg.textGrey)

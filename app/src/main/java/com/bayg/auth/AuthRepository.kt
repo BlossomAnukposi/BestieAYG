@@ -22,6 +22,29 @@ class AuthRepository(
 ) {
     val currentUserEmail: String? get() = authenticator.currentUser?.email
 
+    suspend fun getProfile(): ProfileUi? = withContext(Dispatchers.IO) {
+        val fbUser = authenticator.currentUser ?: return@withContext null
+        val user = db.userDao().getByFirebaseUid(fbUser.uid)
+        val displayName = user?.let { "${it.firstName} ${it.lastName}".trim().ifBlank { it.firstName } }
+            ?: fbUser.displayName?.trim()?.takeIf { it.isNotEmpty() }
+            ?: "User"
+        val email = user?.email ?: fbUser.email.orEmpty()
+        val initial = displayName.firstOrNull()?.uppercaseChar()?.toString() ?: "?"
+        ProfileUi(displayName = displayName, email = email, initial = initial)
+    }
+
+    fun signOut() {
+        authenticator.signOut()
+    }
+
+    suspend fun sendPasswordReset(email: String): Result<Unit> = withContext(Dispatchers.IO) {
+        runCatching {
+            val trimmedEmail = email.trim()
+            require(isValidEmail(trimmedEmail)) { "Enter your email address first." }
+            authenticator.sendPasswordReset(trimmedEmail)
+        }
+    }
+
     suspend fun signUp(name: String, email: String, password: String): Result<Unit> = withContext(Dispatchers.IO) {
         runCatching {
             val trimmedName = name.trim()

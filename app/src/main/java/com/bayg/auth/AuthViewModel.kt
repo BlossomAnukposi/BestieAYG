@@ -19,6 +19,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     var errorMessage by mutableStateOf<String?>(null)
         private set
 
+    var infoMessage by mutableStateOf<String?>(null)
+        private set
+
     var signUpSucceeded by mutableStateOf(false)
         private set
 
@@ -37,6 +40,29 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     fun clearError() {
         errorMessage = null
+        infoMessage = null
+    }
+
+    fun sendPasswordReset(email: String) {
+        if (isLoading) return
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = null
+            infoMessage = null
+
+            repository.sendPasswordReset(email)
+                .onSuccess {
+                    infoMessage = "If an account exists for that email, we sent a reset link."
+                }
+                .onFailure { error ->
+                    errorMessage = when (error) {
+                        is IllegalArgumentException -> error.message
+                        else -> "Could not send reset email. Try again."
+                    }
+                }
+
+            isLoading = false
+        }
     }
 
     fun resetSignUpState() {

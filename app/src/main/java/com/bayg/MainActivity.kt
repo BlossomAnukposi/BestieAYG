@@ -24,8 +24,8 @@ import com.bayg.screens.Permissions
 import com.bayg.screens.ProfileSettings
 import com.bayg.screens.SignUp
 import com.bayg.screens.VerifyEmail
+import com.bayg.auth.AuthNavigation
 import com.bayg.services.storage.sync.SyncWorker
-import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : ComponentActivity() {
 
@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
                 var startDestination by remember { mutableStateOf<String?>(null) }
 
                 LaunchedEffect(Unit) {
-                    startDestination = resolveStartDestination()
+                    startDestination = AuthNavigation.resolveStartDestination(this@MainActivity)
                 }
 
                 if (startDestination != null) {
@@ -91,15 +91,6 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
-        }
-    }
-
-    private fun resolveStartDestination(): String {
-        val user = FirebaseAuth.getInstance().currentUser
-        return when {
-            user == null -> "onboardingStart"
-            !user.isEmailVerified -> "verifyEmail"
-            else -> "dashboard"
         }
     }
 
