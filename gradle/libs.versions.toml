@@ -8,10 +8,11 @@ appcompat = "1.6.1"
 material = "1.10.0"
 activity = "1.8.0"
 constraintlayout = "2.1.4"
+roomCompiler = "2.8.4"
 playServicesLocation = "21.3.0"
 playServicesMaps = "20.0.0"
 googleServices = "4.4.2"
-firebaseBom = "33.5.1"
+firebaseBom = "34.14.0"
 securityCrypto = "1.1.0-alpha06"
 biometric = "1.1.0"
 fragmentKtx = "1.8.5"
@@ -25,6 +26,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomCompiler" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 
