@@ -116,7 +116,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 .onFailure { error ->
                     errorMessage = when (error) {
                         is IllegalArgumentException -> error.message
-                        else -> Authenticator.mapSignInError(error)
+                        else -> Authenticator.SIGN_IN_ERROR_MESSAGE
                     }
                 }
 

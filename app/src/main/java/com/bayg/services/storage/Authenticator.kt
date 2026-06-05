@@ -46,8 +46,7 @@ class Authenticator(private val auth: FirebaseAuth = FirebaseAuth.getInstance())
 
     companion object {
         const val MIN_PASSWORD_LENGTH = 12
-
-        fun mapSignInError(e: Throwable): String = "Invalid email or password."
+        const val SIGN_IN_ERROR_MESSAGE = "Invalid email or password."
 
         fun mapSignUpError(e: Throwable): String {
             val code = (e as? FirebaseAuthException)?.errorCode
