@@ -26,11 +26,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import bayg
+import com.bayg.auth.OnboardingStore
+import com.google.firebase.auth.FirebaseAuth
 import com.bayg.widgets.Caption
 import com.bayg.widgets.GreenArrowButton
 import com.bayg.widgets.GreenButton
@@ -63,6 +66,7 @@ private const val DEFAULT_BLOCK_TIME = 30f
 
 @Composable
 fun AppSetup(navController: NavController) {
+    val context = LocalContext.current
     var isPreset by remember { mutableStateOf(true) }
     var limitValue by remember { mutableFloatStateOf(DEFAULT_APP_LIMIT) }
     var blockValue by remember { mutableFloatStateOf(DEFAULT_BLOCK_TIME) }
@@ -114,7 +118,17 @@ fun AppSetup(navController: NavController) {
             .fillMaxSize()
             .padding(bottom = 50.dp)
     ) {
-        GreenButton(navController, "onboardingStart", "All done! Let's go")
+        GreenButton(
+            onClick = {
+                FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
+                    OnboardingStore.markComplete(context, uid)
+                }
+                navController.navigate("dashboard") {
+                    popUpTo("onboardingStart") { inclusive = true }
+                }
+            },
+            text = "All done! Let's go",
+        )
     }
 }
 

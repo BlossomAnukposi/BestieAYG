@@ -72,7 +72,7 @@ fun Permissions(navController: NavController, permissionManager: PermissionManag
                     .padding(top = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                GreenArrowButton(navController, "signIn")
+                GreenArrowButton(navController, "verifyEmail")
                 Caption("Step 2 of 3")
             }
             ProgressBar(MaterialTheme.bayg.green, PROGRESS_BAR_67_PERCENT)

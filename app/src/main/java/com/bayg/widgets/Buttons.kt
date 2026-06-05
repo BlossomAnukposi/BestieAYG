@@ -53,9 +53,16 @@ fun GreenButton(navController: NavController, route: String, text: String, heigh
 }
 
 @Composable
-fun GreenButton(onClick: () -> Unit, text: String, height: Dp = 56.dp, color: Color = MaterialTheme.bayg.green) {
+fun GreenButton(
+    onClick: () -> Unit,
+    text: String,
+    height: Dp = 56.dp,
+    color: Color = MaterialTheme.bayg.green,
+    enabled: Boolean = true,
+) {
     Button(
-        onClick,
+        onClick = onClick,
+        enabled = enabled,
         colors = ButtonDefaults.buttonColors(containerColor = color),
         shape = RoundedCornerShape(size = 5.dp),
         modifier = Modifier
