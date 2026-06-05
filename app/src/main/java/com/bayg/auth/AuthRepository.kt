@@ -1,9 +1,11 @@
 package com.bayg.auth
 
 import android.content.Context
+import com.bayg.security.SecurePrefs
 import com.bayg.services.storage.AppDatabase
 import com.bayg.services.storage.Authenticator
 import com.bayg.services.storage.entities.User
+import com.bayg.services.storage.entities.UserSettings
 import com.bayg.services.storage.sync.PushToFirestore
 import com.bayg.services.storage.sync.SyncWorker
 import com.google.firebase.auth.FirebaseUser
@@ -35,6 +37,9 @@ class AuthRepository(
 
     fun signOut() {
         authenticator.signOut()
+        val prefs = SecurePrefs(context.applicationContext)
+        prefs.remove(SecurePrefs.Key.LAST_SIGNED_IN_UID)
+        prefs.remove(SecurePrefs.Key.SETTINGS_JSON_CACHE)
     }
 
     suspend fun sendPasswordReset(email: String): Result<Unit> = withContext(Dispatchers.IO) {
@@ -66,6 +71,8 @@ class AuthRepository(
                 lastName = lastName,
             )
             val roomId = db.userDao().insert(user)
+            ensureDefaultSettings(roomId)
+            rememberSignedInUid(fbUser.uid)
             PushToFirestore(db).pushProfile(fbUser, user.copy(id = roomId))
             SyncWorker.runOnce(context)
         }
@@ -79,6 +86,7 @@ class AuthRepository(
 
             val fbUser = authenticator.signIn(trimmedEmail, password)
             ensureLocalUser(fbUser, trimmedEmail)
+            rememberSignedInUid(fbUser.uid)
             SyncWorker.runOnce(context)
 
             if (fbUser.isEmailVerified) SignInResult.Verified else SignInResult.NeedsVerification
@@ -106,7 +114,20 @@ class AuthRepository(
             lastName = lastName,
         )
         val roomId = db.userDao().insert(user)
+        ensureDefaultSettings(roomId)
         PushToFirestore(db).pushProfile(fbUser, user.copy(id = roomId))
+    }
+
+    private suspend fun ensureDefaultSettings(roomUserId: Long) {
+        val userId = roomUserId.toString()
+        if (db.userSettingsDao().getByUserId(userId) == null) {
+            db.userSettingsDao().insert(UserSettings(userId = userId))
+        }
+    }
+
+    private fun rememberSignedInUid(uid: String) {
+        SecurePrefs(context.applicationContext)
+            .putString(SecurePrefs.Key.LAST_SIGNED_IN_UID, uid)
     }
 
     private fun splitName(fullName: String): Pair<String, String> {
