@@ -11,7 +11,7 @@ constraintlayout = "2.1.4"
 roomCompiler = "2.8.4"
 playServicesLocation = "21.3.0"
 playServicesMaps = "20.0.0"
-googleServices = "4.4.2"
+googleServices = "4.4.4"
 firebaseBom = "34.14.0"
 securityCrypto = "1.1.0-alpha06"
 biometric = "1.1.0"
@@ -33,8 +33,8 @@ play-services-maps = { group = "com.google.android.gms", name = "play-services-m
 # Firebase. The BoM keeps all firebase-* versions aligned, so the
 # individual libraries below intentionally omit version.ref.
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
-firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx" }
-firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 firebase-appcheck-playintegrity = { group = "com.google.firebase", name = "firebase-appcheck-playintegrity" }
 firebase-appcheck-debug = { group = "com.google.firebase", name = "firebase-appcheck-debug" }
 

@@ -3,7 +3,6 @@ package com.bayg
 import android.annotation.SuppressLint
 import android.os.Bundle
 import BAYGTheme
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -12,9 +11,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.bayg.auth.AuthNavigation
+import com.bayg.auth.BiometricUnlockGate
+import com.bayg.auth.requiresBiometricUnlock
 import com.bayg.permissions.PermissionManager
 import com.bayg.screens.AppSetup
 import com.bayg.screens.Dashboard
@@ -24,10 +27,9 @@ import com.bayg.screens.Permissions
 import com.bayg.screens.ProfileSettings
 import com.bayg.screens.SignUp
 import com.bayg.screens.VerifyEmail
-import com.bayg.auth.AuthNavigation
 import com.bayg.services.storage.sync.SyncWorker
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
 
     private lateinit var permissionManager: PermissionManager
 
@@ -70,24 +72,37 @@ class MainActivity : ComponentActivity() {
             BAYGTheme {
                 val navController = rememberNavController()
                 var startDestination by remember { mutableStateOf<String?>(null) }
+                var biometricUnlocked by remember { mutableStateOf(false) }
 
                 LaunchedEffect(Unit) {
                     startDestination = AuthNavigation.resolveStartDestination(this@MainActivity)
+                    if (!requiresBiometricUnlock(this@MainActivity)) {
+                        biometricUnlocked = true
+                    }
                 }
 
-                if (startDestination != null) {
-                    NavHost(
-                        navController = navController,
-                        startDestination = startDestination!!,
-                    ) {
-                        composable("onboardingStart") { OnboardingStart(navController) }
-                        composable("signUp") { SignUp(navController) }
-                        composable("login") { Login(navController) }
-                        composable("verifyEmail") { VerifyEmail(navController) }
-                        composable("permissions") { Permissions(navController, permissionManager) }
-                        composable("appSetup") { AppSetup(navController) }
-                        composable("dashboard") { Dashboard(navController) }
-                        composable("settings") { ProfileSettings(navController) }
+                when {
+                    startDestination == null -> Unit
+                    requiresBiometricUnlock(this@MainActivity) && !biometricUnlocked -> {
+                        BiometricUnlockGate(
+                            activity = this@MainActivity,
+                            onUnlocked = { biometricUnlocked = true },
+                        )
+                    }
+                    else -> {
+                        NavHost(
+                            navController = navController,
+                            startDestination = startDestination!!,
+                        ) {
+                            composable("onboardingStart") { OnboardingStart(navController) }
+                            composable("signUp") { SignUp(navController) }
+                            composable("login") { Login(navController) }
+                            composable("verifyEmail") { VerifyEmail(navController) }
+                            composable("permissions") { Permissions(navController, permissionManager) }
+                            composable("appSetup") { AppSetup(navController) }
+                            composable("dashboard") { Dashboard(navController) }
+                            composable("settings") { ProfileSettings(navController) }
+                        }
                     }
                 }
             }

@@ -19,11 +19,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import bayg
 import com.bayg.auth.OnboardingStore
+import com.bayg.services.storage.UserSettingsViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.bayg.widgets.Caption
 import com.bayg.widgets.GreenArrowButton
@@ -65,12 +68,22 @@ private const val DEFAULT_APP_LIMIT = 60f
 private const val DEFAULT_BLOCK_TIME = 30f
 
 @Composable
-fun AppSetup(navController: NavController) {
+fun AppSetup(
+    navController: NavController,
+    settingsViewModel: UserSettingsViewModel = viewModel(),
+) {
     val context = LocalContext.current
     var isPreset by remember { mutableStateOf(true) }
     var limitValue by remember { mutableFloatStateOf(DEFAULT_APP_LIMIT) }
     var blockValue by remember { mutableFloatStateOf(DEFAULT_BLOCK_TIME) }
     var customKeywords by remember { mutableStateOf(listOf<String>()) }
+
+    LaunchedEffect(settingsViewModel.settings) {
+        settingsViewModel.settings?.let { settings ->
+            limitValue = settings.dailyLimitMinutes.toFloat()
+            blockValue = settings.blockDurationMinutes.toFloat()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -120,14 +133,20 @@ fun AppSetup(navController: NavController) {
     ) {
         GreenButton(
             onClick = {
-                FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
-                    OnboardingStore.markComplete(context, uid)
-                }
-                navController.navigate("dashboard") {
-                    popUpTo("onboardingStart") { inclusive = true }
+                settingsViewModel.saveLimits(
+                    dailyLimitMinutes = limitValue.roundToInt(),
+                    blockDurationMinutes = blockValue.roundToInt(),
+                ) {
+                    FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
+                        OnboardingStore.markComplete(context, uid)
+                    }
+                    navController.navigate("dashboard") {
+                        popUpTo("onboardingStart") { inclusive = true }
+                    }
                 }
             },
-            text = "All done! Let's go",
+            text = if (settingsViewModel.isSaving) "Saving..." else "All done! Let's go",
+            enabled = !settingsViewModel.isSaving,
         )
     }
 }
