@@ -63,7 +63,7 @@ fun OnboardingStart(navController: NavController) {
             .padding(bottom = 50.dp)
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            GreenButton(navController, "signIn", "Get Started →")
+            GreenButton(navController, "signUp", "Get Started →")
             Caption("v1.0.0 · no cap, all accountability", align = TextAlign.Center)
         }
     }
