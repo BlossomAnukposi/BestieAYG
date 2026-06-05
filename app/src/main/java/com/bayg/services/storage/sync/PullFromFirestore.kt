@@ -9,34 +9,47 @@ import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
 
 class PullFromFirestore(db: AppDatabase) : SyncRepository(db) {
+
     suspend fun pullAll(localUserId: Long) {
         pullProfile(localUserId)
-        pullBlockEvents(localUserId)
-        pullStreak(localUserId)
+        pullBlockEvents()
+        pullStreak()
     }
 
+    /**
+     * Reads only the signed-in user's document. Listing the whole users
+     * collection is denied by the owner-only security rules.
+     */
     private suspend fun pullProfile(localUserId: Long) {
-        val snaps = Firebase.firestore.collection("users").get().await()
+        val snap = userDoc().get().await()
+        if (!snap.exists()) return
 
-        snaps.documents.forEach { doc ->
-            val user = User(
-                id = localUserId,
-                firstName = doc.getString("firstName") ?: "",
-                lastName = doc.getString("lastName") ?: "",
-                email = doc.getString("email") ?: ""
-            )
+        val existing = db.userDao().getByFirebaseUid(uid)
+        val user = User(
+            id = existing?.id ?: if (localUserId > 0) localUserId else 0,
+            firebaseUid = uid,
+            firstName = snap.getString("firstName") ?: "",
+            lastName = snap.getString("lastName") ?: "",
+            email = snap.getString("email") ?: "",
+            createdAt = snap.getLong("createdAt") ?: System.currentTimeMillis(),
+        )
+
+        if (existing != null) {
+            db.userDao().update(user.copy(id = existing.id))
+        } else {
             db.userDao().insert(user)
         }
     }
 
-    private suspend fun pullBlockEvents(localUserId: Long) {
+    private suspend fun pullBlockEvents() {
         val snaps = Firebase.firestore.collection("block_events")
-            .whereEqualTo("userId", userDoc())
-            .orderBy("triggeredAt").get().await()
+            .whereEqualTo("userId", uid)
+            .orderBy("triggeredAt")
+            .get()
+            .await()
 
         snaps.documents.forEach { doc ->
             val event = BlockEvent(
-                id = localUserId,
                 firebaseId = doc.id,
                 userId = uid,
                 triggeredAt = doc.getLong("triggeredAt") ?: return@forEach,
@@ -46,18 +59,23 @@ class PullFromFirestore(db: AppDatabase) : SyncRepository(db) {
         }
     }
 
-    private suspend fun pullStreak(localUserId: Long) {
+    private suspend fun pullStreak() {
         val snap = Firebase.firestore.collection("streaks")
-            .whereEqualTo("userId", userDoc())
-            .limit(1).get().await().documents.firstOrNull()
+            .whereEqualTo("userId", uid)
+            .limit(1)
+            .get()
+            .await()
+            .documents
+            .firstOrNull()
             ?: return
 
+        val existing = db.streakDao().getByUserId(uid)
         val streak = Streak(
-            id = localUserId,
+            id = existing?.id ?: 0,
             firebaseId = snap.id,
             userId = uid,
             currentStreak = (snap.getLong("currentStreak") ?: 0).toInt(),
-            lastStreakDate = snap.getLong("lastStreakDate")
+            lastStreakDate = snap.getLong("lastStreakDate"),
         )
         db.streakDao().insert(streak)
     }
