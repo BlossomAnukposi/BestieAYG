@@ -25,6 +25,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,17 +37,32 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import bayg
 import com.bayg.R
+import com.bayg.auth.ProfileViewModel
 
 @Composable
-fun ProfileSettings(navController: NavController) {
+fun ProfileSettings(
+    navController: NavController,
+    profileViewModel: ProfileViewModel = viewModel(),
+) {
     var touchGrassMode by remember { mutableStateOf(true) }
     var locationEnabled by remember { mutableStateOf(true) }
     var notificationsEnabled by remember { mutableStateOf(true) }
 
     val scrollState = rememberScrollState()
+    val profile = profileViewModel.profile
+
+    LaunchedEffect(profileViewModel.signedOut) {
+        if (profileViewModel.signedOut) {
+            navController.navigate("onboardingStart") {
+                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                launchSingleTop = true
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -91,7 +107,7 @@ fun ProfileSettings(navController: NavController) {
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "B",
+                            text = profile?.initial ?: "?",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.bayg.black
@@ -100,13 +116,13 @@ fun ProfileSettings(navController: NavController) {
 
                     Column {
                         Text(
-                            text = "Blossom A.",
+                            text = profile?.displayName ?: "Loading...",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.bayg.white
                         )
                         Text(
-                            text = "blossom@student.mihistenden.com",
+                            text = profile?.email ?: "",
                             fontSize = 12.sp,
                             color = MaterialTheme.bayg.textGrey
                         )
@@ -187,7 +203,7 @@ fun ProfileSettings(navController: NavController) {
                 label = "Log Out",
                 value = null,
                 destructive = true,
-                onClick = { /* TODO */ }
+                onClick = { profileViewModel.signOut() }
             )
         }
 
