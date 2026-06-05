@@ -6,18 +6,20 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -37,7 +39,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import bayg
 import com.bayg.R
-import androidx.compose.material3.MaterialTheme
 
 @Composable
 fun ProfileSettings(navController: NavController) {
@@ -46,53 +47,6 @@ fun ProfileSettings(navController: NavController) {
     var notificationsEnabled by remember { mutableStateOf(true) }
 
     val scrollState = rememberScrollState()
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import bayg
-import com.bayg.widgets.Caption
-import com.bayg.widgets.GreenArrowButton
-import com.bayg.widgets.GreenButton
-import com.bayg.widgets.GreyOutlinedCard
-import com.bayg.widgets.Heading2
-import com.bayg.widgets.Heading3
-import com.bayg.widgets.Paragraph
-import com.bayg.widgets.Subtitle
-import com.bayg.widgets.LimitSlider
-import kotlin.math.roundToInt
-
-private const val DEFAULT_SCREEN_TIME_MINUTES = 60f
-private const val MAX_SCREEN_TIME_MINUTES = 180f
-private const val DEFAULT_BLOCK_THRESHOLD_MINUTES = 15f
-private const val MAX_BLOCK_THRESHOLD_MINUTES = 120f
-
-private fun formatMinutes(value: Float): String {
-    val m = value.roundToInt()
-    return if (m < 60) "$m min"
-    else {
-        val h = m / 60
-        val rem = m % 60
-        if (rem == 0) "$h h" else "$h h $rem min"
-    }
-}
-
-@Composable
-fun ProfileSettings(navController: NavController) {
-    var username by remember { mutableStateOf("Your name") }
-    var email by remember { mutableStateOf("you@example.com") }
-    var showPasswordDialog by remember { mutableStateOf(false) }
-    var passwordMasked by remember { mutableStateOf("••••••••") }
-
-    var screenTime by remember { mutableFloatStateOf(DEFAULT_SCREEN_TIME_MINUTES) }
-    var blockThreshold by remember { mutableFloatStateOf(DEFAULT_BLOCK_THRESHOLD_MINUTES) }
-
-    // Keywords state
-    var keywords by remember { mutableStateOf(listOf("Exam", "Deadline")) }
-    var showAddKeywordDialog by remember { mutableStateOf(false) }
-    var newKeywordInput by remember { mutableStateOf("") }
-
-    // Make content scrollable and leave space at bottom so Save button doesn't overlap
-    val scrollState = rememberScrollState()
-    val bottomContentPadding = 120.dp // leave space for fixed button
 
     Column(
         modifier = Modifier
@@ -109,6 +63,7 @@ fun ProfileSettings(navController: NavController) {
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
+        // Profile card
         OutlinedCard(
             modifier = Modifier
                 .fillMaxWidth()
@@ -169,7 +124,7 @@ fun ProfileSettings(navController: NavController) {
             }
         }
 
-        // ===== LIMITS: single card with rows and dividers =====
+        // ===== LIMITS SECTION =====
         SectionHeader("Limits")
 
         SectionCard {
@@ -192,7 +147,7 @@ fun ProfileSettings(navController: NavController) {
             )
         }
 
-        // ===== BEHAVIOUR =====
+        // ===== BEHAVIOUR SECTION =====
         SectionHeader("Behaviour")
 
         SectionCard {
@@ -215,7 +170,7 @@ fun ProfileSettings(navController: NavController) {
             )
         }
 
-        // ===== ACCOUNT =====
+        // ===== ACCOUNT SECTION =====
         SectionHeader("Account")
 
         SectionCard {
@@ -241,19 +196,18 @@ fun ProfileSettings(navController: NavController) {
 }
 
 @Composable
-fun SectionHeader(title: String) {
+private fun SectionHeader(title: String) {
     Text(
         text = title,
-        fontSize = 16.sp,
+        fontSize = 12.sp,
         fontWeight = FontWeight.SemiBold,
         color = MaterialTheme.bayg.textGrey,
         modifier = Modifier.padding(start = 4.dp, top = 24.dp, bottom = 12.dp)
     )
 }
 
-/** A card wrapper that applies the darker outline and internal padding, used per-section */
 @Composable
-fun SectionCard(content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit) {
+private fun SectionCard(content: @Composable ColumnScope.() -> Unit) {
     OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -262,20 +216,18 @@ fun SectionCard(content: @Composable androidx.compose.foundation.layout.ColumnSc
         border = BorderStroke(1.dp, MaterialTheme.bayg.outline),
         shape = RoundedCornerShape(8.dp)
     ) {
-        androidx.compose.foundation.layout.Column(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp)
         ) {
-            // invoke the receiver lambda inside Column's scope
             content()
         }
     }
 }
 
-/** A single clickable setting row with optional value and right arrow */
 @Composable
-fun SettingItem(
+private fun SettingItem(
     label: String,
     value: String?,
     destructive: Boolean = false,
@@ -292,7 +244,7 @@ fun SettingItem(
         Text(
             text = label,
             color = if (destructive) MaterialTheme.bayg.lightRed else MaterialTheme.bayg.white,
-            fontSize = 16.sp
+            fontSize = 14.sp
         )
 
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -303,14 +255,16 @@ fun SettingItem(
                 painter = painterResource(id = R.drawable.ic_arrow_right),
                 contentDescription = "Navigate",
                 tint = if (destructive) MaterialTheme.bayg.lightRed else MaterialTheme.bayg.textGrey,
-                modifier = Modifier.size(18.dp).padding(start = if (value != null) 8.dp else 0.dp)
+                modifier = Modifier
+                    .size(18.dp)
+                    .padding(start = if (value != null) 8.dp else 0.dp)
             )
         }
     }
 }
 
 @Composable
-fun SettingItemToggle(
+private fun SettingItemToggle(
     label: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
@@ -318,11 +272,11 @@ fun SettingItemToggle(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = label, color = MaterialTheme.bayg.white, fontSize = 16.sp)
+        Text(text = label, color = MaterialTheme.bayg.white, fontSize = 14.sp)
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
@@ -337,7 +291,7 @@ fun SettingItemToggle(
 }
 
 @Composable
-fun AccountSecurityInfo() {
+private fun AccountSecurityInfo() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
