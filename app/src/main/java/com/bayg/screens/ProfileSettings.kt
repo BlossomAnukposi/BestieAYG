@@ -26,10 +26,6 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,18 +38,17 @@ import androidx.navigation.NavController
 import bayg
 import com.bayg.R
 import com.bayg.auth.ProfileViewModel
+import com.bayg.services.storage.UserSettingsViewModel
 
 @Composable
 fun ProfileSettings(
     navController: NavController,
     profileViewModel: ProfileViewModel = viewModel(),
+    settingsViewModel: UserSettingsViewModel = viewModel(),
 ) {
-    var touchGrassMode by remember { mutableStateOf(true) }
-    var locationEnabled by remember { mutableStateOf(true) }
-    var notificationsEnabled by remember { mutableStateOf(true) }
-
     val scrollState = rememberScrollState()
     val profile = profileViewModel.profile
+    val userSettings = settingsViewModel.settings
 
     LaunchedEffect(profileViewModel.signedOut) {
         if (profileViewModel.signedOut) {
@@ -146,20 +141,20 @@ fun ProfileSettings(
         SectionCard {
             SettingItem(
                 label = "Daily Limit",
-                value = "45 min",
-                onClick = { /* TODO */ }
+                value = "${userSettings?.dailyLimitMinutes ?: 45} min",
+                onClick = { /* TODO: edit screen */ }
             )
             Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
             SettingItem(
                 label = "Block Duration",
-                value = "30 min",
-                onClick = { /* TODO */ }
+                value = "${userSettings?.blockDurationMinutes ?: 30} min",
+                onClick = { /* TODO: edit screen */ }
             )
             Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
             SettingItem(
-                label = "Pre-Event Limit (3 days)",
-                value = "20 min/day",
-                onClick = { /* TODO */ }
+                label = "Pre-Event Limit (${userSettings?.preEventLookAheadDays ?: 3} days)",
+                value = "${userSettings?.preEventLimitMinutes ?: 20} min/day",
+                onClick = { /* TODO: edit screen */ }
             )
         }
 
@@ -169,20 +164,20 @@ fun ProfileSettings(
         SectionCard {
             SettingItemToggle(
                 label = "Touch Grass Mode",
-                checked = touchGrassMode,
-                onCheckedChange = { touchGrassMode = it }
+                checked = userSettings?.touchGrassModeEnabled ?: true,
+                onCheckedChange = { settingsViewModel.updateToggle(touchGrass = it) }
             )
             Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
             SettingItemToggle(
                 label = "Location",
-                checked = locationEnabled,
-                onCheckedChange = { locationEnabled = it }
+                checked = userSettings?.locationEnabled ?: true,
+                onCheckedChange = { settingsViewModel.updateToggle(location = it) }
             )
             Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
             SettingItemToggle(
                 label = "Notifications",
-                checked = notificationsEnabled,
-                onCheckedChange = { notificationsEnabled = it }
+                checked = userSettings?.notificationsEnabled ?: true,
+                onCheckedChange = { settingsViewModel.updateToggle(notifications = it) }
             )
         }
 
