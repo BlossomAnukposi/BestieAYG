@@ -11,8 +11,11 @@ constraintlayout = "2.1.4"
 roomCompiler = "2.8.4"
 playServicesLocation = "21.3.0"
 playServicesMaps = "20.0.0"
-googleServices = "4.4.2"
-firebaseBom = "33.5.1"
+googleServices = "4.4.4"
+firebaseBom = "34.14.0"
+securityCrypto = "1.1.0-alpha06"
+biometric = "1.1.0"
+fragmentKtx = "1.8.5"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -27,13 +30,19 @@ androidx-room-compiler = { group = "androidx.room", name = "room-compiler", vers
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 
-# Firebase — BoM keeps all Firebase artifact versions aligned, so individual
-# firebase-* libraries below intentionally omit version.ref.
+# Firebase. The BoM keeps all firebase-* versions aligned, so the
+# individual libraries below intentionally omit version.ref.
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
-firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx" }
-firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 firebase-appcheck-playintegrity = { group = "com.google.firebase", name = "firebase-appcheck-playintegrity" }
 firebase-appcheck-debug = { group = "com.google.firebase", name = "firebase-appcheck-debug" }
+
+# AndroidX security + biometric. Used by EncryptedSharedPreferences,
+# Keystore-backed master key, and BiometricPrompt re-unlock.
+androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "securityCrypto" }
+androidx-biometric = { group = "androidx.biometric", name = "biometric", version.ref = "biometric" }
+androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragmentKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
