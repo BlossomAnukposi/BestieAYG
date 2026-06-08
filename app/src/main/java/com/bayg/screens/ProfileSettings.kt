@@ -5,7 +5,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.TextField
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bayg.services.storage.UserSettingsViewModel
-
+import com.bayg.services.storage.Authenticator
+import com.bayg.services.storage.entities.UserSettings
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -225,17 +226,30 @@ fun ProfileSettings(
                 AccountSecurityInfo()
                 Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
                 SettingItem(
-                    label = "Delete All Data",
+                    label = "Reset to Defaults",
                     value = null,
                     destructive = true,
-                    onClick = { /* TODO */ }
+                    onClick = {
+                        // Reset settings to defaults
+                        editedSettings = editedSettings!!.copy(
+                            dailyLimitMinutes = 45,
+                            blockDurationMinutes = 30
+                        )
+                    }
                 )
                 Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
                 SettingItem(
                     label = "Log Out",
                     value = null,
                     destructive = true,
-                    onClick = { /* TODO */ }
+                    onClick = {
+                        // Sign out user
+                        Authenticator().signOut()
+                        // Navigate back to signup
+                        navController.navigate("signUp") {
+                            popUpTo("dashboard") { inclusive = true }
+                        }
+                    }
                 )
             }
 
