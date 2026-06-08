@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.bayg.services.storage.entities.UserSettings
+import com.bayg.services.storage.sync.SyncWorker
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,10 +62,19 @@ class UserSettingsViewModel(application: Application) : AndroidViewModel(applica
         if (isSaving) return
         viewModelScope.launch {
             isSaving = true
-            repository.update(settings)
-            this@UserSettingsViewModel.settings = settings
-            isSaving = false
-            onSaved()
+            try {
+                repository.update(settings)
+                this@UserSettingsViewModel.settings = settings
+
+                // Sync to Firestore after update
+                SyncWorker.runOnce(getApplication())
+            } catch (e: Exception) {
+                // Log error but still close dialog
+                android.util.Log.e("UserSettingsViewModel", "Error saving settings", e)
+            } finally {
+                isSaving = false
+                onSaved()
+            }
         }
     }
 

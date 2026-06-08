@@ -67,6 +67,11 @@ fun ProfileSettings(
     val displayName = viewModel.displayName
     val email = viewModel.email
 
+    // Track edited settings locally (not saved until user clicks "Save")
+    var editedSettings by remember(settings) {
+        mutableStateOf(settings?.copy() ?: null)
+    }
+
     var showDailyLimitDialog by remember { mutableStateOf(false) }
     var showBlockDurationDialog by remember { mutableStateOf(false) }
     var inputValue by remember { mutableStateOf("") }
@@ -74,7 +79,7 @@ fun ProfileSettings(
     val scrollState = rememberScrollState()
 
     // Loading state while settings are being resolved/created
-    if (settings == null) {
+    if (settings == null || editedSettings == null) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -166,18 +171,18 @@ fun ProfileSettings(
         SectionCard {
             SettingItem(
                 label = "Daily Limit",
-                value = "${settings.dailyLimitMinutes} min",
+                value = "${editedSettings!!.dailyLimitMinutes} min",
                 onClick = {
-                    inputValue = settings.dailyLimitMinutes.toString()
+                    inputValue = editedSettings!!.dailyLimitMinutes.toString()
                     showDailyLimitDialog = true
                 }
             )
             Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
             SettingItem(
                 label = "Block Duration",
-                value = "${settings.blockDurationMinutes} min",
+                value = "${editedSettings!!.blockDurationMinutes} min",
                 onClick = {
-                    inputValue = settings.blockDurationMinutes.toString()
+                    inputValue = editedSettings!!.blockDurationMinutes.toString()
                     showBlockDurationDialog = true
                 }
             )
@@ -190,20 +195,26 @@ fun ProfileSettings(
         SectionCard {
             SettingItemToggle(
                 label = "Touch Grass Mode",
-                checked = settings.touchGrassModeEnabled,
-                onCheckedChange = { viewModel.updateToggle(touchGrass = it) }
+                checked = editedSettings!!.touchGrassModeEnabled,
+                onCheckedChange = {
+                    editedSettings = editedSettings!!.copy(touchGrassModeEnabled = it)
+                }
             )
             Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
             SettingItemToggle(
                 label = "Location",
-                checked = settings.locationEnabled,
-                onCheckedChange = { viewModel.updateToggle(location = it) }
+                checked = editedSettings!!.locationEnabled,
+                onCheckedChange = {
+                    editedSettings = editedSettings!!.copy(locationEnabled = it)
+                }
             )
             Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
             SettingItemToggle(
                 label = "Notifications",
-                checked = settings.notificationsEnabled,
-                onCheckedChange = { viewModel.updateToggle(notifications = it) }
+                checked = editedSettings!!.notificationsEnabled,
+                onCheckedChange = {
+                    editedSettings = editedSettings!!.copy(notificationsEnabled = it)
+                }
             )
         }
 
@@ -228,7 +239,57 @@ fun ProfileSettings(
             )
         }
 
-        Spacer(modifier = Modifier.padding(bottom = 80.dp))
+        Spacer(modifier = Modifier.padding(bottom = 24.dp))
+
+        // ===== SAVE / DISCARD BUTTONS =====
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 80.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Button(
+                onClick = {
+                    // Revert to saved settings
+                    editedSettings = settings.copy()
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 8.dp),
+                enabled = !isSaving && editedSettings != settings,
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.bayg.outline,
+                    contentColor = MaterialTheme.bayg.white
+                )
+            ) {
+                Text("Discard")
+            }
+
+            Button(
+                onClick = {
+                    // Save all changes
+                    viewModel.saveLimits(
+                        dailyLimitMinutes = editedSettings!!.dailyLimitMinutes,
+                        blockDurationMinutes = editedSettings!!.blockDurationMinutes
+                    )
+                    viewModel.updateToggle(
+                        touchGrass = editedSettings!!.touchGrassModeEnabled,
+                        location = editedSettings!!.locationEnabled,
+                        notifications = editedSettings!!.notificationsEnabled
+                    )
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 8.dp),
+                enabled = !isSaving && editedSettings != settings,
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.bayg.green,
+                    contentColor = MaterialTheme.bayg.black
+                )
+            ) {
+                Text("Save")
+            }
+        }
     }
 
     // Daily Limit Dialog
@@ -248,16 +309,12 @@ fun ProfileSettings(
                 Button(
                     onClick = {
                         inputValue.toIntOrNull()?.let { newDaily ->
-                            viewModel.saveLimits(
-                                dailyLimitMinutes = newDaily,
-                                blockDurationMinutes = settings.blockDurationMinutes
-                            )
+                            editedSettings = editedSettings!!.copy(dailyLimitMinutes = newDaily)
                         }
                         showDailyLimitDialog = false
-                    },
-                    enabled = !isSaving
+                    }
                 ) {
-                    Text("Save")
+                    Text("OK")
                 }
             },
             dismissButton = {
@@ -285,16 +342,12 @@ fun ProfileSettings(
                 Button(
                     onClick = {
                         inputValue.toIntOrNull()?.let { newBlock ->
-                            viewModel.saveLimits(
-                                dailyLimitMinutes = settings.dailyLimitMinutes,
-                                blockDurationMinutes = newBlock
-                            )
+                            editedSettings = editedSettings!!.copy(blockDurationMinutes = newBlock)
                         }
                         showBlockDurationDialog = false
-                    },
-                    enabled = !isSaving
+                    }
                 ) {
-                    Text("Save")
+                    Text("OK")
                 }
             },
             dismissButton = {
