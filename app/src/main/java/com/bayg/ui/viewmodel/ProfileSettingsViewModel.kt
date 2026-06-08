@@ -34,13 +34,22 @@ class ProfileSettingsViewModel(
     private fun loadSettings() {
         viewModelScope.launch {
             try {
-                val settings = userSettingsDao.getByUserId(userId)
+                val roomUser = db.userDao().getByFirebaseUid(userId)
+                if (roomUser == null) {
+                    _settingsState.value = SettingsUiState.Error("Local user not found for uid: $userId")
+                    return@launch
+                }
+
+                val roomUserId = roomUser.id
+
+                // Now call DAO with the Room user id (Long)
+                val settings = userSettingsDao.getByUserId(roomUserId)
                 if (settings != null) {
                     _settingsState.value = SettingsUiState.Success(settings)
                 } else {
-                    // Create default settings if none exist
+                    // Create default settings referencing the Room user id (Long)
                     val defaultSettings = UserSettings(
-                        userId = userId,
+                        userId = roomUserId,
                         dailyLimitMinutes = 45,
                         blockDurationMinutes = 30,
                         touchGrassModeEnabled = true,
