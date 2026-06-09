@@ -4,9 +4,11 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.bayg.services.storage.entities.User
 
 /**
  * Only stored locally with Room
+ * userId references the User table's primary key (Room ID)
  */
 @Entity(
     tableName = "user_settings",
@@ -23,12 +25,10 @@ import androidx.room.PrimaryKey
 data class UserSettings(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val userId: String,
+    val userId: Long,  // Foreign key to User.id (Room ID)
 
     val dailyLimitMinutes: Int = 45,
     val blockDurationMinutes: Int = 30,
-    val preEventLimitMinutes: Int = 20,
-    val preEventLookAheadDays: Int = 3,
 
     val touchGrassModeEnabled: Boolean = true,
     val locationEnabled: Boolean = true,

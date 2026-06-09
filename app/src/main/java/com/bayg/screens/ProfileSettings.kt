@@ -1,5 +1,12 @@
 package com.bayg.screens
 
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.TextField
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.bayg.services.storage.UserSettingsViewModel
+import com.bayg.services.storage.Authenticator
+import com.bayg.services.storage.entities.UserSettings
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,7 +32,10 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,176 +43,336 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import bayg
 import com.bayg.R
-import com.bayg.auth.ProfileViewModel
-import com.bayg.services.storage.UserSettingsViewModel
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.Arrangement.spacedBy
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.platform.LocalContext
+import com.bayg.widgets.NavBar
 
 @Composable
 fun ProfileSettings(
-    navController: NavController,
-    profileViewModel: ProfileViewModel = viewModel(),
-    settingsViewModel: UserSettingsViewModel = viewModel(),
+    navController: NavController
 ) {
-    val scrollState = rememberScrollState()
-    val profile = profileViewModel.profile
-    val userSettings = settingsViewModel.settings
+    val viewModel: UserSettingsViewModel = viewModel()
+    val settings = viewModel.settings
+    val isSaving = viewModel.isSaving
+    val displayName = viewModel.displayName
+    val email = viewModel.email
 
-    LaunchedEffect(profileViewModel.signedOut) {
-        if (profileViewModel.signedOut) {
-            navController.navigate("onboardingStart") {
-                popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                launchSingleTop = true
-            }
+    var editedSettings by remember(settings) {
+        mutableStateOf(settings?.copy() ?: null)
+    }
+
+    var showDailyLimitDialog by remember { mutableStateOf(false) }
+    var showBlockDurationDialog by remember { mutableStateOf(false) }
+    var inputValue by remember { mutableStateOf("") }
+
+    val scrollState = rememberScrollState()
+
+    if (settings == null || editedSettings == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            androidx.compose.material3.CircularProgressIndicator()
         }
+        return
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.bayg.black)
-            .verticalScroll(scrollState)
-            .padding(horizontal = 20.dp, vertical = 24.dp)
+        modifier = Modifier.fillMaxSize()
     ) {
-        Text(
-            text = "settings",
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.bayg.white,
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
-
-        // Profile card
-        OutlinedCard(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 24.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.bayg.card),
-            border = BorderStroke(1.dp, MaterialTheme.bayg.outline),
-            shape = RoundedCornerShape(12.dp)
+                .weight(1f)
+                .background(MaterialTheme.bayg.black)
+                .verticalScroll(scrollState)
+                .padding(horizontal = 20.dp, vertical = 24.dp)
         ) {
+            Text(
+                text = "settings",
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.bayg.white,
+                modifier = Modifier.padding(bottom = 24.dp)
+            )
+
+            // Profile card
+            OutlinedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.bayg.card),
+                border = BorderStroke(1.dp, MaterialTheme.bayg.outline),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = spacedBy(12.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.bayg.green),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = displayName.firstOrNull()?.uppercaseChar()?.toString() ?: "?",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.bayg.black
+                            )
+                        }
+
+                        Column {
+                            Text(
+                                text = displayName,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.bayg.white
+                            )
+                            Text(
+                                text = email,
+                                fontSize = 12.sp,
+                                color = MaterialTheme.bayg.textGrey
+                            )
+                        }
+                    }
+
+                    Icon(
+                        painter = painterResource(id = android.R.drawable.ic_menu_edit),
+                        contentDescription = "Edit profile",
+                        tint = MaterialTheme.bayg.white,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .clickable { /* TODO */ }
+                    )
+                }
+            }
+
+            // ===== LIMITS SECTION =====
+            SectionHeader("Limits")
+
+            SectionCard {
+                SettingItem(
+                    label = "Daily Limit",
+                    value = "${editedSettings!!.dailyLimitMinutes} min",
+                    onClick = {
+                        inputValue = editedSettings!!.dailyLimitMinutes.toString()
+                        showDailyLimitDialog = true
+                    }
+                )
+                Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
+                SettingItem(
+                    label = "Block Duration",
+                    value = "${editedSettings!!.blockDurationMinutes} min",
+                    onClick = {
+                        inputValue = editedSettings!!.blockDurationMinutes.toString()
+                        showBlockDurationDialog = true
+                    }
+                )
+                Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
+            }
+
+            // ===== BEHAVIOUR SECTION =====
+            SectionHeader("Behaviour")
+
+            SectionCard {
+                SettingItemToggle(
+                    label = "Touch Grass Mode",
+                    checked = editedSettings!!.touchGrassModeEnabled,
+                    onCheckedChange = {
+                        editedSettings = editedSettings!!.copy(touchGrassModeEnabled = it)
+                    }
+                )
+                Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
+                SettingItemToggle(
+                    label = "Location",
+                    checked = editedSettings!!.locationEnabled,
+                    onCheckedChange = {
+                        editedSettings = editedSettings!!.copy(locationEnabled = it)
+                    }
+                )
+                Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
+                SettingItemToggle(
+                    label = "Notifications",
+                    checked = editedSettings!!.notificationsEnabled,
+                    onCheckedChange = {
+                        editedSettings = editedSettings!!.copy(notificationsEnabled = it)
+                    }
+                )
+            }
+
+            // ===== ACCOUNT SECTION =====
+            SectionHeader("Account")
+
+            SectionCard {
+                AccountSecurityInfo()
+                Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
+                SettingItem(
+                    label = "Reset to Defaults",
+                    value = null,
+                    destructive = true,
+                    onClick = {
+                        // Reset settings to defaults
+                        editedSettings = editedSettings!!.copy(
+                            dailyLimitMinutes = 45,
+                            blockDurationMinutes = 30
+                        )
+                    }
+                )
+                Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
+                SettingItem(
+                    label = "Log Out",
+                    value = null,
+                    destructive = true,
+                    onClick = {
+                        // Sign out user
+                        Authenticator().signOut()
+                        // Navigate back to signup
+                        navController.navigate("signUp") {
+                            popUpTo("dashboard") { inclusive = true }
+                        }
+                    }
+                )
+            }
+
+            Spacer(modifier = Modifier.padding(bottom = 24.dp))
+
+            // ===== SAVE / DISCARD BUTTONS =====
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .padding(bottom = 24.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                Button(
+                    onClick = {
+                        // Revert to saved settings
+                        editedSettings = settings.copy()
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 8.dp),
+                    enabled = !isSaving && editedSettings != settings,
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.bayg.outline,
+                        contentColor = MaterialTheme.bayg.white
+                    )
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.bayg.green),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = profile?.initial ?: "?",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.bayg.black
-                        )
-                    }
-
-                    Column {
-                        Text(
-                            text = profile?.displayName ?: "Loading...",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.bayg.white
-                        )
-                        Text(
-                            text = profile?.email ?: "",
-                            fontSize = 12.sp,
-                            color = MaterialTheme.bayg.textGrey
-                        )
-                    }
+                    Text("Discard")
                 }
 
-                Icon(
-                    painter = painterResource(id = android.R.drawable.ic_menu_edit),
-                    contentDescription = "Edit profile",
-                    tint = MaterialTheme.bayg.white,
+                Button(
+                    onClick = {
+                        // Save all changes
+                        viewModel.saveLimits(
+                            dailyLimitMinutes = editedSettings!!.dailyLimitMinutes,
+                            blockDurationMinutes = editedSettings!!.blockDurationMinutes
+                        )
+                        viewModel.updateToggle(
+                            touchGrass = editedSettings!!.touchGrassModeEnabled,
+                            location = editedSettings!!.locationEnabled,
+                            notifications = editedSettings!!.notificationsEnabled
+                        )
+                    },
                     modifier = Modifier
-                        .size(20.dp)
-                        .clickable { /* TODO */ }
-                )
+                        .weight(1f)
+                        .padding(horizontal = 8.dp),
+                    enabled = !isSaving && editedSettings != settings,
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.bayg.green,
+                        contentColor = MaterialTheme.bayg.black
+                    )
+                ) {
+                    Text("Save")
+                }
             }
         }
 
-        // ===== LIMITS SECTION =====
-        SectionHeader("Limits")
+        NavBar(navController)
+    }
 
-        SectionCard {
-            SettingItem(
-                label = "Daily Limit",
-                value = "${userSettings?.dailyLimitMinutes ?: 45} min",
-                onClick = { /* TODO: edit screen */ }
-            )
-            Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
-            SettingItem(
-                label = "Block Duration",
-                value = "${userSettings?.blockDurationMinutes ?: 30} min",
-                onClick = { /* TODO: edit screen */ }
-            )
-            Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
-            SettingItem(
-                label = "Pre-Event Limit (${userSettings?.preEventLookAheadDays ?: 3} days)",
-                value = "${userSettings?.preEventLimitMinutes ?: 20} min/day",
-                onClick = { /* TODO: edit screen */ }
-            )
-        }
+    // Daily Limit Dialog
+    if (showDailyLimitDialog) {
+        AlertDialog(
+            onDismissRequest = { showDailyLimitDialog = false },
+            title = { Text("Set Daily Limit (minutes)") },
+            text = {
+                TextField(
+                    value = inputValue,
+                    onValueChange = { inputValue = it },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        inputValue.toIntOrNull()?.let { newDaily ->
+                            editedSettings = editedSettings!!.copy(dailyLimitMinutes = newDaily)
+                        }
+                        showDailyLimitDialog = false
+                    }
+                ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDailyLimitDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 
-        // ===== BEHAVIOUR SECTION =====
-        SectionHeader("Behaviour")
-
-        SectionCard {
-            SettingItemToggle(
-                label = "Touch Grass Mode",
-                checked = userSettings?.touchGrassModeEnabled ?: true,
-                onCheckedChange = { settingsViewModel.updateToggle(touchGrass = it) }
-            )
-            Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
-            SettingItemToggle(
-                label = "Location",
-                checked = userSettings?.locationEnabled ?: true,
-                onCheckedChange = { settingsViewModel.updateToggle(location = it) }
-            )
-            Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
-            SettingItemToggle(
-                label = "Notifications",
-                checked = userSettings?.notificationsEnabled ?: true,
-                onCheckedChange = { settingsViewModel.updateToggle(notifications = it) }
-            )
-        }
-
-        // ===== ACCOUNT SECTION =====
-        SectionHeader("Account")
-
-        SectionCard {
-            AccountSecurityInfo()
-            Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
-            SettingItem(
-                label = "Delete All Data",
-                value = null,
-                destructive = true,
-                onClick = { /* TODO */ }
-            )
-            Divider(color = MaterialTheme.bayg.outline, thickness = 1.dp)
-            SettingItem(
-                label = "Log Out",
-                value = null,
-                destructive = true,
-                onClick = { profileViewModel.signOut() }
-            )
-        }
-
-        androidx.compose.foundation.layout.Spacer(modifier = Modifier.padding(bottom = 80.dp))
+    // Block Duration Dialog
+    if (showBlockDurationDialog) {
+        AlertDialog(
+            onDismissRequest = { showBlockDurationDialog = false },
+            title = { Text("Set Block Duration (minutes)") },
+            text = {
+                TextField(
+                    value = inputValue,
+                    onValueChange = { inputValue = it },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        inputValue.toIntOrNull()?.let { newBlock ->
+                            editedSettings = editedSettings!!.copy(blockDurationMinutes = newBlock)
+                        }
+                        showBlockDurationDialog = false
+                    }
+                ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showBlockDurationDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 
@@ -283,7 +453,7 @@ private fun SettingItemToggle(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+            .padding(horizontal = 16.dp, vertical = 7.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
