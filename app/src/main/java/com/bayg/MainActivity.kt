@@ -102,6 +102,7 @@ class MainActivity : FragmentActivity() {
                             composable("appSetup") { AppSetup(navController) }
                             composable("dashboard") { Dashboard(navController) }
                             composable("settings") { ProfileSettings(navController) }
+
                         }
                     }
                 }

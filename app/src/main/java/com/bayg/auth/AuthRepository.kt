@@ -119,9 +119,8 @@ class AuthRepository(
     }
 
     private suspend fun ensureDefaultSettings(roomUserId: Long) {
-        val userId = roomUserId.toString()
-        if (db.userSettingsDao().getByUserId(userId) == null) {
-            db.userSettingsDao().insert(UserSettings(userId = userId))
+        if (db.userSettingsDao().getByUserId(roomUserId) == null) {
+            db.userSettingsDao().insert(UserSettings(userId = roomUserId))
         }
     }
 

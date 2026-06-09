@@ -13,11 +13,18 @@ class UserSettingsRepository(
     private val appContext = context.applicationContext
 
     suspend fun getOrCreate(): UserSettings? = withContext(Dispatchers.IO) {
-        val roomUserId = resolveRoomUserId() ?: return@withContext null
-        val userId = roomUserId.toString()
+        // Get Firebase UID from logged-in user
+        val firebaseUid = FirebaseAuth.getInstance().currentUser?.uid ?: return@withContext null
+
+        // Get Room User ID using Firebase UID
+        val roomUser = db.userDao().getByFirebaseUid(firebaseUid) ?: return@withContext null
+        val roomUserId = roomUser.id
+
+        // Query settings by Room User ID
         val dao = db.userSettingsDao()
-        dao.getByUserId(userId) ?: run {
-            val defaults = UserSettings(userId = userId)
+        dao.getByUserId(roomUserId) ?: run {
+            // Create default settings if none exist
+            val defaults = UserSettings(userId = roomUserId)
             val id = dao.insert(defaults)
             defaults.copy(id = id)
         }
@@ -25,10 +32,5 @@ class UserSettingsRepository(
 
     suspend fun update(settings: UserSettings) = withContext(Dispatchers.IO) {
         db.userSettingsDao().update(settings)
-    }
-
-    private suspend fun resolveRoomUserId(): Long? {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return null
-        return db.userDao().getByFirebaseUid(uid)?.id
     }
 }
