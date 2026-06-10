@@ -2,6 +2,7 @@ package com.bayg.widgets
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -171,7 +172,8 @@ fun SmallInfoCard(
     number: String,
     title: String,
     body: List<String>,
-    footer: String
+    footer: String,
+    onClick: (() -> Unit)? = null,
 ) {
     Box(
         modifier = Modifier
@@ -179,6 +181,7 @@ fun SmallInfoCard(
             .height(150.dp)
             .clip(RoundedCornerShape(8.dp))
             .background(MaterialTheme.bayg.card)
+            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
             .padding(16.dp)
     ) {
         Column {

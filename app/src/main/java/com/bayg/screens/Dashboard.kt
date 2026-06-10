@@ -1,6 +1,10 @@
 package com.bayg.screens
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,15 +38,26 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import com.bayg.TouchGrassActivity
+import com.bayg.location.DeviceLocationProvider
 import com.bayg.services.NoAsAService
+import com.bayg.ui.viewmodel.WeatherUiState
+import com.bayg.ui.viewmodel.WeatherViewModel
 import com.bayg.widgets.GreenButton
 import com.bayg.widgets.Heading3
 import com.bayg.widgets.Heading4
@@ -286,11 +301,93 @@ private fun InfoCardsRow() {
             footer = "and 3 more..."
         )
 
-        SmallInfoCard(
-            number = "18",
-            title = "Partly\nCloudy",
-            body = listOf("You should take a walk today"),
-            footer = "High: 23°C | Low: 18°C"
+        WeatherInfoCard()
+    }
+}
+
+@Composable
+private fun WeatherInfoCard() {
+    val context = LocalContext.current
+    val weatherViewModel: WeatherViewModel = viewModel()
+    val weatherState by weatherViewModel.weatherState.collectAsStateWithLifecycle()
+
+    var hasLocationPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED
         )
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { result ->
+        hasLocationPermission =
+            result[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+            result[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+    }
+
+    val requestLocationPermissions = {
+        permissionLauncher.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+            )
+        )
+    }
+
+    LaunchedEffect(hasLocationPermission) {
+        if (!hasLocationPermission) return@LaunchedEffect
+
+        val coords = DeviceLocationProvider.getCurrentLocation(context) ?: run {
+            weatherViewModel.fetchWeather(52.37, 4.89)
+            return@LaunchedEffect
+        }
+        weatherViewModel.fetchWeather(coords.first, coords.second)
+    }
+
+    if (!hasLocationPermission) {
+        SmallInfoCard(
+            number = "?",
+            title = "Enable\nlocation",
+            body = listOf("Tap to fetch OpenWeather for your area"),
+            footer = "Location permission required",
+            onClick = requestLocationPermissions,
+        )
+        return
+    }
+
+    when (val state = weatherState) {
+        WeatherUiState.Loading -> {
+            SmallInfoCard(
+                number = "...",
+                title = "Loading\nweather",
+                body = listOf("Fetching from OpenWeather"),
+                footer = "Using your location",
+            )
+        }
+        is WeatherUiState.Success -> {
+            val temp = state.weather.main.temp.toInt()
+            val description = state.weather.weather.firstOrNull()?.main ?: "Weather"
+            val city = state.weather.name
+            val country = state.weather.sys?.country?.takeIf { it.isNotBlank() }
+            val locationLabel = if (country != null) "$city, $country" else city
+            val humidity = state.weather.main.humidity
+            SmallInfoCard(
+                number = "$temp",
+                title = description.replaceFirstChar { it.uppercase() },
+                body = listOf("You should take a walk today"),
+                footer = "📍 $locationLabel · ${humidity}% humidity · OpenWeather",
+            )
+        }
+        is WeatherUiState.Error -> {
+            SmallInfoCard(
+                number = "!",
+                title = "Weather\nunavailable",
+                body = listOf(state.message),
+                footer = "Check API key + network",
+            )
+        }
     }
 }
