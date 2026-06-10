@@ -13,7 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import com.bayg.screens.AppSetup
 import com.bayg.screens.OnboardingStart
 import com.bayg.screens.Permissions
-import com.bayg.screens.SignIn
+import com.bayg.screens.SignUp
 import com.bayg.screens.Dashboard
 import com.bayg.screens.ProfileSettings
 import androidx.activity.result.contract.ActivityResultContracts
@@ -67,7 +67,7 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(navController = navController, startDestination = "dashboard") {
                     composable("onboardingStart") { OnboardingStart(navController) }
-                    composable("signIn") { SignIn(navController) }
+                    composable("signIn") { SignUp(navController) }
                     composable("permissions") { Permissions(navController, permissionManager) }
                     composable("appSetup") { AppSetup(navController) }
                     composable("dashboard") { Dashboard(navController) }
