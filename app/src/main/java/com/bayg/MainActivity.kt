@@ -5,7 +5,6 @@ import android.os.Bundle
 import BAYGTheme
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,14 +17,16 @@ import androidx.navigation.compose.rememberNavController
 import com.bayg.auth.AuthNavigation
 import com.bayg.auth.BiometricUnlockGate
 import com.bayg.auth.requiresBiometricUnlock
-import com.bayg.permissions.PermissionManager
 import com.bayg.screens.AppSetup
 import com.bayg.screens.Dashboard
 import com.bayg.screens.Login
 import com.bayg.screens.OnboardingStart
 import com.bayg.screens.Permissions
-import com.bayg.screens.ProfileSettings
 import com.bayg.screens.SignUp
+import com.bayg.screens.Dashboard
+import com.bayg.screens.ProfileSettings
+import androidx.activity.result.contract.ActivityResultContracts
+import com.bayg.permissions.PermissionManager
 import com.bayg.screens.VerifyEmail
 import com.bayg.services.storage.sync.SyncWorker
 
@@ -73,6 +74,7 @@ class MainActivity : FragmentActivity() {
                 val navController = rememberNavController()
                 var startDestination by remember { mutableStateOf<String?>(null) }
                 var biometricUnlocked by remember { mutableStateOf(false) }
+
 
                 LaunchedEffect(Unit) {
                     startDestination = AuthNavigation.resolveStartDestination(this@MainActivity)
