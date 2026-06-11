@@ -1,14 +1,13 @@
 package com.bayg
 
-import android.annotation.SuppressLint
-import android.content.Intent
 import BAYGTheme
 import android.Manifest
+import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
-import BAYGTheme
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,16 +20,14 @@ import androidx.navigation.compose.rememberNavController
 import com.bayg.auth.AuthNavigation
 import com.bayg.auth.BiometricUnlockGate
 import com.bayg.auth.requiresBiometricUnlock
+import com.bayg.permissions.PermissionManager
 import com.bayg.screens.AppSetup
 import com.bayg.screens.Dashboard
 import com.bayg.screens.Login
 import com.bayg.screens.OnboardingStart
 import com.bayg.screens.Permissions
-import com.bayg.screens.SignUp
-import com.bayg.screens.Dashboard
 import com.bayg.screens.ProfileSettings
-import androidx.activity.result.contract.ActivityResultContracts
-import com.bayg.permissions.PermissionManager
+import com.bayg.screens.SignUp
 import com.bayg.screens.VerifyEmail
 import com.bayg.services.storage.sync.SyncWorker
 
@@ -42,8 +39,6 @@ class MainActivity : FragmentActivity() {
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         when {
-            permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false -> onLocationPermissionGranted()
-            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false -> onLocationPermissionGranted()
             permissions[android.Manifest.permission.ACCESS_FINE_LOCATION] ?: false -> {
                 onLocationPermissionGranted()
             }
@@ -107,14 +102,6 @@ class MainActivity : FragmentActivity() {
                 var startDestination by remember { mutableStateOf<String?>(null) }
                 var biometricUnlocked by remember { mutableStateOf(false) }
 
-
-                NavHost(navController = navController, startDestination = "ProfileSettings") {
-                    composable("onboardingStart") { OnboardingStart(navController) }
-                    composable("signIn") { SignIn(navController) }
-                    composable("permissions") { Permissions(navController, permissionManager) }
-                    composable("appSetup") { AppSetup(navController) }
-                    composable("dashboard") { Dashboard() }
-                    composable("ProfileSettings") { ProfileSettings(navController) }
                 LaunchedEffect(Unit) {
                     startDestination = AuthNavigation.resolveStartDestination(this@MainActivity)
                     if (!requiresBiometricUnlock(this@MainActivity)) {
@@ -143,7 +130,6 @@ class MainActivity : FragmentActivity() {
                             composable("appSetup") { AppSetup(navController) }
                             composable("dashboard") { Dashboard(navController) }
                             composable("settings") { ProfileSettings(navController) }
-
                         }
                     }
                 }
@@ -172,7 +158,6 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun onUsageStatsPermissionGranted() {
-        // Start the screen time worker now that we can read usage stats
         ScreenTimeWorker.schedule(this)
 
         if (!permissionManager.hasAccessibilityPermission()) {
