@@ -1,9 +1,13 @@
-package com.bayg
+package com.bayg.services
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.content.Context
 import android.content.Intent
+import android.provider.Settings
 import android.view.accessibility.AccessibilityEvent
+import com.bayg.BlockedActivity
+import com.bayg.UsageTracker
 
 /**
  * InstagramBlockerService
@@ -72,10 +76,10 @@ class InstagramBlockerService : AccessibilityService() {
          * Returns true if the Accessibility Service is currently enabled
          * in the device's Accessibility Settings.
          */
-        fun isEnabled(context: android.content.Context): Boolean {
-            val enabledServices = android.provider.Settings.Secure.getString(
+        fun isEnabled(context: Context): Boolean {
+            val enabledServices = Settings.Secure.getString(
                 context.contentResolver,
-                android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
             ) ?: return false
             val componentName = "${context.packageName}/.InstagramBlockerService"
             return enabledServices.contains(componentName)

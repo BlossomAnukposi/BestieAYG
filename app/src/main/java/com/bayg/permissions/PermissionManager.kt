@@ -10,7 +10,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
 import android.util.Log
 import androidx.activity.ComponentActivity
-import com.bayg.InstagramBlockerService
+import com.bayg.services.InstagramBlockerService
 
 class PermissionManager(private val activity: ComponentActivity) {
 

@@ -63,7 +63,7 @@
             android:theme="@style/Theme.BAYG" />
 
         <service
-            android:name=".InstagramBlockerService"
+            android:name=".services.InstagramBlockerService"
             android:exported="true"
             android:label="@string/app_name"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
