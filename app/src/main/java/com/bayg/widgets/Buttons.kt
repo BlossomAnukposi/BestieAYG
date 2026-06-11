@@ -37,10 +37,33 @@ import bayg
 import kotlin.math.roundToInt
 
 @Composable
-fun GreenButton(navController: NavController, route: String, text: String, height: Dp = 56.dp) {
+fun GreenButton(navController: NavController, route: String, text: String, height: Dp = 56.dp, color: Color = MaterialTheme.bayg.green) {
     Button(
         onClick = {navController.navigate(route)},
-        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.bayg.green),
+        colors = ButtonDefaults.buttonColors(containerColor = color),
+        shape = RoundedCornerShape(size = 5.dp),
+        modifier = Modifier
+            .width(334.dp)
+            .height(height)
+    ) { Text(text,
+        color = MaterialTheme.bayg.black,
+        fontSize = 17.sp,
+        fontWeight = FontWeight.Bold,
+    ) }
+}
+
+@Composable
+fun GreenButton(
+    onClick: () -> Unit,
+    text: String,
+    height: Dp = 56.dp,
+    color: Color = MaterialTheme.bayg.green,
+    enabled: Boolean = true,
+) {
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        colors = ButtonDefaults.buttonColors(containerColor = color),
         shape = RoundedCornerShape(size = 5.dp),
         modifier = Modifier
             .width(334.dp)

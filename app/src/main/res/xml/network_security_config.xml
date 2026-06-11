@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Network security configuration.
+
+    Three controls in one file:
+
+    1. Cleartext blocked everywhere. All HTTP traffic is refused, the app
+       talks TLS only. TLS 1.2 minimum on every supported Android version,
+       TLS 1.3 where the platform supports it (Android 10+, API 29+).
+
+    2. Release builds reject user-installed CAs. A user (or attacker) who
+       installs a Burp / mitmproxy / corporate CA cannot intercept release
+       traffic. Debug builds keep the user CAs so the team can still proxy
+       traffic during development.
+
+    3. Per-domain certificate pinning for external APIs.
+       Firebase is intentionally NOT pinned because Google rotates the
+       Google Trust Services certificates every ~90 days. A missed
+       rotation would brick the app on every device.
+
+    Pin values are SHA-256 hashes of the SubjectPublicKeyInfo (SPKI) of
+    each server certificate, base64-encoded. Each domain pins two values
+    (leaf + intermediate CA) so the leaf can rotate without bricking the
+    app. Refresh both before the `expiration` date using:
+
+        powershell -ExecutionPolicy Bypass -File scripts\compute-spki-pin.ps1 api.openweathermap.org
+        powershell -ExecutionPolicy Bypass -File scripts\compute-spki-pin.ps1 overpass-api.de
+        powershell -ExecutionPolicy Bypass -File scripts\compute-spki-pin.ps1 api.open-meteo.com
+        powershell -ExecutionPolicy Bypass -File scripts\compute-spki-pin.ps1 nominatim.openstreetmap.org
+        powershell -ExecutionPolicy Bypass -File scripts\compute-spki-pin.ps1 noasaservice.lol
+        powershell -ExecutionPolicy Bypass -File scripts\compute-spki-pin.ps1 opendata.cbs.nl
+-->
+<network-security-config>
+
+    <!-- Cleartext refused globally. -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- Release builds reject user-installed CAs. -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
+
+    <!--
+        OpenWeather. Leaf cert is *.openweathermap.org issued by Sectigo
+        Public Server Authentication CA OV R36. Backup pin is the
+        intermediate CA. Refresh both before 2027 with:
+            powershell -ExecutionPolicy Bypass -File scripts\compute-spki-pin.ps1 api.openweathermap.org
+    -->
+    <domain-config>
+        <domain includeSubdomains="true">openweathermap.org</domain>
+        <pin-set expiration="2027-01-01">
+            <pin digest="SHA-256">2rABlvP8a/45fRdYlmvSYEWrgBZyNampT8AqVpcPMtk=</pin>
+            <pin digest="SHA-256">KqkYYX5LYAYP7XGemqzbtPPIA8x7BS/BbOIcAXf3j2k=</pin>
+        </pin-set>
+    </domain-config>
+
+    <!--
+        Overpass (OpenStreetMap). Leaf cert is currently lambert.openstreetmap.de
+        with overpass-api.de in the SAN, issued by Let's Encrypt E8. Backup
+        pin is the Let's Encrypt E8 intermediate. LE intermediates rotate
+        roughly every couple of years; refresh both before 2027 with:
+            powershell -ExecutionPolicy Bypass -File scripts\compute-spki-pin.ps1 overpass-api.de
+    -->
+    <domain-config>
+        <domain includeSubdomains="false">overpass-api.de</domain>
+        <pin-set expiration="2027-01-01">
+            <pin digest="SHA-256">mTbFj5CY30AirefHj6+g/ayS1u/6TnAP+x0ZgGPOu4A=</pin>
+            <pin digest="SHA-256">iFvwVyJSxnQdyaUvUERIf+8qk7gRze3612JMwoO3zdU=</pin>
+        </pin-set>
+    </domain-config>
+
+    <!--
+        Open-Meteo (Touch Grass weather). Leaf cert CN=open-meteo.com,
+        issued by Let's Encrypt R12. Refresh both before 2027 with:
+            powershell -ExecutionPolicy Bypass -File scripts\compute-spki-pin.ps1 api.open-meteo.com
+    -->
+    <domain-config>
+        <domain includeSubdomains="true">open-meteo.com</domain>
+        <pin-set expiration="2027-01-01">
+            <pin digest="SHA-256">YAFPPxCwfYpnCvumZr5iRwQxdLb9dak90Qvb33ma0Fo=</pin>
+            <pin digest="SHA-256">kZwN96eHtZftBWrOZUsd6cA4es80n3NzSk/XtYz2EqQ=</pin>
+        </pin-set>
+    </domain-config>
+
+    <!--
+        Nominatim (Touch Grass city reverse-geocode). Leaf cert
+        CN=nominatim.openstreetmap.org, issued by Let's Encrypt YR1.
+        Refresh both before 2027 with:
+            powershell -ExecutionPolicy Bypass -File scripts\compute-spki-pin.ps1 nominatim.openstreetmap.org
+    -->
+    <domain-config>
+        <domain includeSubdomains="false">nominatim.openstreetmap.org</domain>
+        <pin-set expiration="2027-01-01">
+            <pin digest="SHA-256">aYxG28Ea4Ja2f1RoVh73ANdittYvAQ5f+d4eJmfUt8o=</pin>
+            <pin digest="SHA-256">LoMHBotttiDko50Gi13uXW71eIy7LAttI+rYT8wXF4w=</pin>
+        </pin-set>
+    </domain-config>
+
+    <!--
+        No-As-A-Service (dashboard quote). Leaf cert CN=noasaservice.lol,
+        issued by Google Trust Services WE1. Third-party host — refresh
+        both before 2027 with:
+            powershell -ExecutionPolicy Bypass -File scripts\compute-spki-pin.ps1 noasaservice.lol
+    -->
+    <domain-config>
+        <domain includeSubdomains="true">noasaservice.lol</domain>
+        <pin-set expiration="2027-01-01">
+            <pin digest="SHA-256">l5TiAvTkVku4VGUlXXQIT7wnY9KxIeZ/1y47Zi7vGVM=</pin>
+            <pin digest="SHA-256">kIdp6NNEd8wsugYyyIYFsi1ylMCED3hZbSR8ZFsa/A4=</pin>
+        </pin-set>
+    </domain-config>
+
+    <!--
+        CBS open data (stats). Leaf cert CN=opendata.cbs.nl, issued by
+        DigiCert G2 TLS EU RSA4096 SHA384 2022 CA1. Refresh both before
+        2027 with:
+            powershell -ExecutionPolicy Bypass -File scripts\compute-spki-pin.ps1 opendata.cbs.nl
+    -->
+    <domain-config>
+        <domain includeSubdomains="false">opendata.cbs.nl</domain>
+        <pin-set expiration="2027-01-01">
+            <pin digest="SHA-256">Ez8Nh3B6+9imlcGVNtGxioprxXuSj5v6bmGxhVxBejk=</pin>
+            <pin digest="SHA-256">lXt3ip5lkns+fBxV/S9MSfUx0UUdhBEmhXz5PkrAWGg=</pin>
+        </pin-set>
+    </domain-config>
+
+</network-security-config>

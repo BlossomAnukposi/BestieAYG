@@ -6,22 +6,35 @@ import BAYGTheme
 import android.Manifest
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import BAYGTheme
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.bayg.auth.AuthNavigation
+import com.bayg.auth.BiometricUnlockGate
+import com.bayg.auth.requiresBiometricUnlock
 import com.bayg.screens.AppSetup
+import com.bayg.screens.Dashboard
+import com.bayg.screens.Login
 import com.bayg.screens.OnboardingStart
 import com.bayg.screens.Permissions
-import com.bayg.screens.SignIn
+import com.bayg.screens.SignUp
 import com.bayg.screens.Dashboard
 import com.bayg.screens.ProfileSettings
 import androidx.activity.result.contract.ActivityResultContracts
 import com.bayg.permissions.PermissionManager
+import com.bayg.screens.VerifyEmail
+import com.bayg.services.storage.sync.SyncWorker
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
 
     private lateinit var permissionManager: PermissionManager
 
@@ -31,6 +44,15 @@ class MainActivity : ComponentActivity() {
         when {
             permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false -> onLocationPermissionGranted()
             permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false -> onLocationPermissionGranted()
+            permissions[android.Manifest.permission.ACCESS_FINE_LOCATION] ?: false -> {
+                onLocationPermissionGranted()
+            }
+            permissions[android.Manifest.permission.ACCESS_COARSE_LOCATION] ?: false -> {
+                onLocationPermissionGranted()
+            }
+            else -> {
+                // Permission denied
+            }
         }
     }
 
@@ -76,9 +98,15 @@ class MainActivity : ComponentActivity() {
         // Request notification permission on Android 13+, then schedule worker
         requestNotificationPermissionAndSchedule()
 
+        SyncWorker.schedule(this)
+        SyncWorker.runOnce(this)
+
         setContent {
             BAYGTheme {
                 val navController = rememberNavController()
+                var startDestination by remember { mutableStateOf<String?>(null) }
+                var biometricUnlocked by remember { mutableStateOf(false) }
+
 
                 NavHost(navController = navController, startDestination = "ProfileSettings") {
                     composable("onboardingStart") { OnboardingStart(navController) }
@@ -87,6 +115,37 @@ class MainActivity : ComponentActivity() {
                     composable("appSetup") { AppSetup(navController) }
                     composable("dashboard") { Dashboard() }
                     composable("ProfileSettings") { ProfileSettings(navController) }
+                LaunchedEffect(Unit) {
+                    startDestination = AuthNavigation.resolveStartDestination(this@MainActivity)
+                    if (!requiresBiometricUnlock(this@MainActivity)) {
+                        biometricUnlocked = true
+                    }
+                }
+
+                when {
+                    startDestination == null -> Unit
+                    requiresBiometricUnlock(this@MainActivity) && !biometricUnlocked -> {
+                        BiometricUnlockGate(
+                            activity = this@MainActivity,
+                            onUnlocked = { biometricUnlocked = true },
+                        )
+                    }
+                    else -> {
+                        NavHost(
+                            navController = navController,
+                            startDestination = startDestination!!,
+                        ) {
+                            composable("onboardingStart") { OnboardingStart(navController) }
+                            composable("signUp") { SignUp(navController) }
+                            composable("login") { Login(navController) }
+                            composable("verifyEmail") { VerifyEmail(navController) }
+                            composable("permissions") { Permissions(navController, permissionManager) }
+                            composable("appSetup") { AppSetup(navController) }
+                            composable("dashboard") { Dashboard(navController) }
+                            composable("settings") { ProfileSettings(navController) }
+
+                        }
+                    }
                 }
             }
         }

@@ -2,6 +2,7 @@ package com.bayg.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bayg.BuildConfig
 import com.bayg.data.remote.WeatherRepository
 import com.bayg.data.remote.model.WeatherResponse
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +24,13 @@ class WeatherViewModel : ViewModel() {
 
     fun fetchWeather(latitude: Double, longitude: Double) {
         viewModelScope.launch {
+            if (BuildConfig.OPENWEATHER_API_KEY.isBlank()) {
+                _weatherState.value = WeatherUiState.Error(
+                    "Missing OPENWEATHER_API_KEY in local.properties"
+                )
+                return@launch
+            }
+
             _weatherState.value = WeatherUiState.Loading
 
             repository.getWeather(latitude, longitude)
