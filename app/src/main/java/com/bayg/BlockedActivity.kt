@@ -4,6 +4,7 @@ import BAYGTheme
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
@@ -62,15 +63,14 @@ class BlockedActivity : ComponentActivity() {
                 )
             }
         }
-    }
 
-    // Intercept Back — don't let them get back to Instagram
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        super.onBackPressed()
-        goHome()
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                goHome()
+            }
+        })
     }
-
+    
     private fun goHome() {
         val homeIntent = Intent(Intent.ACTION_MAIN).apply {
             addCategory(Intent.CATEGORY_HOME)
