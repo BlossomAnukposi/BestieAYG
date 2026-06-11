@@ -54,7 +54,7 @@ class ScreenTimeWorker(
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 WORK_NAME,
-                ExistingPeriodicWorkPolicy.KEEP_EXISTING, // don't reset if already running
+                ExistingPeriodicWorkPolicy.KEEP, // don't reset if already running
                 request
             )
         }
