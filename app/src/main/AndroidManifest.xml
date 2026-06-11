@@ -24,6 +24,13 @@
     <!-- Read the user's local calendar (no Google Sign-In required) -->
     <uses-permission android:name="android.permission.READ_CALENDAR" />
 
+    <!-- NO-AS-A-SERVICE Network permission -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -45,8 +52,28 @@
         </activity>
 
         <activity
-            android:name=".TouchGrassActivity"
-            android:exported="false" />
+        android:name=".TouchGrassActivity"
+        android:exported="false" />
+
+        <activity
+            android:name=".BlockedActivity"
+            android:exported="false"
+            android:showOnLockScreen="true"
+            android:turnScreenOn="true"
+            android:theme="@style/Theme.BAYG" />
+
+        <service
+            android:name=".services.InstagramBlockerService"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
 
         <!-- Foreground service. foregroundServiceType is required on
              Android 14 (targetSdk 34) and must match the matching
