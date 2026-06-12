@@ -56,6 +56,8 @@ import androidx.compose.ui.text.style.TextAlign
 import com.bayg.TouchGrassActivity
 import com.bayg.location.DeviceLocationProvider
 import com.bayg.services.NoAsAService
+import com.bayg.ui.viewmodel.NearestParkUiState
+import com.bayg.ui.viewmodel.NearestParkViewModel
 import com.bayg.ui.viewmodel.WeatherUiState
 import com.bayg.ui.viewmodel.WeatherViewModel
 import com.bayg.widgets.GreenButton
@@ -294,14 +296,83 @@ private fun InfoCardsRow() {
         modifier = Modifier.width(435.dp).horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        SmallInfoCard(
-            number = "5",
-            title = "Parks\nnear you",
-            body = listOf("Parc Sandur", "Emmen Centrum Park"),
-            footer = "and 3 more..."
-        )
-
+//        SmallInfoCard(
+//            number = "5",
+//            title = "Parks\nnear you",
+//            body = listOf("Parc Sandur", "Emmen Centrum Park"),
+//            footer = "and 3 more..."
+//        )
+        NearestParkInfoCard()
         WeatherInfoCard()
+    }
+}
+
+@Composable
+private fun NearestParkInfoCard() {
+    val context = LocalContext.current
+    val parkViewModel: NearestParkViewModel = viewModel()
+    val parkState by parkViewModel.parkState.collectAsStateWithLifecycle()
+
+    var hasLocationPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                    PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                    PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { result ->
+        hasLocationPermission =
+            result[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                    result[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+    }
+
+    if (!hasLocationPermission) {
+        SmallInfoCard(
+            number = "?",
+            title = "Parks\nnear you",
+            body = listOf("Tap to find parks nearby"),
+            footer = "Location permission required",
+            onClick = {
+                permissionLauncher.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                    )
+                )
+            }
+        )
+        return
+    }
+
+    LaunchedEffect(hasLocationPermission) {
+        val coords = DeviceLocationProvider.getCurrentLocation(context)
+            ?: return@LaunchedEffect
+        parkViewModel.fetchNearestPark(coords.first, coords.second)
+    }
+
+    when (val state = parkState) {
+        NearestParkUiState.Loading -> SmallInfoCard(
+            number = "...",
+            title = "Parks\nnear you",
+            body = listOf("Looking for nearby parks"),
+            footer = "Using your location",
+        )
+        is NearestParkUiState.Success -> SmallInfoCard(
+            number = "${state.totalCount}",
+            title = "Nearest\npark",
+            body = listOf(state.park.name),
+            footer = "📍 ${state.park.distanceLabel}",
+        )
+        is NearestParkUiState.Error -> SmallInfoCard(
+            number = "!",
+            title = "Parks\nnear you",
+            body = listOf(state.message),
+            footer = "Overpass API · OSM data",
+        )
     }
 }
 
