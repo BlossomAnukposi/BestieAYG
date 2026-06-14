@@ -30,6 +30,7 @@ import com.bayg.screens.ProfileSettings
 import com.bayg.screens.SignUp
 import com.bayg.screens.VerifyEmail
 import com.bayg.services.storage.sync.SyncWorker
+import com.bayg.screens.Stats
 
 class MainActivity : FragmentActivity() {
 
@@ -130,6 +131,7 @@ class MainActivity : FragmentActivity() {
                             composable("appSetup") { AppSetup(navController) }
                             composable("dashboard") { Dashboard(navController) }
                             composable("settings") { ProfileSettings(navController) }
+                            composable("stats") { Stats(navController) }
                         }
                     }
                 }
