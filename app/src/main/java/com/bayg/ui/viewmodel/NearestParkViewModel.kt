@@ -51,11 +51,10 @@ class NearestParkViewModel : ViewModel() {
             val response = java.net.URL("$overpassUrl?data=$encoded").readText()
             val elements = JSONObject(response).getJSONArray("elements")
 
-            val parks = mutableListOf<Park>()
-            for (i in 0 until elements.length()) {
+            val parks = (0 until elements.length()).mapNotNull { i ->
                 val el = elements.getJSONObject(i)
-                val tags = el.optJSONObject("tags") ?: continue
-                val name = tags.optString("name", "").ifBlank { continue }
+                val tags = el.optJSONObject("tags") ?: return@mapNotNull null
+                val name = tags.optString("name", "").takeIf { it.isNotBlank() } ?: return@mapNotNull null
 
                 val parkLat: Double
                 val parkLon: Double
@@ -63,12 +62,12 @@ class NearestParkViewModel : ViewModel() {
                     parkLat = el.getDouble("lat")
                     parkLon = el.getDouble("lon")
                 } else {
-                    val center = el.optJSONObject("center") ?: continue
+                    val center = el.optJSONObject("center") ?: return@mapNotNull null
                     parkLat = center.getDouble("lat")
                     parkLon = center.getDouble("lon")
                 }
 
-                parks.add(Park(name, parkLat, parkLon, haversine(lat, lon, parkLat, parkLon)))
+                Park(name, parkLat, parkLon, haversine(lat, lon, parkLat, parkLon))
             }
 
             val nearest = parks.minByOrNull { it.distanceMeters } ?: return@withContext null
