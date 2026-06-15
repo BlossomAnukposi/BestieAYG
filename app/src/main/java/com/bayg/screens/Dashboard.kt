@@ -56,6 +56,8 @@ import androidx.compose.ui.text.style.TextAlign
 import com.bayg.TouchGrassActivity
 import com.bayg.location.DeviceLocationProvider
 import com.bayg.services.NoAsAService
+import com.bayg.services.storage.UserSettingsViewModel
+import com.bayg.services.storage.entities.UserSettings
 import com.bayg.ui.viewmodel.NearestParkUiState
 import com.bayg.ui.viewmodel.NearestParkViewModel
 import com.bayg.ui.viewmodel.WeatherUiState
@@ -73,6 +75,9 @@ import java.util.Locale
 @Composable
 fun Dashboard(navController: NavController) {
     val context = LocalContext.current
+    val viewModel: UserSettingsViewModel = viewModel()
+    val displayName = viewModel.displayName
+
     val messageState = produceState(initialValue = "Loading...") {
         value = try {
             NoAsAService.fetchMessage()
@@ -93,7 +98,7 @@ fun Dashboard(navController: NavController) {
                     .padding(top = 54.dp, bottom = 110.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                TopUsageCard(navController)
+                TopUsageCard(navController, displayName)
                 Spacer(modifier = Modifier.height(42.dp))
 
                 InfoCardsRow()
@@ -132,13 +137,13 @@ fun Dashboard(navController: NavController) {
 }
 
 @Composable
-private fun TopUsageCard(navController: NavController) {
+private fun TopUsageCard(navController: NavController, displayName: String) {
     val today = SimpleDateFormat("MMMM d", Locale.ENGLISH)
         .format(Date())
     val day = SimpleDateFormat("EEEE", Locale.ENGLISH)
         .format(Date())
     val streakCount = 2
-    val firstName = "Blossom"
+    val firstName = displayName.split(" ").firstOrNull() ?: "User"
 
     Box(modifier = Modifier.fillMaxWidth().height(350.dp)) {
         Box(
