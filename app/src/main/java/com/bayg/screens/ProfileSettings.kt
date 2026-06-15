@@ -56,6 +56,26 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.platform.LocalContext
 import com.bayg.widgets.NavBar
 
+// ── Input validation ─────────────────────────────────────────────────────────
+
+/**
+ * Strips non-digit characters, guards against overflow strings, then clamps
+ * the result to [min, max]. Returns null if the input is empty or unparseable.
+ *
+ * @param input  Raw string from the TextField
+ * @param min    Minimum allowed value (inclusive), default 1
+ * @param max    Maximum allowed value (inclusive), default 1440 (minutes in a day)
+ */
+private fun sanitizeLimitInput(input: String, min: Int = 1, max: Int = 1440): Int? {
+    val digitsOnly = input.filter { it.isDigit() }
+    if (digitsOnly.isEmpty()) return null
+    if (digitsOnly.length > 4) return null      // prevents Int overflow on parse
+    val value = digitsOnly.toIntOrNull() ?: return null
+    return value.coerceIn(min, max)
+}
+
+// ── Screen ───────────────────────────────────────────────────────────────────
+
 @Composable
 fun ProfileSettings(
     navController: NavController
@@ -230,7 +250,6 @@ fun ProfileSettings(
                     value = null,
                     destructive = true,
                     onClick = {
-                        // Reset settings to defaults
                         editedSettings = editedSettings!!.copy(
                             dailyLimitMinutes = 45,
                             blockDurationMinutes = 30
@@ -243,9 +262,7 @@ fun ProfileSettings(
                     value = null,
                     destructive = true,
                     onClick = {
-                        // Sign out user
                         Authenticator().signOut()
-                        // Navigate back to signup
                         navController.navigate("signUp") {
                             popUpTo("dashboard") { inclusive = true }
                         }
@@ -264,7 +281,6 @@ fun ProfileSettings(
             ) {
                 Button(
                     onClick = {
-                        // Revert to saved settings
                         editedSettings = settings.copy()
                     },
                     modifier = Modifier
@@ -281,7 +297,6 @@ fun ProfileSettings(
 
                 Button(
                     onClick = {
-                        // Save all changes
                         viewModel.saveLimits(
                             dailyLimitMinutes = editedSettings!!.dailyLimitMinutes,
                             blockDurationMinutes = editedSettings!!.blockDurationMinutes
@@ -309,15 +324,19 @@ fun ProfileSettings(
         NavBar(navController)
     }
 
-    // Daily Limit Dialog
+    // ── Daily Limit Dialog ───────────────────────────────────────────────────
+
     if (showDailyLimitDialog) {
         AlertDialog(
             onDismissRequest = { showDailyLimitDialog = false },
-            title = { Text("Set Daily Limit (minutes)") },
+            title = { Text("Set Daily Limit (1–1440 min)") },
             text = {
                 TextField(
                     value = inputValue,
-                    onValueChange = { inputValue = it },
+                    onValueChange = { newValue ->
+                        // Allow only digits, cap at 4 characters while typing
+                        inputValue = newValue.filter { it.isDigit() }.take(4)
+                    },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -325,8 +344,8 @@ fun ProfileSettings(
             confirmButton = {
                 Button(
                     onClick = {
-                        inputValue.toIntOrNull()?.let { newDaily ->
-                            editedSettings = editedSettings!!.copy(dailyLimitMinutes = newDaily)
+                        sanitizeLimitInput(inputValue, min = 1, max = 1440)?.let { sanitized ->
+                            editedSettings = editedSettings!!.copy(dailyLimitMinutes = sanitized)
                         }
                         showDailyLimitDialog = false
                     }
@@ -342,15 +361,19 @@ fun ProfileSettings(
         )
     }
 
-    // Block Duration Dialog
+    // ── Block Duration Dialog ────────────────────────────────────────────────
+
     if (showBlockDurationDialog) {
         AlertDialog(
             onDismissRequest = { showBlockDurationDialog = false },
-            title = { Text("Set Block Duration (minutes)") },
+            title = { Text("Set Block Duration (1–480 min)") },
             text = {
                 TextField(
                     value = inputValue,
-                    onValueChange = { inputValue = it },
+                    onValueChange = { newValue ->
+                        // Allow only digits, cap at 3 characters while typing (max 480)
+                        inputValue = newValue.filter { it.isDigit() }.take(3)
+                    },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -358,8 +381,8 @@ fun ProfileSettings(
             confirmButton = {
                 Button(
                     onClick = {
-                        inputValue.toIntOrNull()?.let { newBlock ->
-                            editedSettings = editedSettings!!.copy(blockDurationMinutes = newBlock)
+                        sanitizeLimitInput(inputValue, min = 1, max = 480)?.let { sanitized ->
+                            editedSettings = editedSettings!!.copy(blockDurationMinutes = sanitized)
                         }
                         showBlockDurationDialog = false
                     }
@@ -375,6 +398,8 @@ fun ProfileSettings(
         )
     }
 }
+
+// ── Section components ───────────────────────────────────────────────────────
 
 @Composable
 private fun SectionHeader(title: String) {

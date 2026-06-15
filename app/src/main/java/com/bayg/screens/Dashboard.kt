@@ -1,6 +1,7 @@
 package com.bayg.screens
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -53,9 +54,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.ViewModelProvider
 import com.bayg.TouchGrassActivity
 import com.bayg.location.DeviceLocationProvider
 import com.bayg.services.NoAsAService
+import com.bayg.services.storage.UserSettingsViewModel
+import com.bayg.ui.viewmodel.NearestParkViewModel
+import com.bayg.ui.viewmodel.StatsUiState
+import com.bayg.ui.viewmodel.StatsViewModel
+import com.bayg.ui.viewmodel.StatsViewModelFactory
+import com.bayg.ui.viewmodel.NearestParkUiState
 import com.bayg.ui.viewmodel.WeatherUiState
 import com.bayg.ui.viewmodel.WeatherViewModel
 import com.bayg.widgets.GreenButton
@@ -63,7 +71,6 @@ import com.bayg.widgets.Heading3
 import com.bayg.widgets.Heading4
 import com.bayg.widgets.Paragraph
 import com.bayg.widgets.SmallInfoCard
-import com.bayg.widgets.Subtitle
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -71,6 +78,15 @@ import java.util.Locale
 @Composable
 fun Dashboard(navController: NavController) {
     val context = LocalContext.current
+    val viewModel: UserSettingsViewModel = viewModel()
+    val displayName = viewModel.displayName
+
+    val userId = remember { com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: "" }
+    val statsViewModel: StatsViewModel = viewModel(
+        factory = StatsViewModelFactory(context, userId)
+    )
+    val statsState by statsViewModel.uiState.collectAsStateWithLifecycle()
+
     val messageState = produceState(initialValue = "Loading...") {
         value = try {
             NoAsAService.fetchMessage()
@@ -91,7 +107,7 @@ fun Dashboard(navController: NavController) {
                     .padding(top = 54.dp, bottom = 110.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                TopUsageCard(navController)
+                TopUsageCard(navController, displayName, statsState)
                 Spacer(modifier = Modifier.height(42.dp))
 
                 InfoCardsRow()
@@ -130,13 +146,22 @@ fun Dashboard(navController: NavController) {
 }
 
 @Composable
-private fun TopUsageCard(navController: NavController) {
-    val today = SimpleDateFormat("MMMM d", Locale.ENGLISH)
-        .format(Date())
-    val day = SimpleDateFormat("EEEE", Locale.ENGLISH)
-        .format(Date())
+private fun TopUsageCard(
+    navController: NavController,
+    displayName: String,
+    statsState: StatsUiState
+) {
+    val today = SimpleDateFormat("MMMM d", Locale.ENGLISH).format(Date())
+    val day = SimpleDateFormat("EEEE", Locale.ENGLISH).format(Date())
     val streakCount = 2
-    val firstName = "Blossom"
+    val firstName = displayName.split(" ").firstOrNull()?.takeIf { it.isNotBlank() } ?: "there"
+
+    val usageMinutes = (statsState as? StatsUiState.Success)
+        ?.dailyUsage?.firstOrNull { it.isToday }?.minutes ?: 0
+    val dailyLimitMinutes = (statsState as? StatsUiState.Success)?.dailyLimitMinutes ?: 45
+    val isOver = usageMinutes > dailyLimitMinutes
+    val overPercent = if (isOver && dailyLimitMinutes > 0)
+        ((usageMinutes - dailyLimitMinutes) * 100 / dailyLimitMinutes) else 0
 
     Box(modifier = Modifier.fillMaxWidth().height(350.dp)) {
         Box(
@@ -155,13 +180,17 @@ private fun TopUsageCard(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start
                 ) {
-                    UsageCircle()
+                    UsageCircle(usageMinutes, dailyLimitMinutes)  // ← fixed
                     Spacer(modifier = Modifier.weight(1f))
 
                     Column(horizontalAlignment = Alignment.End) {
                         Paragraph("Daily limit", color = MaterialTheme.bayg.black)
-                        Heading3("45 min",MaterialTheme.bayg.black)
-                        Paragraph("⚠ 197% over", color = MaterialTheme.bayg.lightRed)
+                        Heading3("$dailyLimitMinutes min", MaterialTheme.bayg.black)
+                        if (isOver) {
+                            Paragraph("⚠ ${overPercent}% over", color = MaterialTheme.bayg.lightRed)
+                        } else {
+                            Paragraph("✓ within limit", color = MaterialTheme.bayg.black)
+                        }
                     }
                 }
                 Spacer(modifier = Modifier.height(22.dp))
@@ -172,7 +201,7 @@ private fun TopUsageCard(navController: NavController) {
                 modifier = Modifier.align(Alignment.BottomEnd)
             ) {
                 Paragraph("Streak", color = MaterialTheme.bayg.black)
-                Heading4("$streakCount days",MaterialTheme.bayg.black)
+                Heading4("$streakCount days", MaterialTheme.bayg.black)
             }
         }
 
@@ -228,10 +257,7 @@ private fun formatMinutes(totalMinutes: Int): String {
 }
 
 @Composable
-private fun UsageCircle() {
-    val limit: Int = 45
-    val usage: Int = 20
-
+private fun UsageCircle(usage: Int, limit: Int) {  // remove hardcoded vals
     val progress = (usage.toFloat() / limit.toFloat()).coerceIn(0f, 1f)
     val sweepAngle = 360f * progress
 
@@ -260,12 +286,8 @@ private fun UsageCircle() {
         }
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Heading4("${formatMinutes(usage)}", MaterialTheme.bayg.black)
-            Text(
-                "today",
-                fontSize = 21.sp,
-                color = MaterialTheme.bayg.textGrey
-            )
+            Heading4(formatMinutes(usage), MaterialTheme.bayg.black)  // was hardcoded
+            Text("today", fontSize = 21.sp, color = MaterialTheme.bayg.textGrey)
         }
     }
 }
@@ -294,14 +316,83 @@ private fun InfoCardsRow() {
         modifier = Modifier.width(435.dp).horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        SmallInfoCard(
-            number = "5",
-            title = "Parks\nnear you",
-            body = listOf("Parc Sandur", "Emmen Centrum Park"),
-            footer = "and 3 more..."
-        )
-
+//        SmallInfoCard(
+//            number = "5",
+//            title = "Parks\nnear you",
+//            body = listOf("Parc Sandur", "Emmen Centrum Park"),
+//            footer = "and 3 more..."
+//        )
+        NearestParkInfoCard()
         WeatherInfoCard()
+    }
+}
+
+@Composable
+private fun NearestParkInfoCard() {
+    val context = LocalContext.current
+    val parkViewModel: NearestParkViewModel = viewModel()
+    val parkState by parkViewModel.parkState.collectAsStateWithLifecycle()
+
+    var hasLocationPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                    PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                    PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { result ->
+        hasLocationPermission =
+            result[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                    result[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+    }
+
+    if (!hasLocationPermission) {
+        SmallInfoCard(
+            number = "?",
+            title = "Parks\nnear you",
+            body = listOf("Tap to find parks nearby"),
+            footer = "Location permission required",
+            onClick = {
+                permissionLauncher.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                    )
+                )
+            }
+        )
+        return
+    }
+
+    LaunchedEffect(hasLocationPermission) {
+        val coords = DeviceLocationProvider.getCurrentLocation(context)
+            ?: return@LaunchedEffect
+        parkViewModel.fetchNearestPark(coords.first, coords.second)
+    }
+
+    when (val state = parkState) {
+        NearestParkUiState.Loading -> SmallInfoCard(
+            number = "...",
+            title = "Parks\nnear you",
+            body = listOf("Looking for nearby parks"),
+            footer = "Using your location",
+        )
+        is NearestParkUiState.Success -> SmallInfoCard(
+            number = "${state.totalCount}",
+            title = "Nearest\npark",
+            body = listOf(state.park.name),
+            footer = "📍 ${state.park.distanceLabel}",
+        )
+        is NearestParkUiState.Error -> SmallInfoCard(
+            number = "!",
+            title = "Parks\nnear you",
+            body = listOf(state.message),
+            footer = "Overpass API · OSM data",
+        )
     }
 }
 
