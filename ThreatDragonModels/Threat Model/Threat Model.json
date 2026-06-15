@@ -3,7 +3,7 @@
   "summary": {
     "title": "Threat Model",
     "owner": "Josephine",
-    "description": "",
+    "description": "BestieAYG threat model — updated level 0 context diagram June 2026.",
     "id": 0
   },
   "detail": {
@@ -145,7 +145,7 @@
             },
             "attrs": {
               "text": {
-                "text": "Weather API"
+                "text": "OpenWeather API"
               },
               "body": {
                 "stroke": "#333333",
@@ -241,8 +241,8 @@
             "id": "6ac97fae-6c3a-42c2-894e-4ba1a2935b3b",
             "data": {
               "type": "tm.Actor",
-              "name": "Weather API",
-              "description": "External - openweathermap.org",
+              "name": "OpenWeather API",
+              "description": "External - api.openweathermap.org (dashboard weather, API key)",
               "isTrustBoundary": false,
               "outOfScope": true,
               "reasonOutOfScope": "External third-party service (openweathermap.org). We do not control or own this system. Only the data flows to/from it are in scope for threat modeling.",
@@ -379,7 +379,7 @@
             },
             "attrs": {
               "text": {
-                "text": "Instagram data"
+                "text": "Android OS\n(Instagram usage)"
               },
               "body": {
                 "stroke": "#333333",
@@ -475,8 +475,8 @@
             "id": "1ade2d9d-a0a7-4e46-b527-d3bd6e78d5a5",
             "data": {
               "type": "tm.Actor",
-              "name": "Instagram data",
-              "description": "Android OS usage stats for Instagram",
+              "name": "Android OS (Instagram usage)",
+              "description": "On-device — UsageStatsManager + AccessibilityService for com.instagram.android. Not Instagram's network API.",
               "isTrustBoundary": false,
               "outOfScope": true,
               "reasonOutOfScope": "Provided by the Android OS (UsageStatsManager). We do not control Instagram or the Android OS internals, only how our app reads and processes this data is in scope.",
@@ -593,7 +593,7 @@
             "data": {
               "type": "tm.Actor",
               "name": "No-as-a-service",
-              "description": "",
+              "description": "External - noasaservice.lol (sanitized dashboard quote)",
               "isTrustBoundary": false,
               "outOfScope": true,
               "reasonOutOfScope": "External third-party API. We do not control or own this service. Only the data flow from this API into our app is in scope.",
@@ -847,7 +847,7 @@
             },
             "attrs": {
               "text": {
-                "text": "BAYG? App"
+                "text": "BestieAYG App"
               },
               "body": {
                 "stroke": "#333333",
@@ -943,8 +943,8 @@
             "id": "922df735-91af-49dd-80e3-bcc0b95d7837",
             "data": {
               "type": "tm.Process",
-              "name": "BAYG? App",
-              "description": "Android application, Bestie, are you good?",
+              "name": "BestieAYG App",
+              "description": "Android application (com.bayg). Dashboard, Touch Grass, stats, settings, auth.",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
@@ -976,8 +976,8 @@
             "connector": "smooth",
             "data": {
               "type": "tm.Flow",
-              "name": "login credentials",
-              "description": "",
+              "name": "auth credentials",
+              "description": "Email + password via app UI to Firebase Auth",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
@@ -990,7 +990,7 @@
               "trustBoundaryIds": []
             },
             "labels": [
-              "login credentials"
+              "auth credentials"
             ],
             "id": "df33ae7c-4b8d-4fba-b000-9c2133e5e9ed",
             "source": {
@@ -1022,8 +1022,8 @@
             "connector": "smooth",
             "data": {
               "type": "tm.Flow",
-              "name": "weather forecast",
-              "description": "",
+              "name": "OpenWeather forecast",
+              "description": "Current weather JSON for dashboard card (lat/lon + API key)",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
@@ -1036,7 +1036,7 @@
               "trustBoundaryIds": []
             },
             "labels": [
-              "weather forecast"
+              "OpenWeather forecast"
             ],
             "id": "5639bb53-f922-48a5-bb60-455b937518c5",
             "source": {
@@ -1299,8 +1299,8 @@
             "connector": "smooth",
             "data": {
               "type": "tm.Flow",
-              "name": "dashboard output",
-              "description": "",
+              "name": "app UI / stats",
+              "description": "Dashboard, stats charts, settings, Touch Grass screen",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
@@ -1313,7 +1313,7 @@
               "trustBoundaryIds": []
             },
             "labels": [
-              "dashboard output"
+              "app UI / stats"
             ],
             "id": "9b39691a-8e1d-4fd9-a2fe-f02fbb521b66",
             "source": {
@@ -1488,9 +1488,498 @@
               "providesAuthentication": false,
               "threats": []
             }
+          },
+          {
+            "position": {
+              "x": 1000,
+              "y": 250
+            },
+            "size": {
+              "width": 150,
+              "height": 70
+            },
+            "attrs": {
+              "text": {
+                "text": "Firebase\n(Auth + Firestore)"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": "4 3"
+              }
+            },
+            "visible": true,
+            "shape": "actor",
+            "zIndex": 12,
+            "ports": {
+              "groups": {
+                "top": {
+                  "position": "top",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "position": "right",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "bottom": {
+                  "position": "bottom",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "left": {
+                  "position": "left",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                }
+              },
+              "items": [
+                {
+                  "group": "top",
+                  "id": "e8f4a301-0001-4001-8001-000000000001"
+                },
+                {
+                  "group": "right",
+                  "id": "e8f4a301-0002-4001-8001-000000000002"
+                },
+                {
+                  "group": "bottom",
+                  "id": "e8f4a301-0003-4001-8001-000000000003"
+                },
+                {
+                  "group": "left",
+                  "id": "e8f4a301-0004-4001-8001-000000000004"
+                }
+              ]
+            },
+            "id": "e8f4a101-1111-4001-8001-000000000001",
+            "data": {
+              "type": "tm.Actor",
+              "name": "Firebase (Auth + Firestore)",
+              "description": "External - Google Firebase. Auth, email verification, Firestore profile/settings/streak sync.",
+              "isTrustBoundary": false,
+              "outOfScope": true,
+              "reasonOutOfScope": "External Google-managed cloud. We do not control Firebase infrastructure. Only our app's auth calls and Firestore sync paths are in scope.",
+              "hasOpenThreats": false,
+              "providesAuthentication": true,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 80,
+              "y": 450
+            },
+            "size": {
+              "width": 180,
+              "height": 70
+            },
+            "attrs": {
+              "text": {
+                "text": "Open-Meteo / Nominatim"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": "4 3"
+              }
+            },
+            "visible": true,
+            "shape": "actor",
+            "zIndex": 13,
+            "ports": {
+              "groups": {
+                "top": {
+                  "position": "top",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "position": "right",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "bottom": {
+                  "position": "bottom",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "left": {
+                  "position": "left",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                }
+              },
+              "items": [
+                {
+                  "group": "top",
+                  "id": "e8f4a302-0001-4002-8002-000000000001"
+                },
+                {
+                  "group": "right",
+                  "id": "e8f4a302-0002-4002-8002-000000000002"
+                },
+                {
+                  "group": "bottom",
+                  "id": "e8f4a302-0003-4002-8002-000000000003"
+                },
+                {
+                  "group": "left",
+                  "id": "e8f4a302-0004-4002-8002-000000000004"
+                }
+              ]
+            },
+            "id": "e8f4a102-2222-4002-8002-000000000002",
+            "data": {
+              "type": "tm.Actor",
+              "name": "Open-Meteo / Nominatim",
+              "description": "External open data - api.open-meteo.com + nominatim.openstreetmap.org (Touch Grass weather + city)",
+              "isTrustBoundary": false,
+              "outOfScope": true,
+              "reasonOutOfScope": "External open-data APIs. No API key. We only control how Touch Grass consumes and displays the data.",
+              "hasOpenThreats": false,
+              "providesAuthentication": false,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 680,
+              "y": 480
+            },
+            "size": {
+              "width": 160,
+              "height": 70
+            },
+            "attrs": {
+              "text": {
+                "text": "Android Device\nLocation (GPS)"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": "4 3"
+              }
+            },
+            "visible": true,
+            "shape": "actor",
+            "zIndex": 14,
+            "ports": {
+              "groups": {
+                "top": {
+                  "position": "top",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "position": "right",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "bottom": {
+                  "position": "bottom",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "left": {
+                  "position": "left",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                }
+              },
+              "items": [
+                {
+                  "group": "top",
+                  "id": "e8f4a303-0001-4003-8003-000000000001"
+                },
+                {
+                  "group": "right",
+                  "id": "e8f4a303-0002-4003-8003-000000000002"
+                },
+                {
+                  "group": "bottom",
+                  "id": "e8f4a303-0003-4003-8003-000000000003"
+                },
+                {
+                  "group": "left",
+                  "id": "e8f4a303-0004-4003-8003-000000000004"
+                }
+              ]
+            },
+            "id": "e8f4a103-3333-4003-8003-000000000003",
+            "data": {
+              "type": "tm.Actor",
+              "name": "Android Device Location (GPS)",
+              "description": "On-device - FusedLocationProvider / GPS coordinates for weather and parks",
+              "isTrustBoundary": false,
+              "outOfScope": true,
+              "reasonOutOfScope": "Provided by Android OS and device hardware. We only control permission prompts and how coordinates are used.",
+              "hasOpenThreats": false,
+              "providesAuthentication": false,
+              "threats": []
+            }
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": "block"
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 15,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "auth + profile sync",
+              "description": "Firebase Auth tokens, user profile, settings and streak sync via SyncWorker",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": true,
+              "isEncrypted": true,
+              "isPublicNetwork": true,
+              "protocol": "HTTPS/TLS",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "auth + profile sync"
+            ],
+            "id": "e8f4a201-1111-4001-8001-000000000001",
+            "source": {
+              "cell": "922df735-91af-49dd-80e3-bcc0b95d7837",
+              "port": "719ed208-f324-41b6-868c-7d31e6a5704f"
+            },
+            "target": {
+              "cell": "e8f4a101-1111-4001-8001-000000000001",
+              "port": "e8f4a301-0004-4001-8001-000000000004"
+            }
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 16,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "touch-grass weather + city",
+              "description": "Open-Meteo forecast + Nominatim reverse-geocode for Touch Grass screen",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": true,
+              "isPublicNetwork": true,
+              "protocol": "HTTPS/TLS",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "touch-grass weather + city"
+            ],
+            "id": "e8f4a202-2222-4002-8002-000000000002",
+            "source": {
+              "cell": "e8f4a102-2222-4002-8002-000000000002",
+              "port": "e8f4a302-0002-4002-8002-000000000002"
+            },
+            "target": {
+              "cell": "922df735-91af-49dd-80e3-bcc0b95d7837",
+              "port": "b0de27aa-0334-41f5-8c33-ca4301f49561"
+            }
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 17,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "lat/lon coordinates",
+              "description": "GPS coordinates for OpenWeather, Overpass parks, and Touch Grass",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "lat/lon coordinates"
+            ],
+            "id": "e8f4a203-3333-4003-8003-000000000003",
+            "source": {
+              "cell": "e8f4a103-3333-4003-8003-000000000003",
+              "port": "e8f4a303-0001-4003-8003-000000000001"
+            },
+            "target": {
+              "cell": "922df735-91af-49dd-80e3-bcc0b95d7837",
+              "port": "b75262f5-60bf-4663-a361-7e6967be538e"
+            }
           }
         ],
-        "description": "Context Diagram to provide an overview of our app BAYG."
+        "description": "Context Diagram (DFD level 0) — BestieAYG external entities and data flows. Updated June 2026."
       },
       {
         "id": 1,
@@ -1680,7 +2169,7 @@
             },
             "attrs": {
               "text": {
-                "text": "Weather API"
+                "text": "OpenWeather API"
               },
               "body": {
                 "stroke": "#333333",
@@ -2031,7 +2520,7 @@
             },
             "attrs": {
               "text": {
-                "text": "Instagram data"
+                "text": "Android OS\n(Instagram usage)"
               },
               "body": {
                 "stroke": "#333333",
