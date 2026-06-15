@@ -2192,13 +2192,6 @@
                 "51fc100c-11fc-4186-8c4b-2b057c2be794",
                 "532eba73-9e79-4e89-a007-0b819d215eed"
               ]
-            },
-            "tools": {
-              "items": [
-                "boundary",
-                "button-remove"
-              ],
-              "name": null
             }
           },
           {
@@ -3034,8 +3027,8 @@
                 "text": "Biometric\nRe-unlock"
               },
               "body": {
-                "stroke": "#333333",
-                "strokeWidth": 1.5,
+                "stroke": "red",
+                "strokeWidth": 2.5,
                 "strokeDasharray": null
               }
             },
@@ -3171,8 +3164,8 @@
                 "text": "Firebase Session"
               },
               "body": {
-                "stroke": "#333333",
-                "strokeWidth": 1.5,
+                "stroke": "red",
+                "strokeWidth": 2.5,
                 "strokeDasharray": null
               }
             },
@@ -3484,7 +3477,8 @@
             "shape": "flow",
             "attrs": {
               "line": {
-                "stroke": "#333333",
+                "stroke": "red",
+                "strokeWidth": 2.5,
                 "targetMarker": {
                   "name": "block"
                 },
@@ -3838,7 +3832,8 @@
             "shape": "flow",
             "attrs": {
               "line": {
-                "stroke": "#333333",
+                "stroke": "red",
+                "strokeWidth": 2.5,
                 "targetMarker": {
                   "name": "block"
                 },
@@ -4340,8 +4335,8 @@
             },
             "vertices": [
               {
-                "x": 950,
-                "y": 320
+                "x": 990,
+                "y": 340
               }
             ]
           },
@@ -4546,7 +4541,22 @@
               "cell": "0bb2babd-25f3-43e5-9cb3-c4f451f4e1cd",
               "port": "a9ef177e-c0d7-4e4c-9699-17a257ceb3af"
             },
-            "vertices": []
+            "vertices": [
+              {
+                "x": 920,
+                "y": 550
+              }
+            ],
+            "tools": {
+              "items": [
+                "boundary",
+                "button-remove",
+                "vertices",
+                "source-arrowhead",
+                "target-arrowhead"
+              ],
+              "name": null
+            }
           },
           {
             "shape": "flow",
@@ -4769,7 +4779,8 @@
             "shape": "flow",
             "attrs": {
               "line": {
-                "stroke": "#333333",
+                "stroke": "red",
+                "strokeWidth": 2.5,
                 "targetMarker": {
                   "name": "block"
                 },
@@ -4908,8 +4919,8 @@
                 "text": "Fetch OpenWeather"
               },
               "body": {
-                "stroke": "#333333",
-                "strokeWidth": 1.5,
+                "stroke": "red",
+                "strokeWidth": 2.5,
                 "strokeDasharray": null
               }
             },
@@ -5045,8 +5056,8 @@
                 "text": "Fetch parks\n(Overpass)"
               },
               "body": {
-                "stroke": "#333333",
-                "strokeWidth": 1.5,
+                "stroke": "red",
+                "strokeWidth": 2.5,
                 "strokeDasharray": null
               }
             },
@@ -5182,8 +5193,8 @@
                 "text": "Instagram block\n+ Touch Grass"
               },
               "body": {
-                "stroke": "#333333",
-                "strokeWidth": 1.5,
+                "stroke": "red",
+                "strokeWidth": 2.5,
                 "strokeDasharray": null
               }
             },
@@ -5333,8 +5344,8 @@
                 "text": "Dashboard\n+ Stats UI"
               },
               "body": {
-                "stroke": "#333333",
-                "strokeWidth": 1.5,
+                "stroke": "red",
+                "strokeWidth": 2.5,
                 "strokeDasharray": null
               }
             },
@@ -5470,11 +5481,13 @@
                 "text": "Room DB\n(usage stats)"
               },
               "topLine": {
-                "strokeWidth": 1.5,
+                "stroke": "red",
+                "strokeWidth": 2.5,
                 "strokeDasharray": null
               },
               "bottomLine": {
-                "strokeWidth": 1.5,
+                "stroke": "red",
+                "strokeWidth": 2.5,
                 "strokeDasharray": null
               }
             },
@@ -5887,8 +5900,8 @@
           },
           {
             "position": {
-              "x": 770,
-              "y": 291
+              "x": 811.2499999999949,
+              "y": 290
             },
             "size": {
               "width": 120,
@@ -6408,7 +6421,7 @@
               "body": {
                 "stroke": "#333333",
                 "strokeWidth": 1.5,
-                "strokeDasharray": "4 3"
+                "strokeDasharray": null
               }
             },
             "visible": true,
