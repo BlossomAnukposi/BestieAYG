@@ -44,4 +44,16 @@ interface BlockEventDao {
 
     @Query("SELECT COUNT(*) FROM block_events WHERE userId = :userId")
     suspend fun countAll(userId: String): Int
+
+    @Query(
+        "SELECT * FROM block_events WHERE userId = :userId " +
+                "AND triggeredAt BETWEEN :startMillis AND :endMillis ORDER BY triggeredAt DESC"
+    )
+    suspend fun getBetween(userId: String, startMillis: Long, endMillis: Long): List<BlockEvent>
+
+    @Query(
+        "SELECT COUNT(*) FROM block_events WHERE userId = :userId " +
+                "AND triggeredAt BETWEEN :startMillis AND :endMillis"
+    )
+    suspend fun countBetween(userId: String, startMillis: Long, endMillis: Long): Int
 }
