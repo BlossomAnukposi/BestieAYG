@@ -6,7 +6,12 @@ data class WeatherResponse(
     val weather: List<WeatherDescription>,
     val main: MainData,
     val wind: WindData,
-    val name: String
+    val name: String,
+    val sys: SysData? = null,
+)
+
+data class SysData(
+    val country: String? = null,
 )
 
 data class WeatherDescription(

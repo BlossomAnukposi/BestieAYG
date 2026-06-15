@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">BAYG</string>
+    <string name="accessibility_service_description">" Monitors Instagram usage and blocks access when your daily limit is reached."</string>
 </resources>

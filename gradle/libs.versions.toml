@@ -11,11 +11,15 @@ constraintlayout = "2.1.4"
 roomCompiler = "2.8.4"
 playServicesLocation = "21.3.0"
 playServicesMaps = "20.0.0"
+workRuntimeKtx = "2.11.2"
 googleServices = "4.4.4"
 firebaseBom = "34.14.0"
 securityCrypto = "1.1.0-alpha06"
 biometric = "1.1.0"
 fragmentKtx = "1.8.5"
+foundationLayout = "1.11.2"
+runtime = "1.11.2"
+material3 = "1.4.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -29,6 +33,7 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomCompiler" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
+androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
 
 # Firebase. The BoM keeps all firebase-* versions aligned, so the
 # individual libraries below intentionally omit version.ref.
@@ -43,6 +48,9 @@ firebase-appcheck-debug = { group = "com.google.firebase", name = "firebase-appc
 androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "securityCrypto" }
 androidx-biometric = { group = "androidx.biometric", name = "biometric", version.ref = "biometric" }
 androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragmentKtx" }
+androidx-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
+androidx-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
