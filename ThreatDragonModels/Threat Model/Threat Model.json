@@ -3,7 +3,7 @@
   "summary": {
     "title": "Threat Model",
     "owner": "Josephine",
-    "description": "BestieAYG threat model — updated level 0 context diagram June 2026.",
+    "description": "BestieAYG threat model — Level 0 context + Level 1 detailed DFD updated June 2026.",
     "id": 0
   },
   "detail": {
@@ -1983,7 +1983,7 @@
       },
       {
         "id": 1,
-        "title": "Level 1 BAYG Detailed DFD",
+        "title": "Level 1 BestieAYG Detailed DFD",
         "diagramType": "STRIDE",
         "placeholder": "New STRIDE diagram description",
         "thumbnail": "./public/content/images/thumbnail.stride.jpg",
@@ -2000,7 +2000,7 @@
             },
             "attrs": {
               "label": {
-                "text": "BAYG? App Sandbox (Android)"
+                "text": "BestieAYG App Sandbox (Android)"
               }
             },
             "visible": true,
@@ -2009,8 +2009,8 @@
             "id": "75cebe9d-f979-4e66-b980-ba99db88c8bb",
             "data": {
               "type": "tm.BoundaryBox",
-              "name": "BAYG? App Sandbox (Android)",
-              "description": "",
+              "name": "BestieAYG App Sandbox (Android)",
+              "description": "Trust boundary for com.bayg — UI, Room, SecurePrefs, biometric gate, API clients.",
               "isTrustBoundary": true,
               "hasOpenThreats": false,
               "crossingFlows": [
@@ -2025,7 +2025,12 @@
                 "0ecd6c82-a2c9-4627-a544-59ce4c23a086",
                 "dade2af5-f23c-40c6-be90-c8b71ef2c124",
                 "47df9152-1b2b-42ee-b8a5-c6ba84f90439",
-                "702ee57e-4004-4971-bcb3-816d25ac3a70"
+                "702ee57e-4004-4971-bcb3-816d25ac3a70",
+                "bc807b20-f1e1-4c99-84fb-1b75864720ad",
+                "20db4089-08a1-441e-979f-b25bd1cb2ecc",
+                "e8f4b401-0001-4001-8001-000000000001",
+                "e8f4b401-0002-4001-8001-000000000001",
+                "e8f4b401-0003-4001-8001-000000000001"
               ],
               "containedElements": [
                 "984fc639-35f6-46e6-bb75-1267aabcf8ae",
@@ -2265,8 +2270,8 @@
             "id": "71a4086d-c069-4124-9c65-c898a82a7e9a",
             "data": {
               "type": "tm.Actor",
-              "name": "Weather API",
-              "description": "",
+              "name": "OpenWeather API",
+              "description": "External - api.openweathermap.org (dashboard weather, BuildConfig API key)",
               "isTrustBoundary": false,
               "outOfScope": false,
               "reasonOutOfScope": "",
@@ -2871,7 +2876,7 @@
             },
             "attrs": {
               "text": {
-                "text": "Biometric Auth"
+                "text": "Biometric\nRe-unlock"
               },
               "body": {
                 "stroke": "#333333",
@@ -2967,8 +2972,8 @@
             "id": "984fc639-35f6-46e6-bb75-1267aabcf8ae",
             "data": {
               "type": "tm.Process",
-              "name": "Biometric Auth",
-              "description": "BiometricPrompt with CryptoObject, 2nd factor",
+              "name": "Biometric Re-unlock Gate",
+              "description": "BiometricUnlockGate + BiometricAuthManager. Re-unlock after Firebase session; Keystore-backed CryptoObject.",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
@@ -2991,7 +2996,7 @@
             },
             "attrs": {
               "text": {
-                "text": "Session Manager"
+                "text": "Firebase Session"
               },
               "body": {
                 "stroke": "#333333",
@@ -3087,8 +3092,8 @@
             "id": "c767b201-a157-466f-a93c-3a2bc5d49432",
             "data": {
               "type": "tm.Process",
-              "name": "Session Manager",
-              "description": "Issues + validates encrypted session token",
+              "name": "Firebase Session + Onboarding",
+              "description": "Firebase Auth session state + OnboardingStore in SecurePrefs (encrypted). Gates dashboard access.",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
@@ -3138,8 +3143,8 @@
                   "status": "Open",
                   "severity": "High",
                   "type": "Information disclosure",
-                  "description": "If HTTPS is not enforced, credentials can be intercepted",
-                  "mitigation": "Enforce HTTPS; use Android `NetworkSecurityConfig` to block cleartext",
+                  "description": "Credentials sent over TLS to Firebase Auth SDK",
+                  "mitigation": "HTTPS enforced; Firebase SDK uses TLS. NetworkSecurityConfig blocks cleartext.",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 3,
@@ -3189,8 +3194,8 @@
             "connector": "smooth",
             "data": {
               "type": "tm.Flow",
-              "name": "credentials",
-              "description": "",
+              "name": "email + password",
+              "description": "Auth UI passes credentials to Authenticator.kt",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
@@ -3203,7 +3208,7 @@
               "trustBoundaryIds": []
             },
             "labels": [
-              "credentials"
+              "email + password"
             ],
             "id": "a55cf82a-7aa0-45d3-8797-e94be557a9e8",
             "source": {
@@ -3237,32 +3242,34 @@
             "connector": "smooth",
             "data": {
               "type": "tm.Flow",
-              "name": "store hash + salt",
-              "description": "",
+              "name": "auth request (HTTPS)",
+              "description": "signIn/signUp to Firebase Auth over TLS",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
               "hasOpenThreats": true,
               "isBidirectional": false,
-              "isEncrypted": false,
-              "isPublicNetwork": false,
-              "protocol": "",
+              "isEncrypted": true,
+              "isPublicNetwork": true,
+              "protocol": "HTTPS",
               "threats": [
                 {
                   "id": "247b8574-1359-4d98-bf02-91b44ac38539",
-                  "title": "Weak hash algorithm used (MD5/SHA1)",
-                  "status": "Open",
-                  "severity": "Critical",
+                  "title": "MITM on Firebase Auth traffic",
+                  "status": "Mitigated",
+                  "severity": "High",
                   "type": "Tampering",
-                  "description": "Dev uses wrong algorithm, hash is easily cracked",
-                  "mitigation": "Enforce Argon2id in code; document in code review checklist",
+                  "description": "Attacker intercepts auth request on compromised network",
+                  "mitigation": "TLS + certificate pinning for Google/Firebase endpoints",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 4,
                   "score": ""
                 }
               ],
-              "trustBoundaryIds": [],
+              "trustBoundaryIds": [
+                "75cebe9d-f979-4e66-b980-ba99db88c8bb"
+              ],
               "threatFrequency": {
                 "tampering": 1,
                 "informationDisclosure": 0,
@@ -3270,7 +3277,7 @@
               }
             },
             "labels": [
-              "store hash + salt"
+              "auth request (HTTPS)"
             ],
             "id": "bc807b20-f1e1-4c99-84fb-1b75864720ad",
             "source": {
@@ -3278,8 +3285,8 @@
               "port": "b99bd9e5-7263-41b8-bde8-32c94bb5c64f"
             },
             "target": {
-              "cell": "532eba73-9e79-4e89-a007-0b819d215eed",
-              "port": "a9ef177e-c0d7-4e4c-9699-17a257ceb3af"
+              "cell": "e8f4b201-1111-4001-8001-000000000001",
+              "port": "e8f4b301-0004-4001-8001-000000000004"
             },
             "vertices": []
           },
@@ -3303,8 +3310,8 @@
             "connector": "smooth",
             "data": {
               "type": "tm.Flow",
-              "name": "retrieve hash + salt",
-              "description": "",
+              "name": "ID token + profile",
+              "description": "Firebase returns authenticated user + ID token",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
@@ -3317,12 +3324,12 @@
               "trustBoundaryIds": []
             },
             "labels": [
-              "retrieve hash + salt"
+              "ID token + profile"
             ],
             "id": "20db4089-08a1-441e-979f-b25bd1cb2ecc",
             "source": {
-              "cell": "532eba73-9e79-4e89-a007-0b819d215eed",
-              "port": "b6c790c8-76b6-4785-a1be-303d8d357022"
+              "cell": "e8f4b201-1111-4001-8001-000000000001",
+              "port": "e8f4b301-0004-4001-8001-000000000004"
             },
             "target": {
               "cell": "51fc100c-11fc-4186-8c4b-2b057c2be794",
@@ -3355,8 +3362,7 @@
             "connector": "smooth",
             "data": {
               "type": "tm.Flow",
-              "name": "password verified",
-              "description": "",
+              "name": "Firebase auth OK",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
@@ -3369,7 +3375,7 @@
               "trustBoundaryIds": []
             },
             "labels": [
-              "password verified"
+              "Firebase auth OK"
             ],
             "id": "566461e6-a7b7-462a-ba33-6cf73ac70fac",
             "source": {
@@ -3519,8 +3525,8 @@
             "connector": "smooth",
             "data": {
               "type": "tm.Flow",
-              "name": "store session token",
-              "description": "",
+              "name": "store onboarding flag",
+              "description": "OnboardingStore writes encrypted flag to SecurePrefs per UID",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
@@ -3532,12 +3538,12 @@
               "threats": [
                 {
                   "id": "86d9e01f-3891-42f1-b46f-41b630b44505",
-                  "title": "Session token stored unencrypted",
-                  "status": "Open",
-                  "severity": "High",
+                  "title": "Onboarding flag stored unencrypted",
+                  "status": "Mitigated",
+                  "severity": "Medium",
                   "type": "Information disclosure",
-                  "description": "Token in plaintext SharedPreferences, readable via ADB",
-                  "mitigation": "Use `EncryptedSharedPreferences` with Keystore-backed key",
+                  "description": "Onboarding completion flag could leak if prefs are readable",
+                  "mitigation": "SecurePrefs uses EncryptedSharedPreferences + KeystoreManager",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 9,
@@ -3552,7 +3558,7 @@
               }
             },
             "labels": [
-              "store session token"
+              "store onboarding flag"
             ],
             "id": "ca4bcc96-a084-4d4d-a5a6-73dc531d6011",
             "source": {
@@ -4057,8 +4063,7 @@
             "connector": "smooth",
             "data": {
               "type": "tm.Flow",
-              "name": "weather-based recommendation",
-              "description": "",
+              "name": "OpenWeather forecast",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
@@ -4071,7 +4076,7 @@
               "trustBoundaryIds": []
             },
             "labels": [
-              "weather-based recommendation"
+              "OpenWeather forecast"
             ],
             "id": "c99344cd-7446-450b-87c8-574d1bb0c423",
             "source": {
@@ -4109,8 +4114,7 @@
             "connector": "smooth",
             "data": {
               "type": "tm.Flow",
-              "name": "location-based recommendation",
-              "description": "",
+              "name": "parks list",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
@@ -4123,7 +4127,7 @@
               "trustBoundaryIds": []
             },
             "labels": [
-              "location-based recommendation"
+              "parks list"
             ],
             "id": "73b25274-79a8-4731-b0f5-5b46e9704f9f",
             "source": {
@@ -4458,7 +4462,7 @@
             },
             "attrs": {
               "text": {
-                "text": "Create weather-based recommendations"
+                "text": "Fetch OpenWeather"
               },
               "body": {
                 "stroke": "#333333",
@@ -4554,8 +4558,8 @@
             "id": "9b244038-1aef-48f7-a1c5-311c71152764",
             "data": {
               "type": "tm.Process",
-              "name": "Create weather-based recommendations",
-              "description": "Calls Weather API, generates nudge",
+              "name": "Fetch OpenWeather (Dashboard)",
+              "description": "WeatherViewModel + WeatherRepository. Dashboard weather card via api.openweathermap.org (API key in BuildConfig).",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
@@ -4578,7 +4582,7 @@
             },
             "attrs": {
               "text": {
-                "text": "Create location-based recommendations"
+                "text": "Fetch parks\n(Overpass)"
               },
               "body": {
                 "stroke": "#333333",
@@ -4674,8 +4678,8 @@
             "id": "9571624c-9404-4965-a755-65294944d219",
             "data": {
               "type": "tm.Process",
-              "name": "Create location-based recommendations",
-              "description": "Calls Overpass/OSM, finds nearby parks",
+              "name": "Fetch parks (Overpass)",
+              "description": "NearestParkViewModel + TouchGrassActivity. Overpass API for nearby parks from GPS.",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
@@ -4698,7 +4702,7 @@
             },
             "attrs": {
               "text": {
-                "text": "Create Crashout event"
+                "text": "Instagram block\n+ Touch Grass"
               },
               "body": {
                 "stroke": "#333333",
@@ -4794,8 +4798,8 @@
             "id": "23495084-1110-487e-84d1-602d98cd740a",
             "data": {
               "type": "tm.Process",
-              "name": "Create Crashout event",
-              "description": "Policy engine, triggers soft lock",
+              "name": "Instagram block + Touch Grass",
+              "description": "InstagramBlockerService, UsageTracker, TouchGrassActivity. Blocks over-limit usage; Open-Meteo + Nominatim for touch-grass nudge.",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
@@ -4818,7 +4822,7 @@
             },
             "attrs": {
               "text": {
-                "text": "Show dashboard"
+                "text": "Dashboard\n+ Stats UI"
               },
               "body": {
                 "stroke": "#333333",
@@ -4914,8 +4918,8 @@
             "id": "ffe3d3af-2d75-4fc0-94fc-d1f20bed9966",
             "data": {
               "type": "tm.Process",
-              "name": "Show dashboard",
-              "description": "Aggregates all data, displays to user",
+              "name": "Dashboard + Stats UI",
+              "description": "Dashboard.kt + Stats.kt. Aggregates weather, parks, usage, CBS benchmark, crashout events.",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
@@ -4938,7 +4942,7 @@
             },
             "attrs": {
               "text": {
-                "text": "Stats Database"
+                "text": "Room DB\n(usage stats)"
               },
               "topLine": {
                 "strokeWidth": 1.5,
@@ -5037,14 +5041,14 @@
             "id": "0bb2babd-25f3-43e5-9cb3-c4f451f4e1cd",
             "data": {
               "type": "tm.Store",
-              "name": "Stats Database",
-              "description": "Stores: crashout events, usage history, streaks",
+              "name": "Room DB (usage stats)",
+              "description": "AppDatabase — block_events, streaks, user_settings. Written by UsageTracker and dashboard.",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
               "hasOpenThreats": false,
               "isALog": false,
-              "isEncrypted": true,
+              "isEncrypted": false,
               "isSigned": false,
               "storesCredentials": false,
               "storesInventory": false,
@@ -5062,7 +5066,7 @@
             },
             "attrs": {
               "text": {
-                "text": "Register / Login"
+                "text": "Auth UI"
               },
               "body": {
                 "stroke": "#333333",
@@ -5158,8 +5162,8 @@
             "id": "c0498921-40d6-4dca-bbb8-2f36634c63a5",
             "data": {
               "type": "tm.Process",
-              "name": "Register / Login",
-              "description": "Collects email + password from user",
+              "name": "Auth UI",
+              "description": "Login/Register screens (AuthNavigation). Collects email + password from user.",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
@@ -5182,7 +5186,7 @@
             },
             "attrs": {
               "text": {
-                "text": "Password Auth"
+                "text": "Firebase Auth\nClient"
               },
               "body": {
                 "stroke": "red",
@@ -5278,8 +5282,8 @@
             "id": "51fc100c-11fc-4186-8c4b-2b057c2be794",
             "data": {
               "type": "tm.Process",
-              "name": "Password Auth",
-              "description": "Verifies password using Argon2id hash comparison",
+              "name": "Firebase Auth Client",
+              "description": "Authenticator.kt — signIn/signUp via Firebase Auth SDK (HTTPS). Passwords never stored locally.",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
@@ -5291,12 +5295,12 @@
               "threats": [
                 {
                   "id": "0d0a3b9a-45c1-4078-be38-5a7847a09ae2",
-                  "title": "Attacker impersonates user with stolen hash",
+                  "title": "Credential stuffing against Firebase Auth",
                   "status": "Open",
-                  "severity": "Critical",
+                  "severity": "High",
                   "type": "Spoofing",
-                  "description": "If hash is extracted, attacker cracks it offline",
-                  "mitigation": "Argon2id with high cost factor makes cracking infeasible",
+                  "description": "Attacker replays leaked credentials against sign-in endpoint",
+                  "mitigation": "Firebase rate limiting + min 12-char password policy in Authenticator",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 6,
@@ -5308,8 +5312,8 @@
                   "status": "Open",
                   "severity": "High",
                   "type": "Elevation of privilege",
-                  "description": "Attacker hooks auth function to return \"success\"",
-                  "mitigation": "Use CryptoObject, auth result is cryptographic, not just a boolean",
+                  "description": "Attacker hooks isSignedIn or auth callback to skip login",
+                  "mitigation": "Biometric re-unlock gate; Firebase token validated server-side for Firestore rules",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 8,
@@ -5337,7 +5341,7 @@
             },
             "attrs": {
               "text": {
-                "text": "Users Database"
+                "text": "SecurePrefs\n+ Room"
               },
               "topLine": {
                 "stroke": "red",
@@ -5438,8 +5442,8 @@
             "id": "532eba73-9e79-4e89-a007-0b819d215eed",
             "data": {
               "type": "tm.Store",
-              "name": "Users Database",
-              "description": "Stores: email, Argon2id hash, salt, session token.",
+              "name": "SecurePrefs + Room",
+              "description": "SecurePrefs (EncryptedSharedPreferences + KeystoreManager) for onboarding flags. Room AppDatabase for local user profile cache.",
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
@@ -5452,12 +5456,12 @@
               "threats": [
                 {
                   "id": "28a19142-7cb9-4969-a167-ebc3b771dcd4",
-                  "title": "Hash stored without salt",
+                  "title": "Room DB stored unencrypted",
                   "status": "Open",
-                  "severity": "Critical",
-                  "type": "Tampering",
-                  "description": "Without salt, rainbow tables crack hashes instantly",
-                  "mitigation": "Always generate unique salt per user with \"SecureRandom\"",
+                  "severity": "Medium",
+                  "type": "Information disclosure",
+                  "description": "bayg.db is plaintext SQLite; usage stats readable if device is rooted",
+                  "mitigation": "allowBackup=false; consider SQLCipher for future hardening",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 7,
@@ -5466,10 +5470,10 @@
                 {
                   "id": "8e93ad1b-a85c-4592-a66a-a6304a2464bb",
                   "title": "Database extracted via ADB backup",
-                  "status": "Open",
+                  "status": "Mitigated",
                   "severity": "High",
                   "type": "Information disclosure",
-                  "description": "`adb backup` exposes full DB on non-rooted device",
+                  "description": "`adb backup` could expose DB on older Android versions",
                   "mitigation": "`allowBackup=\"false\"` in AndroidManifest",
                   "modelType": "STRIDE",
                   "new": false,
@@ -5478,7 +5482,7 @@
                 }
               ],
               "threatFrequency": {
-                "tampering": 1,
+                "tampering": 0,
                 "repudiation": 0,
                 "informationDisclosure": 1,
                 "denialOfService": 0
@@ -5491,6 +5495,514 @@
               ],
               "name": null
             }
+          },
+          {
+            "position": {
+              "x": 1320,
+              "y": 80
+            },
+            "size": {
+              "width": 150,
+              "height": 70
+            },
+            "attrs": {
+              "text": {
+                "text": "Firebase\n(Auth + Firestore)"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": "4 3"
+              }
+            },
+            "visible": true,
+            "shape": "actor",
+            "zIndex": 22,
+            "ports": {
+              "groups": {
+                "top": {
+                  "position": "top",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "position": "right",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "bottom": {
+                  "position": "bottom",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "left": {
+                  "position": "left",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                }
+              },
+              "items": [
+                {
+                  "group": "top",
+                  "id": "e8f4b301-0001-4001-8001-000000000001"
+                },
+                {
+                  "group": "right",
+                  "id": "e8f4b301-0002-4001-8001-000000000002"
+                },
+                {
+                  "group": "bottom",
+                  "id": "e8f4b301-0003-4001-8001-000000000003"
+                },
+                {
+                  "group": "left",
+                  "id": "e8f4b301-0004-4001-8001-000000000004"
+                }
+              ]
+            },
+            "id": "e8f4b201-1111-4001-8001-000000000001",
+            "data": {
+              "type": "tm.Actor",
+              "name": "Firebase (Auth + Firestore)",
+              "description": "External - Google Firebase. Auth, email verification, Firestore profile/settings/streak sync.",
+              "isTrustBoundary": false,
+              "outOfScope": true,
+              "reasonOutOfScope": "External Google-managed cloud. Only auth calls and Firestore sync paths are in scope.",
+              "hasOpenThreats": false,
+              "providesAuthentication": true,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 30,
+              "y": 400
+            },
+            "size": {
+              "width": 130,
+              "height": 60
+            },
+            "attrs": {
+              "text": {
+                "text": "Open-Meteo /\nNominatim"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": "4 3"
+              }
+            },
+            "visible": true,
+            "shape": "actor",
+            "zIndex": 23,
+            "ports": {
+              "groups": {
+                "top": {
+                  "position": "top",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "position": "right",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "bottom": {
+                  "position": "bottom",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "left": {
+                  "position": "left",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                }
+              },
+              "items": [
+                {
+                  "group": "top",
+                  "id": "e8f4b301-1001-4001-8001-000000000001"
+                },
+                {
+                  "group": "right",
+                  "id": "e8f4b301-1002-4001-8001-000000000002"
+                },
+                {
+                  "group": "bottom",
+                  "id": "e8f4b301-1003-4001-8001-000000000003"
+                },
+                {
+                  "group": "left",
+                  "id": "e8f4b301-1004-4001-8001-000000000004"
+                }
+              ]
+            },
+            "id": "e8f4b201-2222-4001-8001-000000000001",
+            "data": {
+              "type": "tm.Actor",
+              "name": "Open-Meteo / Nominatim",
+              "description": "External - Touch Grass weather (Open-Meteo) and reverse geocode (Nominatim). Certificate pinned.",
+              "isTrustBoundary": false,
+              "outOfScope": true,
+              "reasonOutOfScope": "External open APIs. Only consumption in TouchGrassActivity is in scope.",
+              "hasOpenThreats": false,
+              "providesAuthentication": false,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 30,
+              "y": 680
+            },
+            "size": {
+              "width": 130,
+              "height": 60
+            },
+            "attrs": {
+              "text": {
+                "text": "Android Device\nLocation (GPS)"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": "4 3"
+              }
+            },
+            "visible": true,
+            "shape": "actor",
+            "zIndex": 24,
+            "ports": {
+              "groups": {
+                "top": {
+                  "position": "top",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "position": "right",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "bottom": {
+                  "position": "bottom",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "left": {
+                  "position": "left",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                }
+              },
+              "items": [
+                {
+                  "group": "top",
+                  "id": "e8f4b301-2001-4001-8001-000000000001"
+                },
+                {
+                  "group": "right",
+                  "id": "e8f4b301-2002-4001-8001-000000000002"
+                },
+                {
+                  "group": "bottom",
+                  "id": "e8f4b301-2003-4001-8001-000000000003"
+                },
+                {
+                  "group": "left",
+                  "id": "e8f4b301-2004-4001-8001-000000000004"
+                }
+              ]
+            },
+            "id": "e8f4b201-3333-4001-8001-000000000001",
+            "data": {
+              "type": "tm.Actor",
+              "name": "Android Device Location (GPS)",
+              "description": "On-device FusedLocationProvider / DeviceLocationProvider for weather and parks.",
+              "isTrustBoundary": false,
+              "outOfScope": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "providesAuthentication": false,
+              "threats": []
+            }
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "touch-grass weather",
+              "description": "Open-Meteo forecast for Touch Grass screen",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": true,
+              "isPublicNetwork": true,
+              "protocol": "HTTPS",
+              "threats": [],
+              "trustBoundaryIds": [
+                "75cebe9d-f979-4e66-b980-ba99db88c8bb"
+              ]
+            },
+            "labels": [
+              "touch-grass weather"
+            ],
+            "id": "e8f4b401-0001-4001-8001-000000000001",
+            "source": {
+              "cell": "e8f4b201-2222-4001-8001-000000000001",
+              "port": "e8f4b301-1002-4001-8001-000000000002"
+            },
+            "target": {
+              "cell": "23495084-1110-487e-84d1-602d98cd740a",
+              "port": "dc94475c-3544-4daa-83cb-20102704377d"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "GPS coordinates",
+              "description": "Lat/lon from DeviceLocationProvider",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": [
+                "75cebe9d-f979-4e66-b980-ba99db88c8bb"
+              ]
+            },
+            "labels": [
+              "GPS coordinates"
+            ],
+            "id": "e8f4b401-0002-4001-8001-000000000001",
+            "source": {
+              "cell": "e8f4b201-3333-4001-8001-000000000001",
+              "port": "e8f4b301-2002-4001-8001-000000000002"
+            },
+            "target": {
+              "cell": "9b244038-1aef-48f7-a1c5-311c71152764",
+              "port": "dc94475c-3544-4daa-83cb-20102704377d"
+            },
+            "vertices": [
+              {
+                "x": 200,
+                "y": 420
+              }
+            ]
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "GPS coordinates",
+              "description": "Lat/lon for Overpass park query",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": [
+                "75cebe9d-f979-4e66-b980-ba99db88c8bb"
+              ]
+            },
+            "labels": [
+              "GPS coordinates"
+            ],
+            "id": "e8f4b401-0003-4001-8001-000000000001",
+            "source": {
+              "cell": "e8f4b201-3333-4001-8001-000000000001",
+              "port": "e8f4b301-2002-4001-8001-000000000002"
+            },
+            "target": {
+              "cell": "9571624c-9404-4965-a755-65294944d219",
+              "port": "dc94475c-3544-4daa-83cb-20102704377d"
+            },
+            "vertices": [
+              {
+                "x": 180,
+                "y": 600
+              }
+            ]
           },
           {
             "position": {
@@ -5610,7 +6122,7 @@
             }
           }
         ],
-        "description": "Level 1 DFD"
+        "description": "Level 1 DFD — internal processes, Room storage, Firebase auth, and external API clients. Updated June 2026."
       }
     ],
     "diagramTop": 2,
