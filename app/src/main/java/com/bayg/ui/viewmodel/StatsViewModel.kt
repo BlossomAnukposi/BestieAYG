@@ -52,7 +52,7 @@ sealed class StatsUiState {
     data class Error(val message: String) : StatsUiState()
 }
 
-class StatsViewModel(
+internal class StatsViewModel(
     private val context: Context,
     private val userId: String,
 ) : ViewModel() {

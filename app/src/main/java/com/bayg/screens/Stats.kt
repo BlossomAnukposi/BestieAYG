@@ -63,7 +63,7 @@ import com.bayg.services.storage.entities.BlockEventSeverity
  * TODO: replace "currentUserId" with however the app resolves the
  * logged-in user's Firebase UID elsewhere (e.g. FirebaseAuth.getInstance().uid).
  */
-private class StatsViewModelFactory(
+class StatsViewModelFactory(
     private val context: Context,
     private val userId: String,
 ) : ViewModelProvider.Factory {
