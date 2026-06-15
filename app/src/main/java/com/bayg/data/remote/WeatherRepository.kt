@@ -17,7 +17,7 @@ import java.io.IOException
  * - Network logging is disabled in release builds to prevent key/coord leakage in logs
  * - Returns Result<T> so callers handle errors gracefully (no crashes on network failure)
  */
-class WeatherRepository {
+class WeatherRepository : WeatherDataSource {
 
     private val apiKey = BuildConfig.OPENWEATHER_API_KEY
 
@@ -53,7 +53,7 @@ class WeatherRepository {
      *   result.onSuccess { weather -> ... }
      *   result.onFailure { error -> ... }
      */
-    suspend fun getWeather(latitude: Double, longitude: Double): Result<WeatherResponse> {
+    override suspend fun getWeather(latitude: Double, longitude: Double): Result<WeatherResponse> {
         return try {
             val response = api.getCurrentWeather(
                 latitude = latitude,
