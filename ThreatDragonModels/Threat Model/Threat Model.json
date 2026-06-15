@@ -3,7 +3,7 @@
   "summary": {
     "title": "Threat Model",
     "owner": "Josephine",
-    "description": "BestieAYG threat model — Level 0 context + Level 1 detailed DFD updated June 2026.",
+    "description": "BestieAYG threat model — Level 0 context + Level 1 detailed DFD with expanded STRIDE threats. June 2026.",
     "id": 0
   },
   "detail": {
@@ -948,12 +948,43 @@
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
-              "hasOpenThreats": false,
+              "hasOpenThreats": true,
               "handlesCardPayment": false,
               "handlesGoodsOrServices": false,
               "isWebApplication": false,
               "privilegeLevel": "",
-              "threats": []
+              "threats": [
+                {
+                  "id": "5b605a16-b1de-48d8-90a9-d180a51a967a",
+                  "title": "Repackaged APK removes Instagram blocker",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Tampering",
+                  "description": "Attacker distributes modified APK without InstagramBlockerService or with raised usage limits.",
+                  "mitigation": "Release signing; distribute via team channel; document integrity checks in security report.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 1,
+                  "score": ""
+                },
+                {
+                  "id": "7c312656-0138-4ade-8b66-2edc49699478",
+                  "title": "Sensitive local data read on rooted device",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Information disclosure",
+                  "description": "Rooted user reads Room DB, logs, or memory containing usage stats and calendar-derived signals.",
+                  "mitigation": "Minimize PII at rest; EncryptedSharedPreferences for flags; no passwords stored locally.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 2,
+                  "score": ""
+                }
+              ],
+              "threatFrequency": {
+                "tampering": 1,
+                "informationDisclosure": 1
+              }
             }
           },
           {
@@ -981,13 +1012,30 @@
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
-              "hasOpenThreats": false,
+              "hasOpenThreats": true,
               "isBidirectional": false,
               "isEncrypted": false,
               "isPublicNetwork": false,
               "protocol": "",
-              "threats": [],
-              "trustBoundaryIds": []
+              "threats": [
+                {
+                  "id": "575e6097-9c93-459d-b7d4-cef9319db46f",
+                  "title": "Phishing overlay on login screen",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Spoofing",
+                  "description": "Malicious app draws overlay mimicking Auth UI to harvest credentials.",
+                  "mitigation": "Use system autofill where possible; educate users; FLAG_SECURE on auth screens (optional).",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 11,
+                  "score": ""
+                }
+              ],
+              "trustBoundaryIds": [],
+              "threatFrequency": {
+                "spoofing": 1
+              }
             },
             "labels": [
               "auth credentials"
@@ -1027,13 +1075,44 @@
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
-              "hasOpenThreats": false,
+              "hasOpenThreats": true,
               "isBidirectional": false,
               "isEncrypted": false,
               "isPublicNetwork": false,
               "protocol": "",
-              "threats": [],
-              "trustBoundaryIds": []
+              "threats": [
+                {
+                  "id": "708cd845-bca5-45f9-a236-1cedb004bb4b",
+                  "title": "OpenWeather API key extracted from APK",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Information disclosure",
+                  "description": "BuildConfig.OPENWEATHER_API_KEY is embedded at compile time; strings/decompile reveals key.",
+                  "mitigation": "Rate-limit key in OpenWeather dashboard; rotate if abused; proxy via backend (future).",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 12,
+                  "score": ""
+                },
+                {
+                  "id": "9ba1a4ec-3401-47da-8a60-1e74bfb55975",
+                  "title": "Spoofed weather response (MITM)",
+                  "status": "Mitigated",
+                  "severity": "Medium",
+                  "type": "Tampering",
+                  "description": "Attacker returns fake JSON to manipulate dashboard weather nudge.",
+                  "mitigation": "Certificate pinning for openweathermap.org in network_security_config.xml.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 13,
+                  "score": ""
+                }
+              ],
+              "trustBoundaryIds": [],
+              "threatFrequency": {
+                "informationDisclosure": 1,
+                "tampering": 1
+              }
             },
             "labels": [
               "OpenWeather forecast"
@@ -1212,13 +1291,30 @@
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
-              "hasOpenThreats": false,
+              "hasOpenThreats": true,
               "isBidirectional": false,
               "isEncrypted": false,
               "isPublicNetwork": false,
               "protocol": "",
-              "threats": [],
-              "trustBoundaryIds": []
+              "threats": [
+                {
+                  "id": "99a5e00e-7c42-4805-97a9-168f38041268",
+                  "title": "Instagram usage metadata exposes behaviour",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Information disclosure",
+                  "description": "UsageStatsManager reveals app-open duration; correlates with mental-health nudges.",
+                  "mitigation": "PACKAGE_USAGE_STATS permission gated in UI; data stays on device except Firestore sync.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 15,
+                  "score": ""
+                }
+              ],
+              "trustBoundaryIds": [],
+              "threatFrequency": {
+                "informationDisclosure": 1
+              }
             },
             "labels": [
               "usage data"
@@ -1263,8 +1359,25 @@
               "isEncrypted": false,
               "isPublicNetwork": false,
               "protocol": "",
-              "threats": [],
-              "trustBoundaryIds": []
+              "threats": [
+                {
+                  "id": "4bea1758-dddb-4b5e-9099-28afa539dff3",
+                  "title": "Malicious HTML/JS in No-as-a-Service quote",
+                  "status": "Mitigated",
+                  "severity": "High",
+                  "type": "Tampering",
+                  "description": "noasaservice.lol returns crafted payload with script tags or javascript: URIs shown on dashboard.",
+                  "mitigation": "NoAsAMessageSanitizer strips tags, JS URIs, control chars; 500-char cap.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 14,
+                  "score": ""
+                }
+              ],
+              "trustBoundaryIds": [],
+              "threatFrequency": {
+                "tampering": 1
+              }
             },
             "labels": [
               "random rejection reason"
@@ -1865,13 +1978,44 @@
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
-              "hasOpenThreats": false,
+              "hasOpenThreats": true,
               "isBidirectional": true,
               "isEncrypted": true,
               "isPublicNetwork": true,
               "protocol": "HTTPS/TLS",
-              "threats": [],
-              "trustBoundaryIds": []
+              "threats": [
+                {
+                  "id": "a4a12edb-133f-4954-89b2-b5b5f00d3292",
+                  "title": "Firestore security rules too permissive",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Information disclosure",
+                  "description": "Misconfigured rules let user A read/write user B profile, settings, or streak documents.",
+                  "mitigation": "Rules require request.auth.uid == resource.data.uid; review in Firebase console.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 16,
+                  "score": ""
+                },
+                {
+                  "id": "36fd7319-f55e-40d0-b0fa-b010ccddbbe1",
+                  "title": "Stolen Firebase ID token replay",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Spoofing",
+                  "description": "Leaked ID token used from another client until expiry to access Firestore as victim.",
+                  "mitigation": "Short token TTL; secure device storage; signOut on suspicious activity.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 17,
+                  "score": ""
+                }
+              ],
+              "trustBoundaryIds": [],
+              "threatFrequency": {
+                "informationDisclosure": 1,
+                "spoofing": 1
+              }
             },
             "labels": [
               "auth + profile sync"
@@ -2984,12 +3128,29 @@
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
-              "hasOpenThreats": false,
+              "hasOpenThreats": true,
               "handlesCardPayment": false,
               "handlesGoodsOrServices": false,
               "isWebApplication": false,
               "privilegeLevel": "",
-              "threats": []
+              "threats": [
+                {
+                  "id": "601cb7a5-68f7-463e-860c-f504607af7d1",
+                  "title": "Biometric gate skipped on emulator",
+                  "status": "Open",
+                  "severity": "Low",
+                  "type": "Elevation of privilege",
+                  "description": "Emulator without enrolled biometrics may weaken re-unlock on dev builds.",
+                  "mitigation": "Require BIOMETRIC_STRONG; fail closed if no biometric enrolled on production devices.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 22,
+                  "score": ""
+                }
+              ],
+              "threatFrequency": {
+                "elevationOfPrivilege": 1
+              }
             }
           },
           {
@@ -3104,12 +3265,29 @@
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
-              "hasOpenThreats": false,
+              "hasOpenThreats": true,
               "handlesCardPayment": false,
               "handlesGoodsOrServices": false,
               "isWebApplication": false,
               "privilegeLevel": "",
-              "threats": []
+              "threats": [
+                {
+                  "id": "0cedcc78-4ccc-4efb-a62f-6b196a0df853",
+                  "title": "Session persists after password change elsewhere",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Spoofing",
+                  "description": "Firebase session remains valid on device if password reset on another client.",
+                  "mitigation": "Call auth.currentUser.reload() before sensitive actions; signOut on token refresh failure.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 21,
+                  "score": ""
+                }
+              ],
+              "threatFrequency": {
+                "spoofing": 1
+              }
             }
           },
           {
@@ -3146,12 +3324,12 @@
               "threats": [
                 {
                   "id": "f6e7f120-1a0d-4ffe-a012-31fc7a04517a",
-                  "title": "Password exposed in network traffic",
+                  "title": "Credentials captured on device before TLS",
                   "status": "Open",
                   "severity": "High",
                   "type": "Information disclosure",
-                  "description": "Credentials sent over TLS to Firebase Auth SDK",
-                  "mitigation": "HTTPS enforced; Firebase SDK uses TLS. NetworkSecurityConfig blocks cleartext.",
+                  "description": "Malware, accessibility overlay, or keyboard logger reads email/password while the user types in Auth UI, before Firebase SDK transmits over HTTPS.",
+                  "mitigation": "Minimize credential lifetime in memory; rely on Firebase SDK for transport; educate users against sideloaded keyboards. NetworkSecurityConfig blocks cleartext.",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 3,
@@ -3162,9 +3340,7 @@
                 "75cebe9d-f979-4e66-b980-ba99db88c8bb"
               ],
               "threatFrequency": {
-                "tampering": 0,
-                "informationDisclosure": 1,
-                "denialOfService": 0
+                "informationDisclosure": 1
               }
             },
             "labels": [
@@ -3263,11 +3439,11 @@
                 {
                   "id": "247b8574-1359-4d98-bf02-91b44ac38539",
                   "title": "MITM on Firebase Auth traffic",
-                  "status": "Mitigated",
+                  "status": "Open",
                   "severity": "High",
                   "type": "Tampering",
-                  "description": "Attacker intercepts auth request on compromised network",
-                  "mitigation": "TLS + certificate pinning for Google/Firebase endpoints",
+                  "description": "Attacker with a user-installed CA (debug builds) or compromised network proxy could intercept Firebase Auth requests. Firebase is intentionally not certificate-pinned because Google rotates GTS certificates ~every 90 days.",
+                  "mitigation": "Release builds reject user CAs (network_security_config.xml debug-overrides). Document accepted risk for Firebase; rely on TLS + system trust store in production.",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 4,
@@ -3278,9 +3454,7 @@
                 "75cebe9d-f979-4e66-b980-ba99db88c8bb"
               ],
               "threatFrequency": {
-                "tampering": 1,
-                "informationDisclosure": 0,
-                "denialOfService": 0
+                "tampering": 1
               }
             },
             "labels": [
@@ -3327,15 +3501,32 @@
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
-              "hasOpenThreats": false,
+              "hasOpenThreats": true,
               "isBidirectional": false,
               "isEncrypted": false,
               "isPublicNetwork": false,
               "protocol": "",
-              "threats": [],
+              "threats": [
+                {
+                  "id": "b72f26a8-9a30-472f-a4bd-f55e64f4a574",
+                  "title": "ID token logged in debug builds",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Information disclosure",
+                  "description": "Verbose logging of Firebase user or token in debug APK shared among team.",
+                  "mitigation": "Strip sensitive logs in release; ProGuard/R8; no token in Log.d calls.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 29,
+                  "score": ""
+                }
+              ],
               "trustBoundaryIds": [
                 "75cebe9d-f979-4e66-b980-ba99db88c8bb"
-              ]
+              ],
+              "threatFrequency": {
+                "informationDisclosure": 1
+              }
             },
             "labels": [
               "ID token + profile"
@@ -3446,8 +3637,8 @@
                   "status": "Open",
                   "severity": "Critical",
                   "type": "Information disclosure",
-                  "description": "Raw biometric data should NEVER leave the TEE",
-                  "mitigation": "Use Android `BiometricPrompt` API only, never store biometric data yourself",
+                  "description": "Custom code stores fingerprint templates or routes biometrics outside the TEE. Android BiometricPrompt only returns success/failure — raw biometrics must never be persisted.",
+                  "mitigation": "BiometricAuthManager uses BiometricPrompt + Keystore CryptoObject only. No biometric templates stored in SecurePrefs or Room.",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 5,
@@ -3458,9 +3649,7 @@
                 "75cebe9d-f979-4e66-b980-ba99db88c8bb"
               ],
               "threatFrequency": {
-                "tampering": 0,
-                "informationDisclosure": 1,
-                "denialOfService": 0
+                "informationDisclosure": 1
               }
             },
             "labels": [
@@ -3550,7 +3739,7 @@
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
-              "hasOpenThreats": true,
+              "hasOpenThreats": false,
               "isBidirectional": false,
               "isEncrypted": false,
               "isPublicNetwork": false,
@@ -3562,8 +3751,8 @@
                   "status": "Mitigated",
                   "severity": "Medium",
                   "type": "Information disclosure",
-                  "description": "Onboarding completion flag could leak if prefs are readable",
-                  "mitigation": "SecurePrefs uses EncryptedSharedPreferences + KeystoreManager",
+                  "description": "OnboardingStore flag (onboarding_complete_<uid>) identifies account state. If stored in plaintext SharedPreferences, rooted device or backup could read it.",
+                  "mitigation": "OnboardingStore uses SecurePrefs → EncryptedSharedPreferences with KeystoreManager master key.",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 9,
@@ -3572,9 +3761,7 @@
               ],
               "trustBoundaryIds": [],
               "threatFrequency": {
-                "tampering": 0,
-                "informationDisclosure": 1,
-                "denialOfService": 0
+                "informationDisclosure": 1
               }
             },
             "labels": [
@@ -3668,15 +3855,32 @@
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
-              "hasOpenThreats": false,
+              "hasOpenThreats": true,
               "isBidirectional": false,
               "isEncrypted": false,
               "isPublicNetwork": false,
               "protocol": "",
-              "threats": [],
+              "threats": [
+                {
+                  "id": "349cc3fc-2fdf-4df0-ae18-38ca27a63812",
+                  "title": "Pinned OpenWeather cert expires",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Denial of service",
+                  "description": "SPKI pin-set expiration (2027-01-01) or leaf rotation without pin update bricks weather card.",
+                  "mitigation": "Refresh pins via scripts/compute-spki-pin.ps1 before expiration; monitor CI.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 28,
+                  "score": ""
+                }
+              ],
               "trustBoundaryIds": [
                 "75cebe9d-f979-4e66-b980-ba99db88c8bb"
-              ]
+              ],
+              "threatFrequency": {
+                "denialOfService": 1
+              }
             },
             "labels": [
               "weather forecast"
@@ -3781,10 +3985,27 @@
               "isEncrypted": false,
               "isPublicNetwork": false,
               "protocol": "",
-              "threats": [],
+              "threats": [
+                {
+                  "id": "196e9987-9430-44b1-b306-110cd822df17",
+                  "title": "Untrusted JSON displayed without sanitization",
+                  "status": "Mitigated",
+                  "severity": "High",
+                  "type": "Tampering",
+                  "description": "noasaservice.lol response rendered on Touch Grass / dashboard without filtering.",
+                  "mitigation": "NoAsAMessageSanitizer + length cap before Compose Text display.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 27,
+                  "score": ""
+                }
+              ],
               "trustBoundaryIds": [
                 "75cebe9d-f979-4e66-b980-ba99db88c8bb"
-              ]
+              ],
+              "threatFrequency": {
+                "tampering": 1
+              }
             },
             "labels": [
               "random rejection reason"
@@ -4565,15 +4786,32 @@
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
-              "hasOpenThreats": false,
+              "hasOpenThreats": true,
               "isBidirectional": false,
               "isEncrypted": false,
               "isPublicNetwork": false,
               "protocol": "",
-              "threats": [],
+              "threats": [
+                {
+                  "id": "c1094e3c-6901-4838-af3b-c34e612ccd03",
+                  "title": "Precise GPS sent to OpenWeather",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Information disclosure",
+                  "description": "Lat/lon in WeatherRepository query reveals user location to third party.",
+                  "mitigation": "Location permission rationale in UI; coarse location option; OpenWeather privacy policy.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 30,
+                  "score": ""
+                }
+              ],
               "trustBoundaryIds": [
                 "75cebe9d-f979-4e66-b980-ba99db88c8bb"
-              ]
+              ],
+              "threatFrequency": {
+                "informationDisclosure": 1
+              }
             },
             "labels": [
               "GPS coordinates"
@@ -4764,12 +5002,29 @@
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
-              "hasOpenThreats": false,
+              "hasOpenThreats": true,
               "handlesCardPayment": false,
               "handlesGoodsOrServices": false,
               "isWebApplication": false,
               "privilegeLevel": "",
-              "threats": []
+              "threats": [
+                {
+                  "id": "f6342282-4dcb-4f25-8094-a11ede69d23f",
+                  "title": "API key abuse after APK decompilation",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Information disclosure",
+                  "description": "WeatherRepository reads BuildConfig.OPENWEATHER_API_KEY; attacker drains quota.",
+                  "mitigation": "OpenWeather dashboard rate limits; monitor usage; document in threat model.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 18,
+                  "score": ""
+                }
+              ],
+              "threatFrequency": {
+                "informationDisclosure": 1
+              }
             }
           },
           {
@@ -4884,12 +5139,29 @@
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
-              "hasOpenThreats": false,
+              "hasOpenThreats": true,
               "handlesCardPayment": false,
               "handlesGoodsOrServices": false,
               "isWebApplication": false,
               "privilegeLevel": "",
-              "threats": []
+              "threats": [
+                {
+                  "id": "f753b293-ce98-4e30-94e5-1db15d2e988d",
+                  "title": "Malicious park names from Overpass",
+                  "status": "Open",
+                  "severity": "Low",
+                  "type": "Tampering",
+                  "description": "Compromised Overpass instance returns offensive or misleading OSM tag names.",
+                  "mitigation": "Certificate pinning for overpass-api.de; display as plain text only (no WebView).",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 26,
+                  "score": ""
+                }
+              ],
+              "threatFrequency": {
+                "tampering": 1
+              }
             }
           },
           {
@@ -5004,12 +5276,43 @@
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
-              "hasOpenThreats": false,
+              "hasOpenThreats": true,
               "handlesCardPayment": false,
               "handlesGoodsOrServices": false,
               "isWebApplication": false,
               "privilegeLevel": "",
-              "threats": []
+              "threats": [
+                {
+                  "id": "5c14210b-b867-4f6c-9d43-cf528a961abf",
+                  "title": "Instagram blocker bypassed via settings",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Elevation of privilege",
+                  "description": "User disables Usage Access, force-stops InstagramBlockerService, or changes device date.",
+                  "mitigation": "Re-prompt for PACKAGE_USAGE_STATS; foreground service restart; validate stats server-side if synced.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 19,
+                  "score": ""
+                },
+                {
+                  "id": "16afa8ba-5ffe-498f-a7bb-2822f96b021e",
+                  "title": "Inflated usage stats to avoid block",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Tampering",
+                  "description": "Attacker hooks UsageStatsManager or modifies Room block_events to under-report Instagram time.",
+                  "mitigation": "Stats sourced from OS UsageStatsManager; Room is display cache only.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 20,
+                  "score": ""
+                }
+              ],
+              "threatFrequency": {
+                "elevationOfPrivilege": 1,
+                "tampering": 1
+              }
             }
           },
           {
@@ -5124,12 +5427,29 @@
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
-              "hasOpenThreats": false,
+              "hasOpenThreats": true,
               "handlesCardPayment": false,
               "handlesGoodsOrServices": false,
               "isWebApplication": false,
               "privilegeLevel": "",
-              "threats": []
+              "threats": [
+                {
+                  "id": "67b9d2b1-8b07-4fb5-9827-4766fdc260b9",
+                  "title": "Dashboard leaks aggregated sensitive context",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Information disclosure",
+                  "description": "Screen shows usage vs NL average, calendar-driven crashout, GPS-derived location label.",
+                  "mitigation": "FLAG_SECURE optional on stats; minimize fields; user consent for location.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 23,
+                  "score": ""
+                }
+              ],
+              "threatFrequency": {
+                "informationDisclosure": 1
+              }
             }
           },
           {
@@ -5247,13 +5567,30 @@
               "outOfScope": false,
               "isTrustBoundary": false,
               "reasonOutOfScope": "",
-              "hasOpenThreats": false,
+              "hasOpenThreats": true,
               "isALog": false,
               "isEncrypted": false,
               "isSigned": false,
               "storesCredentials": false,
               "storesInventory": false,
-              "threats": []
+              "threats": [
+                {
+                  "id": "39a3ee32-d97e-425d-9c52-b5f117e07616",
+                  "title": "Streak / block history tampered locally",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Tampering",
+                  "description": "Attacker edits block_events or streaks rows in bayg.db to fake progress.",
+                  "mitigation": "Firestore sync can reconcile; treat Room as cache; validate on push (SyncWorker).",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 25,
+                  "score": ""
+                }
+              ],
+              "threatFrequency": {
+                "tampering": 1
+              }
             }
           },
           {
@@ -5373,7 +5710,24 @@
               "handlesGoodsOrServices": false,
               "isWebApplication": false,
               "privilegeLevel": "",
-              "threats": []
+              "threats": [
+                {
+                  "id": "271536d3-d6cf-4896-94fd-7086c89e368a",
+                  "title": "Weak password accepted at registration",
+                  "status": "Mitigated",
+                  "severity": "Medium",
+                  "type": "Tampering",
+                  "description": "User submits password under 12 characters if client validation is bypassed.",
+                  "mitigation": "Authenticator.MIN_PASSWORD_LENGTH=12; Firebase ERROR_WEAK_PASSWORD mapped in UI.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 24,
+                  "score": ""
+                }
+              ],
+              "threatFrequency": {
+                "tampering": 1
+              }
             }
           },
           {
@@ -5500,8 +5854,8 @@
                   "status": "Open",
                   "severity": "High",
                   "type": "Spoofing",
-                  "description": "Attacker replays leaked credentials against sign-in endpoint",
-                  "mitigation": "Firebase rate limiting + min 12-char password policy in Authenticator",
+                  "description": "Attacker replays breached email/password pairs against Authenticator.signIn(). Successful login grants Firebase session until sign-out.",
+                  "mitigation": "MIN_PASSWORD_LENGTH=12 in Authenticator; Firebase Auth rate limits; email verification required before full access.",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 6,
@@ -5513,8 +5867,8 @@
                   "status": "Open",
                   "severity": "High",
                   "type": "Elevation of privilege",
-                  "description": "Attacker hooks isSignedIn or auth callback to skip login",
-                  "mitigation": "Biometric re-unlock gate; Firebase token validated server-side for Firestore rules",
+                  "description": "Frida/Xposed hooks FirebaseAuth.getInstance().currentUser or isSignedIn to return a fake authenticated state and skip BiometricUnlockGate.",
+                  "mitigation": "BiometricUnlockGate re-validates on resume; Firestore security rules require valid ID token; sensitive actions should re-check auth.getCurrentUser() at use time.",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 8,
@@ -5523,10 +5877,6 @@
               ],
               "threatFrequency": {
                 "spoofing": 1,
-                "tampering": 0,
-                "repudiation": 0,
-                "informationDisclosure": 0,
-                "denialOfService": 0,
                 "elevationOfPrivilege": 1
               }
             }
@@ -5661,8 +6011,8 @@
                   "status": "Open",
                   "severity": "Medium",
                   "type": "Information disclosure",
-                  "description": "bayg.db is plaintext SQLite; usage stats readable if device is rooted",
-                  "mitigation": "allowBackup=false; consider SQLCipher for future hardening",
+                  "description": "bayg.db (Room) holds block_events, streaks, user_settings in plaintext SQLite. Rooted device or forensic image exposes Instagram usage patterns.",
+                  "mitigation": "android:allowBackup=false; no credentials in Room; SQLCipher considered for future release.",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 7,
@@ -5674,7 +6024,7 @@
                   "status": "Mitigated",
                   "severity": "High",
                   "type": "Information disclosure",
-                  "description": "`adb backup` could expose DB on older Android versions",
+                  "description": "Legacy adb backup or device transfer could copy app data including bayg.db if backup were enabled.",
                   "mitigation": "`allowBackup=\"false\"` in AndroidManifest",
                   "modelType": "STRIDE",
                   "new": false,
@@ -5683,10 +6033,7 @@
                 }
               ],
               "threatFrequency": {
-                "tampering": 0,
-                "repudiation": 0,
-                "informationDisclosure": 1,
-                "denialOfService": 0
+                "informationDisclosure": 2
               }
             }
           },
@@ -6164,6 +6511,6 @@
     ],
     "diagramTop": 2,
     "reviewer": "",
-    "threatTop": 10
+    "threatTop": 30
   }
 }
