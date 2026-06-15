@@ -59,10 +59,11 @@ import com.bayg.TouchGrassActivity
 import com.bayg.location.DeviceLocationProvider
 import com.bayg.services.NoAsAService
 import com.bayg.services.storage.UserSettingsViewModel
-import com.bayg.ui.viewmodel.NearestParkUiState
 import com.bayg.ui.viewmodel.NearestParkViewModel
 import com.bayg.ui.viewmodel.StatsUiState
 import com.bayg.ui.viewmodel.StatsViewModel
+import com.bayg.ui.viewmodel.StatsViewModelFactory
+import com.bayg.ui.viewmodel.NearestParkUiState
 import com.bayg.ui.viewmodel.WeatherUiState
 import com.bayg.ui.viewmodel.WeatherViewModel
 import com.bayg.widgets.GreenButton

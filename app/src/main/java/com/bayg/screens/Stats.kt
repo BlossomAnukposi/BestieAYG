@@ -55,23 +55,7 @@ import com.bayg.widgets.Heading4
 import com.bayg.widgets.NavBar
 import com.bayg.widgets.Paragraph
 import com.bayg.services.storage.entities.BlockEventSeverity
-
-/**
- * Factory for StatsViewModel — mirrors how ProfileSettingsViewModel is
- * expected to be constructed (context + firebase userId).
- *
- * TODO: replace "currentUserId" with however the app resolves the
- * logged-in user's Firebase UID elsewhere (e.g. FirebaseAuth.getInstance().uid).
- */
-class StatsViewModelFactory(
-    private val context: Context,
-    private val userId: String,
-) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-        return StatsViewModel(context, userId) as T
-    }
-}
+import com.bayg.ui.viewmodel.StatsViewModelFactory
 
 @Composable
 fun Stats(navController: NavController) {
