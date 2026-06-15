@@ -19,8 +19,8 @@
         "cells": [
           {
             "position": {
-              "x": 860,
-              "y": 140
+              "x": 900,
+              "y": 110.00000000000006
             },
             "size": {
               "width": 112.5,
@@ -136,8 +136,8 @@
           },
           {
             "position": {
-              "x": 560,
-              "y": 357.0000000000001
+              "x": 460,
+              "y": 420
             },
             "size": {
               "width": 112.5,
@@ -253,8 +253,8 @@
           },
           {
             "position": {
-              "x": 304,
-              "y": 287.0000000000001
+              "x": 120,
+              "y": 220
             },
             "size": {
               "width": 160,
@@ -1393,6 +1393,7 @@
             },
             "visible": true,
             "shape": "actor",
+            "zIndex": 11,
             "ports": {
               "groups": {
                 "top": {
@@ -1476,7 +1477,6 @@
               ]
             },
             "id": "f2539d15-b5d0-480d-9cd4-1d2d5f227ab7",
-            "zIndex": 11,
             "data": {
               "type": "tm.Actor",
               "name": "CBS StatLine",
