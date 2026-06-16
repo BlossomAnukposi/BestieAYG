@@ -2,6 +2,7 @@ package com.bayg.data.remote
 
 import com.bayg.BuildConfig
 import com.bayg.data.remote.model.WeatherResponse
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.HttpException
@@ -26,7 +27,22 @@ import java.io.IOException
  */
 class WeatherRepository : WeatherDataSource {
 
+    /**
+     * Tags every request to the proxy with X-Bayg-Client so the Worker
+     * can reject random scrapers that have discovered the public URL.
+     * This is not authentication (an attacker who decompiles the APK
+     * sees the header); quota protection comes from the Worker's
+     * per-IP rate limit.
+     */
+    private val clientHeaderInterceptor = Interceptor { chain ->
+        val tagged = chain.request().newBuilder()
+            .header(CLIENT_HEADER_NAME, CLIENT_HEADER_VALUE)
+            .build()
+        chain.proceed(tagged)
+    }
+
     private val httpClient = OkHttpClient.Builder()
+        .addInterceptor(clientHeaderInterceptor)
         .addInterceptor(
             HttpLoggingInterceptor().apply {
                 level = if (BuildConfig.DEBUG)
@@ -64,5 +80,10 @@ class WeatherRepository : WeatherDataSource {
         // lives only inside the Worker (Cloudflare encrypted env).
         private const val PROXY_BASE_URL =
             "https://bayg-weather-proxy.bayg-weather-proxy.workers.dev/"
+
+        // Sent on every /weather request; matches REQUIRED_CLIENT_VALUE
+        // in proxy/src/index.js.
+        private const val CLIENT_HEADER_NAME = "X-Bayg-Client"
+        private const val CLIENT_HEADER_VALUE = "bayg-android"
     }
 }

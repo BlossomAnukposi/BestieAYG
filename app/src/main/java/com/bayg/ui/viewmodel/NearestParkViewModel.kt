@@ -1,5 +1,6 @@
 package com.bayg.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bayg.Park
@@ -25,12 +26,13 @@ class NearestParkViewModel : ViewModel() {
             try {
                 val (nearest, total) = fetchFromOverpass(lat, lon)
                     ?: run {
-                        _parkState.value = NearestParkUiState.Error("No parks found nearby")
+                        _parkState.value = NearestParkUiState.Error(NO_PARKS_MESSAGE)
                         return@launch
                     }
                 _parkState.value = NearestParkUiState.Success(nearest, total)
             } catch (e: Exception) {
-                _parkState.value = NearestParkUiState.Error(e.message ?: "Unknown error")
+                Log.w(TAG, "Overpass request failed", e)
+                _parkState.value = NearestParkUiState.Error(GENERIC_ERROR_MESSAGE)
             }
         }
     }
@@ -80,6 +82,12 @@ class NearestParkViewModel : ViewModel() {
         val dLambda = Math.toRadians(lon2 - lon1)
         val a = Math.sin(dPhi / 2).pow(2) + Math.cos(phi1) * Math.cos(phi2) * Math.sin(dLambda / 2).pow(2)
         return 6_371_000.0 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    }
+
+    companion object {
+        private const val TAG = "NearestParkVM"
+        private const val NO_PARKS_MESSAGE = "No parks found nearby"
+        private const val GENERIC_ERROR_MESSAGE = "Couldn't load parks. Try again."
     }
 }
 
