@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -285,7 +286,10 @@ private fun DailyUsageChart(days: List<DayUsage>, dailyLimitMinutes: Int) {
                 }
             }
 
-            // "45m" style label for the limit line
+            // "45m" style label for the limit line. Use `offset` (not `padding`)
+            // for the upward nudge: Compose rejects negative values in `padding`
+            // at runtime, but `offset` accepts them and is the correct API for
+            // visually translating an element off its layout position.
             Text(
                 text = "${dailyLimitMinutes}m",
                 fontSize = 13.sp,
@@ -293,7 +297,7 @@ private fun DailyUsageChart(days: List<DayUsage>, dailyLimitMinutes: Int) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(top = (-8).dp)
+                    .offset(y = (-8).dp)
             )
         }
 
