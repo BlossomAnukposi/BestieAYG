@@ -29,7 +29,12 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: temurin
 
+      # Skip the Android Emulator install (tools meta-package).
+      # We don't run instrumented tests in CI, so the emulator is unused
+      # and its download from Google's CDN is flaky (ZipFile unknown archive).
       - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
 
       - uses: actions/cache@v4
         with:
@@ -70,7 +75,12 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: temurin
 
+      # Skip the Android Emulator install (tools meta-package).
+      # We don't run instrumented tests in CI, so the emulator is unused
+      # and its download from Google's CDN is flaky (ZipFile unknown archive).
       - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
 
       - uses: actions/cache@v4
         with:
@@ -111,7 +121,12 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: temurin
 
+      # Skip the Android Emulator install (tools meta-package).
+      # We don't run instrumented tests in CI, so the emulator is unused
+      # and its download from Google's CDN is flaky (ZipFile unknown archive).
       - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
 
       - uses: actions/cache@v4
         with:
@@ -154,7 +169,12 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: temurin
 
+      # Skip the Android Emulator install (tools meta-package).
+      # We don't run instrumented tests in CI, so the emulator is unused
+      # and its download from Google's CDN is flaky (ZipFile unknown archive).
       - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
 
       - uses: actions/cache@v4
         with:
