@@ -1,18 +1,9 @@
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.services)
     id("io.gitlab.arturbosch.detekt") version "1.23.8"
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.devtools.ksp")
-}
-
-// Load local.properties to read API key securely
-val localProps = Properties()
-val localPropsFile = rootProject.file("local.properties")
-if (localPropsFile.exists()) {
-    localProps.load(localPropsFile.inputStream())
 }
 
 android {
@@ -32,9 +23,9 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Inject API key into BuildConfig (if missing, use empty string to avoid build failures)
-        val apiKey = localProps.getProperty("OPENWEATHER_API_KEY") ?: ""
-        buildConfigField("String", "OPENWEATHER_API_KEY", "\"$apiKey\"")
+        // OpenWeather API key intentionally NOT bundled here. The app calls
+        // a Cloudflare Worker proxy (see proxy/) which holds the key
+        // server-side. Removed after pentest Test 1 found the key in the APK.
     }
 
     buildFeatures {

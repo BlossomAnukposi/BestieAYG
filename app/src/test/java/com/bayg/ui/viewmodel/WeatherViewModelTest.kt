@@ -38,7 +38,6 @@ class WeatherViewModelTest {
         val weather = sampleWeather()
         val viewModel = WeatherViewModel(
             repository = FakeWeatherDataSource(Result.success(weather)),
-            hasApiKey = { true },
         )
 
         viewModel.fetchWeather(52.78, 6.90)
@@ -53,7 +52,6 @@ class WeatherViewModelTest {
     fun `fetchWeather emits error when repository fails`() = runTest(testDispatcher) {
         val viewModel = WeatherViewModel(
             repository = FakeWeatherDataSource(Result.failure(IllegalStateException("Network down"))),
-            hasApiKey = { true },
         )
 
         viewModel.fetchWeather(52.78, 6.90)
@@ -62,24 +60,6 @@ class WeatherViewModelTest {
         val state = viewModel.weatherState.value
         assertTrue(state is WeatherUiState.Error)
         assertEquals("Network down", (state as WeatherUiState.Error).message)
-    }
-
-    @Test
-    fun `fetchWeather emits error when API key is missing`() = runTest(testDispatcher) {
-        val viewModel = WeatherViewModel(
-            repository = FakeWeatherDataSource(Result.success(sampleWeather())),
-            hasApiKey = { false },
-        )
-
-        viewModel.fetchWeather(52.78, 6.90)
-        advanceUntilIdle()
-
-        val state = viewModel.weatherState.value
-        assertTrue(state is WeatherUiState.Error)
-        assertEquals(
-            "Missing OPENWEATHER_API_KEY in local.properties",
-            (state as WeatherUiState.Error).message,
-        )
     }
 
     private fun sampleWeather() = WeatherResponse(
