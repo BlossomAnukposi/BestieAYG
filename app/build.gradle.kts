@@ -120,6 +120,13 @@ dependencies {
     implementation(libs.androidx.security.crypto)
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.fragment.ktx)
+
+    // SQLCipher for Room. Encrypts the on-disk SQLite database with
+    // AES-256 so an ADB backup or rooted-device extraction yields
+    // unreadable bytes. See app/src/main/java/com/bayg/security/
+    // DbPassphraseProvider.kt for how the passphrase is stored.
+    implementation("net.zetetic:sqlcipher-android:4.6.1@aar")
+    implementation("androidx.sqlite:sqlite-ktx:2.4.0")
 }
 
 ksp {

@@ -80,6 +80,10 @@ class SecurePrefs(context: Context) {
         BIOMETRIC_UNLOCK_ENABLED("biometric_unlock_enabled"),
         REMEMBER_ME("remember_me"),
         SETTINGS_JSON_CACHE("settings_json_cache"),
+
+        // SQLCipher passphrase, Base64-encoded. Read by DbPassphraseProvider
+        // when opening the encrypted Room database.
+        DB_PASSPHRASE_B64("db_passphrase_b64"),
     }
 
     private companion object {
