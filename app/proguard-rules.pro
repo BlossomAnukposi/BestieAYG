@@ -54,6 +54,14 @@
 -keep @androidx.room.Database class * { *; }
 -keep class com.bayg.services.storage.entities.** { *; }
 
+# ---- SQLCipher ----------------------------------------------------
+# SQLCipher's JNI layer is reached by reflection from the AAR. Keep the
+# whole `net.zetetic.database.sqlcipher` package so R8 does not rename
+# the entry points that the native library expects.
+-keep class net.zetetic.database.sqlcipher.** { *; }
+-keep class net.zetetic.database.** { *; }
+-dontwarn net.zetetic.database.**
+
 # ---- Firebase -----------------------------------------------------
 # Firebase SDKs ship consumer rules; these two lines silence false-positive
 # warnings about reflective access that the SDK handles internally.
