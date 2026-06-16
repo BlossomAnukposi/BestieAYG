@@ -34,7 +34,12 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // R8 + resource shrinking. Raises the bar against pentest
+            // Test 1 (APK decompilation): class/method names get renamed
+            // and dead code is stripped. See app/proguard-rules.pro for
+            // reflective-access keeps (Retrofit, Gson, Room, Firebase).
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

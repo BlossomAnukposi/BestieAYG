@@ -1,21 +1,75 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
+# BestieAYG ProGuard / R8 rules.
 #
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Goal: enable R8 on release builds so class/method names are obfuscated
+# and dead code is stripped, while keeping everything that depends on
+# reflection (Retrofit, Gson, Room, Compose, Firebase, Kotlin coroutines).
+#
+# Most third-party libs ship their own consumer-proguard-rules.pro, so
+# this file only adds keeps for OUR reflective surface plus a few
+# defensive rules for common pitfalls.
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# ---- Stack-trace readability for crash reports --------------------
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Keep annotation metadata that libraries use at runtime (Retrofit, Room,
+# Firebase, Compose, Gson all rely on this).
+-keepattributes *Annotation*,Signature,Exceptions,InnerClasses,EnclosingMethod
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# ---- Retrofit / OkHttp --------------------------------------------
+# Retrofit creates a dynamic proxy for our service interface; methods must
+# survive obfuscation so the @GET / @Query annotations are still reachable.
+-keep,allowobfuscation interface com.bayg.data.remote.WeatherApiService
+
+# Retrofit's own consumer rules cover most of the rest; this is belt-and-braces.
+-keepclasseswithmembers,allowobfuscation class * {
+    @retrofit2.http.* <methods>;
+}
+
+# OkHttp uses platform classes that R8 sometimes can't resolve on older SDKs.
+-dontwarn okhttp3.internal.platform.**
+-dontwarn org.conscrypt.**
+-dontwarn org.bouncycastle.**
+-dontwarn org.openjsse.**
+
+# ---- Gson model classes -------------------------------------------
+# Response DTOs are populated reflectively by Gson. Fields would otherwise
+# be renamed and Gson would write into ghost fields.
+-keep class com.bayg.data.remote.model.** { *; }
+-keep class com.bayg.data.remote.model.**$* { *; }
+
+# Generic Gson safety net for any other @SerializedName usage.
+-keepattributes RuntimeVisibleAnnotations,AnnotationDefault
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keep class * extends com.google.gson.reflect.TypeToken
+-keepclassmembers,allowobfuscation class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
+
+# ---- Room ---------------------------------------------------------
+# Room ships its own consumer rules, but keeping the entity classes
+# explicitly protects against Gson + Room sharing the same DTOs.
+-keep @androidx.room.Entity class * { *; }
+-keep @androidx.room.Dao class * { *; }
+-keep @androidx.room.Database class * { *; }
+-keep class com.bayg.services.storage.entities.** { *; }
+
+# ---- Firebase -----------------------------------------------------
+# Firebase SDKs ship consumer rules; these two lines silence false-positive
+# warnings about reflective access that the SDK handles internally.
+-dontwarn com.google.firebase.**
+-dontwarn com.google.android.gms.**
+
+# ---- Kotlinx coroutines -------------------------------------------
+# coroutines-core ships consumer rules; the warning suppression keeps R8
+# quiet about internal classes that are intentionally not on the runtime
+# classpath in production builds.
+-dontwarn kotlinx.coroutines.debug.**
+
+# ---- Compose ------------------------------------------------------
+# Compose runtime has its own rules; nothing extra needed.
+
+# ---- BuildConfig --------------------------------------------------
+# Keep BuildConfig so the few BuildConfig.DEBUG checks in our code (e.g.
+# WeatherRepository's HTTP logging level) survive shrinking.
+-keep class com.bayg.BuildConfig { *; }

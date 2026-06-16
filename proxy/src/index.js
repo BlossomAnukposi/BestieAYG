@@ -17,15 +17,31 @@
  * The OpenWeather key lives only in Cloudflare's encrypted secret store
  * (env.OPENWEATHER_API_KEY), reachable in the Worker runtime but never
  * shipped to clients.
+ *
+ * Defenses against quota-drain after the proxy URL is discovered:
+ *   1. Client header check (X-Bayg-Client: bayg-android)
+ *      — kills opportunistic scrapers using random curl / browsers.
+ *   2. Per-IP rate limit via WEATHER_RATELIMIT (60 req/min)
+ *      — caps even motivated attackers who reproduce the header.
+ *   3. Edge cache (60s)
+ *      — repeated requests for the same coords hit Cloudflare's edge,
+ *        not OpenWeather, so they don't count against the upstream quota.
  */
 
 const OPENWEATHER_BASE = "https://api.openweathermap.org/data/2.5/weather";
+
+// Shared client identifier. Sent by the BestieAYG Android app on every
+// /weather request. NOT a secret (an attacker who decompiles the APK
+// will see it) — its job is to filter out random scrapers, not to
+// authenticate the client. Quota protection comes from the rate limit.
+const REQUIRED_CLIENT_HEADER = "X-Bayg-Client";
+const REQUIRED_CLIENT_VALUE = "bayg-android";
 
 // CORS — fine to keep wildcard; the Worker is read-only and the key never leaves.
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": `Content-Type, ${REQUIRED_CLIENT_HEADER}`,
 };
 
 function jsonResponse(body, status = 200) {
@@ -63,6 +79,21 @@ export default {
 
     if (url.pathname !== "/weather") {
       return jsonResponse({ error: "Not found" }, 404);
+    }
+
+    // 1) Client header check. No header => not our app => reject.
+    if (request.headers.get(REQUIRED_CLIENT_HEADER) !== REQUIRED_CLIENT_VALUE) {
+      return jsonResponse({ error: "Forbidden" }, 403);
+    }
+
+    // 2) Per-IP rate limit. CF-Connecting-IP is set by Cloudflare on every
+    //    incoming request and cannot be spoofed by the client.
+    const clientIp = request.headers.get("CF-Connecting-IP") ?? "unknown";
+    if (env.WEATHER_RATELIMIT) {
+      const { success } = await env.WEATHER_RATELIMIT.limit({ key: clientIp });
+      if (!success) {
+        return jsonResponse({ error: "Rate limit exceeded" }, 429);
+      }
     }
 
     const lat = url.searchParams.get("lat");
