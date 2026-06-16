@@ -129,14 +129,28 @@ abstract class AppDatabase : RoomDatabase() {
         private fun deletePlaintextDbIfPresent(context: Context, passphrase: ByteArray) {
             val dbFile: File = context.getDatabasePath(DB_NAME)
             if (!dbFile.exists() || dbFile.length() < SQLITE_MAGIC.size) return
-            val firstBytes = dbFile.inputStream().use { it.readNBytes(SQLITE_MAGIC.size) }
+            // Read the first 16 bytes the API-24-compatible way. The length
+            // check above guarantees the file has at least that many bytes,
+            // so a single `read` call is sufficient and we do not need
+            // `InputStream.readNBytes`, which only exists on API 33+.
+            val firstBytes = ByteArray(SQLITE_MAGIC.size)
+            dbFile.inputStream().use { stream ->
+                var offset = 0
+                while (offset < firstBytes.size) {
+                    val n = stream.read(firstBytes, offset, firstBytes.size - offset)
+                    if (n <= 0) break
+                    offset += n
+                }
+            }
             if (firstBytes.contentEquals(SQLITE_MAGIC)) {
                 Log.w(TAG, "Plaintext bayg.db detected, deleting so SQLCipher can recreate.")
                 context.deleteDatabase(DB_NAME)
             }
-            // Wipe the passphrase reference from the local stack frame, just in case.
+            // Reference the passphrase so the JIT cannot reorder this method
+            // ahead of the caller having loaded the key, even though we do
+            // not use it directly here.
             @Suppress("UNUSED_VARIABLE")
-            val _unused = passphrase
+            val unused = passphrase
         }
 
         // "SQLite format 3" + null terminator. Present at offset 0 of any
