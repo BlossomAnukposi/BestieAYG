@@ -850,8 +850,8 @@
                 "text": "BestieAYG App"
               },
               "body": {
-                "stroke": "#333333",
-                "strokeWidth": 1.5,
+                "stroke": "red",
+                "strokeWidth": 2.5,
                 "strokeDasharray": null
               }
             },
@@ -974,16 +974,29 @@
                   "severity": "Medium",
                   "type": "Information disclosure",
                   "description": "Rooted user reads Room DB, logs, or memory containing usage stats and calendar-derived signals.",
-                  "mitigation": "Minimize PII at rest; EncryptedSharedPreferences for flags; no passwords stored locally.",
+                  "mitigation": "Minimize PII at rest; EncryptedSharedPreferences for flags; no passwords stored locally. Room DB itself is now SQLCipher-encrypted (see Room DB threat); logs are scrubbed of GPS coordinates (see Parks error UI threat); rooted-user memory access remains an accepted residual risk for the course-project threat model.",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 2,
+                  "score": ""
+                },
+                {
+                  "id": "b5e1c0c9-7ab8-4a4f-8c3e-1ca6e1d8a701",
+                  "title": "R8 / minification not enabled on release builds",
+                  "status": "Mitigated",
+                  "severity": "Low",
+                  "type": "Information disclosure",
+                  "description": "The original release build shipped with isMinifyEnabled=false and isShrinkResources=false, so jadx recovered the project's class and method names verbatim. This made every Test 1 step (BuildConfig search, repository inspection, repack-and-reinstall) noticeably easier than it would have been against a shrunk build.",
+                  "mitigation": "isMinifyEnabled and isShrinkResources both set to true in the release block of app/build.gradle.kts. A complete set of -keep rules was added to app/proguard-rules.pro for the reflective surfaces of Retrofit, Gson, Room, Firebase, SQLCipher, and BuildConfig. The R8-shrunk release APK was rebuilt, installed on the emulator, and verified to behave identically to the debug build (login, dashboard, Worker-backed weather, parks). This is a defence-in-depth measure rather than a vulnerability fix; no code path becomes safer purely by being obfuscated, but the next decompilation attempt produces a meaningfully harder artefact to read.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 24,
                   "score": ""
                 }
               ],
               "threatFrequency": {
                 "tampering": 1,
-                "informationDisclosure": 1
+                "informationDisclosure": 2
               }
             }
           },
@@ -1086,11 +1099,11 @@
                 {
                   "id": "708cd845-bca5-45f9-a236-1cedb004bb4b",
                   "title": "OpenWeather API key extracted from APK",
-                  "status": "Open",
+                  "status": "Mitigated",
                   "severity": "Medium",
                   "type": "Information disclosure",
-                  "description": "BuildConfig.OPENWEATHER_API_KEY is embedded at compile time; strings/decompile reveals key.",
-                  "mitigation": "Rate-limit key in OpenWeather dashboard; rotate if abused; proxy via backend (future).",
+                  "description": "BuildConfig.OPENWEATHER_API_KEY was embedded at compile time; jadx recovered the literal in seconds during pentest Test 1.",
+                  "mitigation": "The buildConfigField line was removed from app/build.gradle.kts; the OPENWEATHER_API_KEY entry was removed from local.properties and from the CI workflow secrets injection. The OpenWeather key now lives only inside the Cloudflare Worker (proxy/) as an encrypted secret; the Android app calls the Worker at https://bayg-weather-proxy.bayg-weather-proxy.workers.dev/weather and the Worker attaches the key server-side. The leaked key value was rotated and the new key only exists in Cloudflare's secret store. R8 / minification was also enabled on release builds to raise the bar against future static-analysis recovery of any similar literal.",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 12,
@@ -1103,7 +1116,7 @@
                   "severity": "Medium",
                   "type": "Tampering",
                   "description": "Attacker returns fake JSON to manipulate dashboard weather nudge.",
-                  "mitigation": "Certificate pinning for openweathermap.org in network_security_config.xml.",
+                  "mitigation": "Defence-in-depth: (1) the app no longer talks to api.openweathermap.org directly; weather requests go through the Cloudflare Worker (bayg-weather-proxy), which is operated by the team and serves only validated upstream responses; (2) in release builds, mitmproxy-style user-CA MITM is rejected at the trust-anchor layer (pentest Test 2 Run 2a evidence); (3) the pin block for openweathermap.org was removed during this assessment because keeping a pin for an unreachable endpoint would only create a future maintenance failure on cert rotation.",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 13,
@@ -3436,11 +3449,11 @@
                 {
                   "id": "247b8574-1359-4d98-bf02-91b44ac38539",
                   "title": "MITM on Firebase Auth traffic",
-                  "status": "Open",
+                  "status": "Mitigated",
                   "severity": "High",
                   "type": "Tampering",
                   "description": "Attacker with a user-installed CA (debug builds) or compromised network proxy could intercept Firebase Auth requests. Firebase is intentionally not certificate-pinned because Google rotates GTS certificates ~every 90 days.",
-                  "mitigation": "Release builds reject user CAs (network_security_config.xml debug-overrides). Document accepted risk for Firebase; rely on TLS + system trust store in production.",
+                  "mitigation": "Release builds reject user CAs at the network_security_config.xml base trust-anchor layer. Pentest Test 2 Run 2a verified live: a release build under mitmproxy rejected every TLS handshake with 'Trust anchor for certification path not found' across Firestore, OsmDroid, reCAPTCHA, and Chromium TLS. Firebase remains intentionally unpinned because Google Trust Services rotates ~every 90 days; release-build user-CA rejection is the binding defence.",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 4,
@@ -4546,17 +4559,7 @@
                 "x": 920,
                 "y": 550
               }
-            ],
-            "tools": {
-              "items": [
-                "boundary",
-                "button-remove",
-                "vertices",
-                "source-arrowhead",
-                "target-arrowhead"
-              ],
-              "name": null
-            }
+            ]
           },
           {
             "shape": "flow",
@@ -5026,11 +5029,11 @@
                 {
                   "id": "f6342282-4dcb-4f25-8094-a11ede69d23f",
                   "title": "API key abuse after APK decompilation",
-                  "status": "Open",
+                  "status": "Mitigated",
                   "severity": "Medium",
                   "type": "Information disclosure",
-                  "description": "WeatherRepository reads BuildConfig.OPENWEATHER_API_KEY; attacker drains quota.",
-                  "mitigation": "OpenWeather dashboard rate limits; monitor usage; document in threat model.",
+                  "description": "WeatherRepository previously read BuildConfig.OPENWEATHER_API_KEY directly; recovering it from a decompiled APK allowed an attacker to drain the team's OpenWeather quota.",
+                  "mitigation": "Key removed from the APK entirely (see threat #12). The Cloudflare Worker that now holds the key enforces (a) a shared client identifier header X-Bayg-Client: bayg-android, returning 403 otherwise, which filters out opportunistic scrapers, and (b) a per-IP rate limit of 60 requests/minute via Cloudflare's free-tier rate-limit binding, which caps quota abuse even when an attacker reproduces the client header. The header check and rate limit were both verified live with curl. Future recommendation (logged in Priority Recommendations) is to replace the static header with a Firebase-signed short-lived token so abuse becomes traceable to a real account.",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 18,
@@ -5460,10 +5463,23 @@
                   "new": false,
                   "number": 23,
                   "score": ""
+                },
+                {
+                  "id": "c4a2b6e1-9d3f-4f02-bc01-7f4d8a0b9c25",
+                  "title": "GPS coordinates leaked via Parks error UI",
+                  "status": "Mitigated",
+                  "severity": "Low",
+                  "type": "Information disclosure",
+                  "description": "When the Overpass API call backing the 'Parks near you' dashboard card failed, the original NearestParkViewModel rendered the raw exception message into the card body. For java.net.URL failures, the JVM's default exception message contains the full request URL, which contains the user's latitude and longitude in the embedded Overpass query's around:1500,LAT,LON clause. The user's GPS coordinates therefore appeared on screen and in logcat whenever Overpass returned a transient 504 or 429.",
+                  "mitigation": "NearestParkViewModel.kt rewritten: the catch block now logs the real exception privately via Log.w(TAG, ..., e) and surfaces a generic 'Couldn't load parks. Try again.' message to the UI. The two user-facing strings (no-parks-found, generic-error) were extracted into named constants on the companion object. The technical detail of the failure no longer leaves the ViewModel class, so no Overpass URL ever reaches the dashboard or logcat in a form that exposes coordinates.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 25,
+                  "score": ""
                 }
               ],
               "threatFrequency": {
-                "informationDisclosure": 1
+                "informationDisclosure": 2
               }
             }
           },
@@ -6025,11 +6041,11 @@
                 {
                   "id": "28a19142-7cb9-4969-a167-ebc3b771dcd4",
                   "title": "Room DB stored unencrypted",
-                  "status": "Open",
+                  "status": "Mitigated",
                   "severity": "Medium",
                   "type": "Information disclosure",
                   "description": "bayg.db (Room) holds block_events, streaks, user_settings in plaintext SQLite. Rooted device or forensic image exposes Instagram usage patterns.",
-                  "mitigation": "android:allowBackup=false; no credentials in Room; SQLCipher considered for future release.",
+                  "mitigation": "Room is opened through SQLCipher's SupportOpenHelperFactory with a 256-bit random passphrase generated on first launch via SecureRandom and persisted inside EncryptedSharedPreferences (Android Keystore-backed). Any leftover plaintext bayg.db from prior installs is deleted on first SQLCipher launch. Pentest Test 3 verified live: a fresh adb backup after the change produced a bayg.db beginning with a random 16-byte AES salt; sqlite3.connect() fails with 'DatabaseError: file is not a database'. The same extraction script that previously recovered the user's email returns nothing usable.",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 7,
@@ -6041,8 +6057,8 @@
                   "status": "Mitigated",
                   "severity": "High",
                   "type": "Information disclosure",
-                  "description": "Legacy adb backup or device transfer could copy app data including bayg.db if backup were enabled.",
-                  "mitigation": "`allowBackup=\"false\"` in AndroidManifest",
+                  "description": "Legacy adb backup or device transfer could copy app data including bayg.db. Pentest Test 3 confirmed that adb backup against a debuggable build does still recover the file in raw form because the Android developer tool bypasses allowBackup=false when the target is debuggable=true.",
+                  "mitigation": "Defence-in-depth: (1) allowBackup=false and dataExtractionRules exclude the database in the manifest, so release builds resist adb backup outright; (2) the database itself is now encrypted by SQLCipher (see threat #7), so even when the file is recovered by an attacker who repackages a release APK with debuggable=true, the contents are unreadable without the keystore-protected passphrase. Pentest Test 3 verified live: a post-mitigation adb backup yields a bayg.db that sqlite3 refuses to open.",
                   "modelType": "STRIDE",
                   "new": false,
                   "number": 10,
