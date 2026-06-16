@@ -4,22 +4,27 @@ import com.bayg.BuildConfig
 import com.bayg.data.remote.model.WeatherResponse
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.HttpException
 import java.io.IOException
 
 /**
- * WeatherRepository — handles all communication with the OpenWeather API.
+ * WeatherRepository — handles all weather requests for the app.
+ *
+ * Architecture:
+ *   App ─► BestieAYG Cloudflare Worker proxy ─► OpenWeather
  *
  * Security notes:
- * - API key is read from BuildConfig (injected at build time from local.properties)
- * - Network logging is disabled in release builds to prevent key/coord leakage in logs
- * - Returns Result<T> so callers handle errors gracefully (no crashes on network failure)
+ * - The OpenWeather API key is NOT in the APK. It lives only in the
+ *   Cloudflare Worker's encrypted secret store (proxy/src/index.js).
+ * - The proxy URL itself is not a secret; certificate validation is
+ *   handled by the system trust store + the platform's TLS stack.
+ * - Network logging is disabled in release builds so coordinates never
+ *   leak into logcat.
+ * - Returns Result<T> so callers handle errors gracefully.
  */
 class WeatherRepository : WeatherDataSource {
-
-    private val apiKey = BuildConfig.OPENWEATHER_API_KEY
 
     private val httpClient = OkHttpClient.Builder()
         .addInterceptor(
@@ -33,40 +38,31 @@ class WeatherRepository : WeatherDataSource {
         .build()
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl("https://api.openweathermap.org/")
+        .baseUrl(PROXY_BASE_URL)
         .client(httpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
     private val api = retrofit.create(WeatherApiService::class.java)
 
-    /**
-     * Fetches current weather for the given coordinates.
-     *
-     * @param latitude  User's GPS latitude
-     * @param longitude User's GPS longitude
-     * @return Result.success(WeatherResponse) on success
-     *         Result.failure(Exception) on network error or bad response
-     *
-     * Usage in ViewModel:
-     *   val result = weatherRepository.getWeather(lat, lon)
-     *   result.onSuccess { weather -> ... }
-     *   result.onFailure { error -> ... }
-     */
     override suspend fun getWeather(latitude: Double, longitude: Double): Result<WeatherResponse> {
         return try {
             val response = api.getCurrentWeather(
                 latitude = latitude,
-                longitude = longitude,
-                apiKey = apiKey
+                longitude = longitude
             )
             Result.success(response)
         } catch (e: IOException) {
-            // Network error (e.g. no internet)
             Result.failure(e)
         } catch (e: HttpException) {
-            // HTTP error (e.g. 404 Not Found, 401 Unauthorized)
             Result.failure(e)
         }
+    }
+
+    companion object {
+        // Public proxy endpoint. Not a secret — the secret OpenWeather key
+        // lives only inside the Worker (Cloudflare encrypted env).
+        private const val PROXY_BASE_URL =
+            "https://bayg-weather-proxy.bayg-weather-proxy.workers.dev/"
     }
 }

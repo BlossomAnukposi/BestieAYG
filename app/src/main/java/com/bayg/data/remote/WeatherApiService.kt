@@ -7,19 +7,19 @@ import retrofit2.http.Query
 interface WeatherApiService {
 
     /**
-     * Fetches current weather for a given latitude and longitude.
-     * OpenWeather endpoint: GET /data/2.5/weather
+     * Fetches current weather for a given latitude and longitude from the
+     * BestieAYG weather proxy (Cloudflare Worker).
      *
-     * @param latitude  GPS latitude of the user
-     * @param longitude GPS longitude of the user
-     * @param units     "metric" returns °C and m/s
-     * @param apiKey    OpenWeather API key (injected from BuildConfig — never hardcoded)
+     * Endpoint: GET https://<proxy>/weather?lat=..&lon=..
+     *
+     * The proxy holds the OpenWeather API key server-side and forwards the
+     * request to OpenWeather, so no API key is ever shipped in the APK.
+     * See `proxy/src/index.js` and the threat-model entry "OpenWeather API
+     * key extracted from APK" (now Mitigated).
      */
-    @GET("data/2.5/weather")
+    @GET("weather")
     suspend fun getCurrentWeather(
         @Query("lat") latitude: Double,
-        @Query("lon") longitude: Double,
-        @Query("units") units: String = "metric",
-        @Query("appid") apiKey: String
+        @Query("lon") longitude: Double
     ): WeatherResponse
 }

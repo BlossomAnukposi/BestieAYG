@@ -18,12 +18,17 @@
        Google Trust Services certificates every ~90 days. A missed
        rotation would brick the app on every device.
 
+       OpenWeather is also NOT pinned anymore: the app no longer talks
+       to api.openweathermap.org directly. Weather requests go through
+       our Cloudflare Worker proxy (see proxy/) which holds the API
+       key server-side. Cloudflare rotates its TLS certs frequently
+       too, so the Worker URL is left to system trust like Firebase.
+
     Pin values are SHA-256 hashes of the SubjectPublicKeyInfo (SPKI) of
     each server certificate, base64-encoded. Each domain pins two values
     (leaf + intermediate CA) so the leaf can rotate without bricking the
     app. Refresh both before the `expiration` date using:
 
-        powershell -ExecutionPolicy Bypass -File scripts\compute-spki-pin.ps1 api.openweathermap.org
         powershell -ExecutionPolicy Bypass -File scripts\compute-spki-pin.ps1 overpass-api.de
         powershell -ExecutionPolicy Bypass -File scripts\compute-spki-pin.ps1 api.open-meteo.com
         powershell -ExecutionPolicy Bypass -File scripts\compute-spki-pin.ps1 nominatim.openstreetmap.org
@@ -46,20 +51,6 @@
             <certificates src="user" />
         </trust-anchors>
     </debug-overrides>
-
-    <!--
-        OpenWeather. Leaf cert is *.openweathermap.org issued by Sectigo
-        Public Server Authentication CA OV R36. Backup pin is the
-        intermediate CA. Refresh both before 2027 with:
-            powershell -ExecutionPolicy Bypass -File scripts\compute-spki-pin.ps1 api.openweathermap.org
-    -->
-    <domain-config>
-        <domain includeSubdomains="true">openweathermap.org</domain>
-        <pin-set expiration="2027-01-01">
-            <pin digest="SHA-256">2rABlvP8a/45fRdYlmvSYEWrgBZyNampT8AqVpcPMtk=</pin>
-            <pin digest="SHA-256">KqkYYX5LYAYP7XGemqzbtPPIA8x7BS/BbOIcAXf3j2k=</pin>
-        </pin-set>
-    </domain-config>
 
     <!--
         Overpass (OpenStreetMap). Leaf cert is currently lambert.openstreetmap.de

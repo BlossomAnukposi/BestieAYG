@@ -48,7 +48,6 @@ jobs:
         run: |
           chmod +x ./gradlew
           echo "sdk.dir=${ANDROID_SDK_ROOT}" >> local.properties
-          echo "OPENWEATHER_API_KEY=${{ secrets.OPENWEATHER_API_KEY }}" >> local.properties
           echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 -d > app/google-services.json
 
       - name: Run Android Lint
@@ -94,7 +93,6 @@ jobs:
         run: |
           chmod +x ./gradlew
           echo "sdk.dir=${ANDROID_SDK_ROOT}" >> local.properties
-          echo "OPENWEATHER_API_KEY=${{ secrets.OPENWEATHER_API_KEY }}" >> local.properties
           echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 -d > app/google-services.json
 
       - name: Run Detekt
@@ -140,7 +138,6 @@ jobs:
         run: |
           chmod +x ./gradlew
           echo "sdk.dir=${ANDROID_SDK_ROOT}" >> local.properties
-          echo "OPENWEATHER_API_KEY=${{ secrets.OPENWEATHER_API_KEY }}" >> local.properties
           echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 -d > app/google-services.json
 
       - name: Run unit tests
@@ -188,7 +185,6 @@ jobs:
         run: |
           chmod +x ./gradlew
           echo "sdk.dir=${ANDROID_SDK_ROOT}" >> local.properties
-          echo "OPENWEATHER_API_KEY=${{ secrets.OPENWEATHER_API_KEY }}" >> local.properties
           echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 -d > app/google-services.json
 
       - name: Build debug APK

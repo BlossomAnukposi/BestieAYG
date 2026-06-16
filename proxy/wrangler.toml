@@ -1,0 +1,10 @@
+name = "bayg-weather-proxy"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+# The OpenWeather API key is stored as an encrypted Cloudflare secret,
+# NOT in this file and NOT in git. Set it once with:
+#   npx wrangler secret put OPENWEATHER_API_KEY
+#
+# Verify with:
+#   npx wrangler secret list
