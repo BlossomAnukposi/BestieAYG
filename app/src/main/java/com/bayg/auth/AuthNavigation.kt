@@ -7,12 +7,12 @@ object AuthNavigation {
     fun resolveStartDestination(context: Context): String {
         val user = FirebaseAuth.getInstance().currentUser ?: return "onboardingStart"
         if (!user.isEmailVerified) return "verifyEmail"
-        if (!OnboardingStore.isComplete(context, user.uid)) return "permissions"
+        if (!OnboardingStore.isComplete(context)) return "permissions"
         return "dashboard"
     }
 
     fun resolvePostSignInDestination(context: Context): String {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return "onboardingStart"
-        return if (OnboardingStore.isComplete(context, uid)) "dashboard" else "permissions"
+        if (FirebaseAuth.getInstance().currentUser == null) return "onboardingStart"
+        return if (OnboardingStore.isComplete(context)) "dashboard" else "permissions"
     }
 }

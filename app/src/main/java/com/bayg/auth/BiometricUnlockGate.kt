@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 fun requiresBiometricUnlock(context: Context): Boolean {
     val user = FirebaseAuth.getInstance().currentUser ?: return false
     if (!user.isEmailVerified) return false
-    if (!OnboardingStore.isComplete(context, user.uid)) return false
+    if (!OnboardingStore.isComplete(context)) return false
     return BiometricAuthManager(context).canAuthenticate() == BiometricAuthManager.CanAuthenticate.Ok
 }
 

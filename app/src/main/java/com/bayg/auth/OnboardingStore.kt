@@ -3,14 +3,18 @@ package com.bayg.auth
 import android.content.Context
 import com.bayg.security.SecurePrefs
 
+/**
+ * Device-local onboarding completion flag. Stored in encrypted SecurePrefs.
+ * One flag per install — permissions and app setup are device setup, not per-account.
+ */
 object OnboardingStore {
-    private fun key(uid: String) = "onboarding_complete_$uid"
+    private const val KEY_ONBOARDING_COMPLETE = "onboarding_complete"
 
-    fun isComplete(context: Context, uid: String): Boolean {
-        return SecurePrefs(context.applicationContext).getBoolean(key(uid), false)
+    fun isComplete(context: Context): Boolean {
+        return SecurePrefs(context.applicationContext).getBoolean(KEY_ONBOARDING_COMPLETE, false)
     }
 
-    fun markComplete(context: Context, uid: String) {
-        SecurePrefs(context.applicationContext).putBoolean(key(uid), true)
+    fun markComplete(context: Context) {
+        SecurePrefs(context.applicationContext).putBoolean(KEY_ONBOARDING_COMPLETE, true)
     }
 }
