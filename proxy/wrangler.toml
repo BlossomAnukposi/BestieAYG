@@ -1,0 +1,21 @@
+name = "bayg-weather-proxy"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+# The OpenWeather API key is stored as an encrypted Cloudflare secret,
+# NOT in this file and NOT in git. Set it once with:
+#   npx wrangler secret put OPENWEATHER_API_KEY
+#
+# Verify with:
+#   npx wrangler secret list
+
+# Cloudflare Workers Rate Limiting binding (free tier).
+# Caps any single client IP at 60 weather requests per minute.
+# Keeps a determined attacker from draining the OpenWeather quota even
+# after decompiling the APK and discovering the proxy URL + client header.
+# namespace_id is just a numeric id you pick — it scopes the counters.
+[[unsafe.bindings]]
+name = "WEATHER_RATELIMIT"
+type = "ratelimit"
+namespace_id = "1001"
+simple = { limit = 60, period = 60 }
