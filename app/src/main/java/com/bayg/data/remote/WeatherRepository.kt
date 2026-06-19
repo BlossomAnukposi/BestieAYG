@@ -72,6 +72,8 @@ class WeatherRepository : WeatherDataSource {
             Result.failure(e)
         } catch (e: HttpException) {
             Result.failure(e)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 

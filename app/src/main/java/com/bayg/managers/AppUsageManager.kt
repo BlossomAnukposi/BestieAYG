@@ -30,6 +30,9 @@ class AppUsageManager(private val context: Context) {
         } catch (e: SecurityException) {
             Log.e(LOG_TAG, "Security exception - Usage Stats permission not granted", e)
             0L
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Failed to query Instagram usage stats", e)
+            0L
         }
     }
 }

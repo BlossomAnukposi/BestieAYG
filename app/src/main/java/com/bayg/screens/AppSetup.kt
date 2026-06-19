@@ -36,7 +36,6 @@ import androidx.navigation.NavController
 import bayg
 import com.bayg.auth.OnboardingStore
 import com.bayg.services.storage.UserSettingsViewModel
-import com.google.firebase.auth.FirebaseAuth
 import com.bayg.widgets.Caption
 import com.bayg.widgets.GreenArrowButton
 import com.bayg.widgets.GreenButton
@@ -137,9 +136,7 @@ fun AppSetup(
                     dailyLimitMinutes = limitValue.roundToInt(),
                     blockDurationMinutes = blockValue.roundToInt(),
                 ) {
-                    FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
-                        OnboardingStore.markComplete(context, uid)
-                    }
+                    OnboardingStore.markComplete(context)
                     navController.navigate("dashboard") {
                         popUpTo("onboardingStart") { inclusive = true }
                     }

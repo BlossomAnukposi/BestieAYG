@@ -2,7 +2,6 @@ package com.bayg
 
 import BAYGTheme
 import android.Manifest
-import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -76,7 +75,6 @@ class MainActivity : FragmentActivity() {
         }
     }
 
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
