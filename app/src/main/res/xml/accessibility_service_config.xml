@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    accessibility_service_config.xml
+
+    Configures InstagramBlockerService as an AccessibilityService.
+    - accessibilityEventTypes: only TYPE_WINDOW_STATE_CHANGED (battery-efficient)
+    - accessibilityFeedbackType: FEEDBACK_GENERIC (no spoken/haptic feedback)
+    - notificationTimeout: 100ms minimum between events
+    - canRetrieveWindowContent: false (we only need package name, not content)
+    - packageNames: lock monitoring to Instagram only so we don't
+      waste cycles on every app window change system-wide
+-->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeWindowStateChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:notificationTimeout="100"
+    android:canRetrieveWindowContent="false"
+    android:packageNames="com.instagram.android"
+    android:description="@string/accessibility_service_description" />

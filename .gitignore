@@ -60,3 +60,6 @@ lint-results*
 .DS_Store
 Desktop.ini
 Thumbs.db
+
+# ─── LOCAL REPOSITORY ────────────────────────────────────────────────────────
+/app/schemas/
