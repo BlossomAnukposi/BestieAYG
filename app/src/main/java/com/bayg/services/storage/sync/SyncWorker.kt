@@ -34,9 +34,6 @@ class SyncWorker(appContext: Context, params: WorkerParameters) : CoroutineWorke
         return try {
             syncPull.pullAll(localUid)
 
-            val streak = db.streakDao().getByUserId(uid)
-            if (streak != null) syncPush.pushStreak(streak)
-
             val blockEvents = db.blockEventDao().getUnsyncedBlockEvents(uid)
             for (event in blockEvents) {
                 syncPush.pushBlockEvent(event)

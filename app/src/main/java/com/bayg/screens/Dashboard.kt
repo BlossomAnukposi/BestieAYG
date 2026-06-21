@@ -97,23 +97,25 @@ fun Dashboard(navController: NavController) {
 
     Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.bayg.black)) {
         val current = messageState.value
-        if (current == "Loading...") {
-            CircularProgressIndicator()
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 22.dp)
-                    .padding(top = 54.dp, bottom = 110.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                TopUsageCard(navController, displayName, statsState)
-                Spacer(modifier = Modifier.height(42.dp))
 
-                InfoCardsRow()
-                Spacer(modifier = Modifier.height(34.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 22.dp)
+                .padding(top = 54.dp, bottom = 110.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            TopUsageCard(navController, displayName, statsState, viewModel)
+            Spacer(modifier = Modifier.height(42.dp))
 
-                Column (horizontalAlignment = Alignment.CenterHorizontally) {
+            InfoCardsRow()
+            Spacer(modifier = Modifier.height(34.dp))
+
+            Column (horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center) {
+                if (current == "Loading...") {
+                    CircularProgressIndicator(color = MaterialTheme.bayg.green)
+                } else {
                     Text(
                         text = "“${current}”",
                         style = TextStyle(
@@ -124,23 +126,23 @@ fun Dashboard(navController: NavController) {
                             textAlign = TextAlign.Center,
                         )
                     )
-                    Spacer(modifier = Modifier.height(54.dp))
-
-                    GreenButton(
-                        onClick = {
-                            context.startActivity(Intent(context, TouchGrassActivity::class.java))
-                        },
-                        "🌿 Touch Grass", color = MaterialTheme.bayg.white
-                    )
                 }
-            }
+                Spacer(modifier = Modifier.height(54.dp))
 
-            Box(
-                contentAlignment = Alignment.BottomCenter,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                NavBar(navController)
+                GreenButton(
+                    onClick = {
+                        context.startActivity(Intent(context, TouchGrassActivity::class.java))
+                    },
+                    "🌿 Touch Grass", color = MaterialTheme.bayg.white
+                )
             }
+        }
+
+        Box(
+            contentAlignment = Alignment.BottomCenter,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            NavBar(navController)
         }
     }
 }
@@ -149,11 +151,12 @@ fun Dashboard(navController: NavController) {
 private fun TopUsageCard(
     navController: NavController,
     displayName: String,
-    statsState: StatsUiState
+    statsState: StatsUiState,
+    viewModel: UserSettingsViewModel
 ) {
     val today = SimpleDateFormat("MMMM d", Locale.ENGLISH).format(Date())
     val day = SimpleDateFormat("EEEE", Locale.ENGLISH).format(Date())
-    val streakCount = 2
+    val streakCount = viewModel.streakCount
     val firstName = displayName.split(" ").firstOrNull()?.takeIf { it.isNotBlank() } ?: "there"
 
     val usageMinutes = (statsState as? StatsUiState.Success)
@@ -206,7 +209,8 @@ private fun TopUsageCard(
         }
 
         ProfileButton(Modifier.align(Alignment.TopEnd), navController, firstName)
-        StreakDays(modifier = Modifier.align(Alignment.BottomStart))
+        val viewModel: UserSettingsViewModel = viewModel()
+        StreakDays(modifier = Modifier.align(Alignment.BottomStart), viewModel = viewModel)
     }
 }
 
@@ -230,7 +234,7 @@ private fun ProfileButton(modifier: Modifier = Modifier, navController: NavContr
 }
 
 @Composable
-private fun StreakDays(modifier: Modifier = Modifier) {
+private fun StreakDays(modifier: Modifier = Modifier, viewModel: UserSettingsViewModel = viewModel()) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(5.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -240,7 +244,7 @@ private fun StreakDays(modifier: Modifier = Modifier) {
             .padding(7.dp, 10.dp, 10.dp, 7.dp)
     ) {
         listOf("S", "M", "T", "W", "T", "F", "S").forEachIndexed { index, day ->
-            DayDot(day, active = index == 0 || index == 2 || index == 3)
+            DayDot(day, active = viewModel.activeStreakDays[index])
         }
     }
 }

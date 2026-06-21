@@ -46,9 +46,7 @@ fun GreyOutlinedCard(minHeight: Dp = 94.dp, content: @Composable () -> Unit) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.bayg.card),
         border = BorderStroke(1.dp, MaterialTheme.bayg.outline),
         shape = RoundedCornerShape(size = 5.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp)
+        modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp).defaultMinSize(minHeight = minHeight)) {
             content()

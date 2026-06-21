@@ -11,12 +11,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.bayg.security.DbPassphraseProvider
 import com.bayg.services.storage.daos.BlockEventDao
 import com.bayg.services.storage.daos.DailyUsageDao
-import com.bayg.services.storage.daos.StreakDao
 import com.bayg.services.storage.daos.UserDao
 import com.bayg.services.storage.daos.UserSettingsDao
 import com.bayg.services.storage.entities.BlockEvent
 import com.bayg.services.storage.entities.DailyUsage
-import com.bayg.services.storage.entities.Streak
 import com.bayg.services.storage.entities.User
 import com.bayg.services.storage.entities.UserSettings
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
@@ -27,7 +25,6 @@ import java.io.File
         User::class,
         UserSettings::class,
         BlockEvent::class,
-        Streak::class,
         DailyUsage::class
     ],
     version = 2,
@@ -39,7 +36,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun userSettingsDao(): UserSettingsDao
     abstract fun blockEventDao(): BlockEventDao
-    abstract fun streakDao(): StreakDao
     abstract fun dailyUsageDao(): DailyUsageDao
 
     companion object {

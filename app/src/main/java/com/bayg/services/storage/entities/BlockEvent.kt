@@ -5,11 +5,6 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-enum class BlockEventSeverity {
-    RED,
-    ORANGE
-}
-
 @Entity(
     tableName = "block_events",
     foreignKeys = [

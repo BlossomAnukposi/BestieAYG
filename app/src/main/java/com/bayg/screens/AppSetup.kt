@@ -119,7 +119,6 @@ fun AppSetup(
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(15.dp)) {
-            KeywordsSection(isPreset, customKeywords) { customKeywords = it }
             ModeSection(isPreset) { isPreset = it }
         }
 
@@ -196,67 +195,6 @@ fun AppBlockSection(isPreset: Boolean, value: Float, onValueChange: (Float) -> U
                 Column(Modifier.fillMaxWidth()) {
                     LimitSlider(MaterialTheme.bayg.lightRed, value,
                         BLOCK_TIME_OPTIONS_COUNT, 0f..FOUR_HOURS_LIMIT, onValueChange)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun KeywordsSection(
-    isPreset: Boolean,
-    customKeywords: List<String>,
-    onKeywordsChange: (List<String>) -> Unit
-) {
-    var showDialog by remember(isPreset) { mutableStateOf(false) }
-    var inputText by remember(isPreset) { mutableStateOf("") }
-
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text("Add keyword") },
-            text = {
-                TextField(
-                    value = inputText,
-                    onValueChange = { inputText = it },
-                    placeholder = { Text("e.g. Interview") },
-                    singleLine = true
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    if (inputText.isNotBlank()) onKeywordsChange(customKeywords + inputText.trim())
-                    inputText = ""
-                    showDialog = false
-                }) { Text("Add") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDialog = false }) { Text("Cancel") }
-            }
-        )
-    }
-
-    Column {
-        Paragraph("Event Keywords", bold = true)
-        Paragraph("Crashout watches for these in your Calendar", MaterialTheme.bayg.textGrey)
-
-        Row {
-            if (isPreset) {
-                SelectableCard("Exam", initialSelected = true)
-                SelectableCard("Deadline", initialSelected = true)
-            } else {
-                customKeywords.forEach { SelectableCard(it) }
-                OutlinedCard(
-                    onClick = { showDialog = true },
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.bayg.card),
-                    shape = RoundedCornerShape(3.dp),
-                    border = BorderStroke(1.dp, MaterialTheme.bayg.outline),
-                ) {
-                    Text(
-                        text = "+ Add keyword",
-                        style = TextStyle(fontSize = 15.sp, color = MaterialTheme.bayg.textGrey),
-                        modifier = Modifier.padding(10.dp)
-                    )
                 }
             }
         }

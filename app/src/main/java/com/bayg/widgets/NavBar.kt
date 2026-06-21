@@ -30,7 +30,7 @@ fun NavBar(navController: NavController) {
             .fillMaxWidth()
             .padding(50.dp, 10.dp)
     ) {
-        NavButton("Home", "dashboard", navController)
+        NavButton("Home", "permissions", navController)
         NavButton("Stats", "stats", navController)
         NavButton("Settings", "settings", navController)
     }

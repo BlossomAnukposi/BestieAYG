@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface BlockEventDao {
     @Query("SELECT * FROM block_events WHERE userId = :userId ORDER BY triggeredAt DESC")
-    fun getAllBlockEvents(userId: String): Flow<List<BlockEvent>>
+    fun getAllBlockEvents(userId: String): List<BlockEvent>
 
     @Query("""
         SELECT * FROM block_events

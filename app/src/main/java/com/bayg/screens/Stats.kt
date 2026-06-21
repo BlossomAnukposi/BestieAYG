@@ -31,17 +31,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -51,8 +47,6 @@ import com.bayg.ui.viewmodel.DayUsage
 import com.bayg.ui.viewmodel.StatsPeriod
 import com.bayg.ui.viewmodel.StatsUiState
 import com.bayg.ui.viewmodel.StatsViewModel
-import com.bayg.widgets.Heading3
-import com.bayg.widgets.Heading4
 import com.bayg.widgets.NavBar
 import com.bayg.widgets.Paragraph
 import com.bayg.services.storage.entities.BlockEventSeverity

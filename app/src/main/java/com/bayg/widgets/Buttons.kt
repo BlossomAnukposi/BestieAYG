@@ -172,7 +172,6 @@ fun PermissionToggle(isGranted: Boolean, onToggle: () -> Unit) {
             checkedTrackColor = MaterialTheme.bayg.green,
             uncheckedTrackColor = MaterialTheme.bayg.textGrey
         ),
-        modifier = Modifier.width(36.dp),
-        enabled = !isGranted // Disable toggle once permission is granted (optional)
+        modifier = Modifier.width(36.dp)
     )
 }

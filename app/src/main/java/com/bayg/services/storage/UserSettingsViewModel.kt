@@ -6,12 +6,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.bayg.services.storage.entities.BlockEvent
 import com.bayg.services.storage.entities.UserSettings
 import com.bayg.services.storage.sync.SyncWorker
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.DayOfWeek
 
 class UserSettingsViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = UserSettingsRepository(application)
@@ -29,6 +34,12 @@ class UserSettingsViewModel(application: Application) : AndroidViewModel(applica
     var email by mutableStateOf("")
         private set
 
+    var streakCount by mutableStateOf(0)
+        private set
+
+    var activeStreakDays by mutableStateOf(BooleanArray(7) { false })
+        private set
+
     init {
         load()
     }
@@ -37,7 +48,55 @@ class UserSettingsViewModel(application: Application) : AndroidViewModel(applica
         viewModelScope.launch {
             settings = repository.getOrCreate()
             loadUserProfile()
+            loadStreak()
         }
+    }
+
+    private suspend fun loadStreak() {
+        withContext(Dispatchers.IO) {
+            try {
+                val fbUser = FirebaseAuth.getInstance().currentUser ?: return@withContext
+                val blockEvents = db.blockEventDao().getAllBlockEvents(fbUser.uid)
+
+                streakCount = 0
+                activeStreakDays = calculateActiveStreakDays(blockEvents)
+            } catch (e: Exception) {
+                // Fail silently; streak won't load but other data will still work
+                android.util.Log.e("UserSettingsViewModel", "Error loading streak", e)
+            }
+        }
+    }
+
+    private fun calculateActiveStreakDays(blockEvents: List<BlockEvent>): BooleanArray {
+        // Default to all false (no active days)
+        val activeDays = BooleanArray(7) { false } // Index 0=Sun, 1=Mon, ..., 6=Sat
+
+//        if (streak == null || streak.currentStreak <= 0 || streak.lastStreakDate == null) {
+//            return activeDays
+//        }
+//
+//        // Convert lastStreakDate to LocalDate
+//        val instant = Instant.ofEpochMilli(streak.lastStreakDate!!)
+//        val lastStreakLocalDate = instant.atZone(ZoneId.systemDefault()).toLocalDate()
+//
+//        // Calculate the start date of the streak
+//        val streakStartDate = lastStreakLocalDate.minusDays((streak.currentStreak - 1).toLong())
+
+        // Get today's date
+//        val today = LocalDate.now()
+//
+//        // For each day in the current week (Sunday to Saturday)
+//        val weekStart = today.with(DayOfWeek.SUNDAY) // Start of current week (Sunday)
+//
+//        for (dayOffset in 0..6) {
+//            val currentDate = weekStart.plusDays(dayOffset.toLong())
+//            // Check if this date falls within the streak period
+//            if (!currentDate.isBefore(streakStartDate) && !currentDate.isAfter(lastStreakLocalDate)) {
+//                activeDays[dayOffset] = true
+//            }
+//        }
+
+        return activeDays
     }
 
     private suspend fun loadUserProfile() {
