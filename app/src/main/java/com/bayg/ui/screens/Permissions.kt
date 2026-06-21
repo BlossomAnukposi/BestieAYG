@@ -1,4 +1,4 @@
-package com.bayg.screens
+package com.bayg.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -33,7 +33,6 @@ import com.bayg.widgets.Paragraph
 import com.bayg.widgets.ProgressBar
 import com.bayg.widgets.RedTagCard
 import com.bayg.widgets.Subtitle
-import com.bayg.widgets.Toggle
 import com.bayg.widgets.PermissionToggle
 import kotlinx.coroutines.delay
 

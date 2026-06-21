@@ -56,4 +56,7 @@ interface BlockEventDao {
                 "AND triggeredAt BETWEEN :startMillis AND :endMillis"
     )
     suspend fun countBetween(userId: String, startMillis: Long, endMillis: Long): Int
+
+    @Query("SELECT triggeredAt FROM block_events WHERE userId = :userId ORDER BY triggeredAt ASC")
+    suspend fun getAllTriggeredTimestamps(userId: String): List<Long>
 }

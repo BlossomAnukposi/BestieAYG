@@ -1,15 +1,10 @@
-package com.bayg.screens
+package com.bayg.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -23,38 +18,41 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import bayg
-import com.bayg.R
+import com.bayg.auth.AuthNavigation
 import com.bayg.auth.AuthViewModel
 import com.bayg.widgets.BaygOutlinedTextField
-import com.bayg.widgets.Caption
 import com.bayg.widgets.GreenArrowButton
 import com.bayg.widgets.GreenButton
-import com.bayg.widgets.GreyOutlinedCard
 import com.bayg.widgets.Heading1
 import com.bayg.widgets.Heading3
-import com.bayg.widgets.Paragraph
-import com.bayg.widgets.ProgressBar
 import com.bayg.widgets.Subtitle
 
-private const val PROGRESS_BAR_34_PERCENT = 0.33f
-
 @Composable
-fun SignUp(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
-    var name by remember { mutableStateOf("") }
+fun Login(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
-    LaunchedEffect(authViewModel.signUpSucceeded) {
-        if (authViewModel.signUpSucceeded) {
-            authViewModel.resetSignUpState()
-            navController.navigate("verifyEmail") {
-                popUpTo("signUp") { inclusive = false }
+    LaunchedEffect(authViewModel.signInSucceeded, authViewModel.signInNeedsVerification) {
+        when {
+            authViewModel.signInSucceeded -> {
+                authViewModel.resetSignInState()
+                val destination = AuthNavigation.resolvePostSignInDestination(context)
+                navController.navigate(destination) {
+                    popUpTo("onboardingStart") { inclusive = true }
+                }
+            }
+            authViewModel.signInNeedsVerification -> {
+                authViewModel.resetSignInState()
+                navController.navigate("verifyEmail") {
+                    popUpTo("login") { inclusive = false }
+                }
             }
         }
     }
@@ -68,34 +66,15 @@ fun SignUp(navController: NavController, authViewModel: AuthViewModel = viewMode
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        Column {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.width(334.dp).padding(top = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                GreenArrowButton(navController, "onboardingStart")
-                Caption("Step 1 of 3")
-            }
-            ProgressBar(MaterialTheme.bayg.green, PROGRESS_BAR_34_PERCENT)
-        }
+        GreenArrowButton(navController, "signUp")
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Heading1("CRASH\nOUT.", MaterialTheme.bayg.green)
-            Heading3("sign up", MaterialTheme.bayg.white)
-            Subtitle("we need to know who you are before we snitch on you")
+            Heading3("log in", MaterialTheme.bayg.white)
+            Subtitle("welcome back. no excuses today.")
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            BaygOutlinedTextField(
-                value = name,
-                onValueChange = {
-                    name = it
-                    authViewModel.clearError()
-                },
-                placeholder = "Enter your name",
-                prefix = "Aa",
-            )
             BaygOutlinedTextField(
                 value = email,
                 onValueChange = {
@@ -112,39 +91,35 @@ fun SignUp(navController: NavController, authViewModel: AuthViewModel = viewMode
                     password = it
                     authViewModel.clearError()
                 },
-                placeholder = "Set a new password",
+                placeholder = "Enter your password",
                 prefix = "*",
                 isPassword = true,
             )
-        }
-
-        GreyOutlinedCard {
-            Row {
-                Image(
-                    painter = painterResource(id = R.drawable.security),
-                    contentDescription = "Security icon",
-                    modifier = Modifier.size(60.dp),
-                )
-                Column {
-                    Paragraph("Firebase Auth + email verification", MaterialTheme.bayg.white, true)
-                    Caption("Your password never leaves Firebase. We pinky promise.")
-                }
-            }
         }
 
         authViewModel.errorMessage?.let { message ->
             Text(message, color = MaterialTheme.bayg.lightRed)
         }
 
+        authViewModel.infoMessage?.let { message ->
+            Text(message, color = MaterialTheme.bayg.textGrey)
+        }
+
         GreenButton(
-            onClick = { authViewModel.signUp(name, email, password) },
-            text = if (authViewModel.isLoading) "Creating account..." else "Next",
-            color = MaterialTheme.bayg.white,
+            onClick = { authViewModel.signIn(email, password) },
+            text = if (authViewModel.isLoading) "Signing in..." else "Log in",
             enabled = !authViewModel.isLoading,
         )
 
-        TextButton(onClick = { navController.navigate("login") }) {
-            Text("Already have an account? Log in", color = MaterialTheme.bayg.textGrey)
+        TextButton(
+            onClick = { authViewModel.sendPasswordReset(email) },
+            enabled = !authViewModel.isLoading,
+        ) {
+            Text("Forgot password?", color = MaterialTheme.bayg.textGrey)
+        }
+
+        TextButton(onClick = { navController.navigate("signUp") }) {
+            Text("New here? Create an account", color = MaterialTheme.bayg.textGrey)
         }
     }
 }

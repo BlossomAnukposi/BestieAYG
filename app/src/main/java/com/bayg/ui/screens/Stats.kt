@@ -1,4 +1,4 @@
-package com.bayg.screens
+package com.bayg.ui.screens
 
 import android.content.Context
 import androidx.compose.foundation.Canvas
@@ -51,6 +51,7 @@ import com.bayg.widgets.NavBar
 import com.bayg.widgets.Paragraph
 import com.bayg.services.storage.entities.BlockEventSeverity
 import com.bayg.ui.viewmodel.StatsViewModelFactory
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun Stats(navController: NavController) {
@@ -147,7 +148,7 @@ fun Stats(navController: NavController) {
  * Placeholder — wire up to your actual auth source.
  */
 private fun currentUserId(context: Context): String {
-    return com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    return FirebaseAuth.getInstance().currentUser?.uid ?: ""
 }
 
 // ── Period tabs ─────────────────────────────────────────────────────────

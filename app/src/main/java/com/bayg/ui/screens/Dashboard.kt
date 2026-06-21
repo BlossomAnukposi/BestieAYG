@@ -1,7 +1,6 @@
-package com.bayg.screens
+package com.bayg.ui.screens
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -23,6 +22,7 @@ import androidx.navigation.NavController
 import bayg
 import com.bayg.widgets.NavBar
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +39,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,17 +49,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.lifecycle.ViewModelProvider
+import androidx.compose.ui.unit.Dp
 import com.bayg.TouchGrassActivity
 import com.bayg.location.DeviceLocationProvider
 import com.bayg.services.NoAsAService
-import com.bayg.services.storage.UserSettingsViewModel
+import com.bayg.services.storage.StreakViewModel
+import com.bayg.ui.viewmodel.UserSettingsViewModel
 import com.bayg.ui.viewmodel.NearestParkViewModel
 import com.bayg.ui.viewmodel.StatsUiState
 import com.bayg.ui.viewmodel.StatsViewModel
@@ -71,9 +74,11 @@ import com.bayg.widgets.Heading3
 import com.bayg.widgets.Heading4
 import com.bayg.widgets.Paragraph
 import com.bayg.widgets.SmallInfoCard
+import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.collections.get
 
 @Composable
 fun Dashboard(navController: NavController) {
@@ -81,7 +86,7 @@ fun Dashboard(navController: NavController) {
     val viewModel: UserSettingsViewModel = viewModel()
     val displayName = viewModel.displayName
 
-    val userId = remember { com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: "" }
+    val userId = remember { FirebaseAuth.getInstance().currentUser?.uid ?: "" }
     val statsViewModel: StatsViewModel = viewModel(
         factory = StatsViewModelFactory(context, userId)
     )
@@ -105,7 +110,7 @@ fun Dashboard(navController: NavController) {
                 .padding(top = 54.dp, bottom = 110.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            TopUsageCard(navController, displayName, statsState, viewModel)
+            TopUsageCard(navController, displayName, statsState)
             Spacer(modifier = Modifier.height(42.dp))
 
             InfoCardsRow()
@@ -152,7 +157,7 @@ private fun TopUsageCard(
     navController: NavController,
     displayName: String,
     statsState: StatsUiState,
-    viewModel: UserSettingsViewModel
+    viewModel: StreakViewModel = viewModel()
 ) {
     val today = SimpleDateFormat("MMMM d", Locale.ENGLISH).format(Date())
     val day = SimpleDateFormat("EEEE", Locale.ENGLISH).format(Date())
@@ -203,14 +208,13 @@ private fun TopUsageCard(
                 horizontalAlignment = Alignment.End,
                 modifier = Modifier.align(Alignment.BottomEnd)
             ) {
-                Paragraph("Streak", color = MaterialTheme.bayg.black)
+                Paragraph("Current Streak", color = MaterialTheme.bayg.black)
                 Heading4("$streakCount days", MaterialTheme.bayg.black)
             }
         }
 
         ProfileButton(Modifier.align(Alignment.TopEnd), navController, firstName)
-        val viewModel: UserSettingsViewModel = viewModel()
-        StreakDays(modifier = Modifier.align(Alignment.BottomStart), viewModel = viewModel)
+        StreakDays(modifier = Modifier.align(Alignment.BottomStart))
     }
 }
 
@@ -234,7 +238,9 @@ private fun ProfileButton(modifier: Modifier = Modifier, navController: NavContr
 }
 
 @Composable
-private fun StreakDays(modifier: Modifier = Modifier, viewModel: UserSettingsViewModel = viewModel()) {
+private fun StreakDays(modifier: Modifier = Modifier, viewModel: StreakViewModel = viewModel()) {
+    val todayIdx = viewModel.todayIndex()
+
     Row(
         horizontalArrangement = Arrangement.spacedBy(5.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -244,7 +250,11 @@ private fun StreakDays(modifier: Modifier = Modifier, viewModel: UserSettingsVie
             .padding(7.dp, 10.dp, 10.dp, 7.dp)
     ) {
         listOf("S", "M", "T", "W", "T", "F", "S").forEachIndexed { index, day ->
-            DayDot(day, active = viewModel.activeStreakDays[index])
+            if (index == todayIdx) {
+                TodayDot(day)
+            } else {
+                DayDot(day, viewModel.activeStreakDays[index])
+            }
         }
     }
 }
@@ -261,7 +271,7 @@ private fun formatMinutes(totalMinutes: Int): String {
 }
 
 @Composable
-private fun UsageCircle(usage: Int, limit: Int) {  // remove hardcoded vals
+private fun UsageCircle(usage: Int, limit: Int) {
     val progress = (usage.toFloat() / limit.toFloat()).coerceIn(0f, 1f)
     val sweepAngle = 360f * progress
 
@@ -290,7 +300,7 @@ private fun UsageCircle(usage: Int, limit: Int) {  // remove hardcoded vals
         }
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Heading4(formatMinutes(usage), MaterialTheme.bayg.black)  // was hardcoded
+            Heading4(formatMinutes(usage), MaterialTheme.bayg.black)
             Text("today", fontSize = 21.sp, color = MaterialTheme.bayg.textGrey)
         }
     }
@@ -309,8 +319,41 @@ private fun DayDot(text: String, active: Boolean) {
             text = text,
             fontWeight = FontWeight.Bold,
             fontSize = 13.sp,
+            lineHeight = 1.sp,
             color = if (active) MaterialTheme.bayg.black else MaterialTheme.bayg.white
         )
+    }
+}
+
+@Composable
+private fun TodayDot(text: String) {
+    Box(
+        modifier = Modifier
+            .size(27.dp)
+            .background(MaterialTheme.bayg.black)
+            .border(
+                width = 0.5.dp,
+                color = MaterialTheme.bayg.green,
+                shape = CircleShape
+            )
+            .padding(5.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(CircleShape)
+                .background(MaterialTheme.bayg.darkGreen),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = text,
+                fontWeight = FontWeight.Bold,
+                fontSize = 13.sp,
+                color = MaterialTheme.bayg.green,
+                lineHeight = 1.sp
+            )
+        }
     }
 }
 

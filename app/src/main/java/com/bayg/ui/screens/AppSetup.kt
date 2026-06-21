@@ -1,6 +1,5 @@
-package com.bayg.screens
+package com.bayg.ui.screens
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,14 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,13 +21,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import bayg
 import com.bayg.auth.OnboardingStore
-import com.bayg.services.storage.UserSettingsViewModel
+import com.bayg.ui.viewmodel.UserSettingsViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.bayg.widgets.Caption
 import com.bayg.widgets.GreenArrowButton
@@ -47,7 +37,6 @@ import com.bayg.widgets.Heading3
 import com.bayg.widgets.LimitSlider
 import com.bayg.widgets.Paragraph
 import com.bayg.widgets.ProgressBar
-import com.bayg.widgets.SelectableCard
 import com.bayg.widgets.Subtitle
 import com.bayg.widgets.ToggleCard
 import kotlin.math.roundToInt

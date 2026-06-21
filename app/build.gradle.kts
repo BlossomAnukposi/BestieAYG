@@ -47,6 +47,7 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -127,6 +128,9 @@ dependencies {
     // DbPassphraseProvider.kt for how the passphrase is stored.
     implementation("net.zetetic:sqlcipher-android:4.6.1@aar")
     implementation("androidx.sqlite:sqlite-ktx:2.4.0")
+
+    // Desugaring for API level 24 support
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 }
 
 ksp {

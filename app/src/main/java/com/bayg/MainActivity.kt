@@ -1,7 +1,6 @@
 package com.bayg
 
 import BAYGTheme
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
@@ -22,16 +21,16 @@ import com.bayg.auth.AuthNavigation
 import com.bayg.auth.BiometricUnlockGate
 import com.bayg.auth.requiresBiometricUnlock
 import com.bayg.managers.PermissionManager
-import com.bayg.screens.AppSetup
-import com.bayg.screens.Dashboard
-import com.bayg.screens.Login
-import com.bayg.screens.OnboardingStart
-import com.bayg.screens.Permissions
-import com.bayg.screens.ProfileSettings
-import com.bayg.screens.SignUp
-import com.bayg.screens.VerifyEmail
+import com.bayg.ui.screens.AppSetup
+import com.bayg.ui.screens.Dashboard
+import com.bayg.ui.screens.Login
+import com.bayg.ui.screens.OnboardingStart
+import com.bayg.ui.screens.Permissions
+import com.bayg.ui.screens.ProfileSettings
+import com.bayg.ui.screens.SignUp
+import com.bayg.ui.screens.VerifyEmail
 import com.bayg.services.storage.sync.SyncWorker
-import com.bayg.screens.Stats
+import com.bayg.ui.screens.Stats
 
 class MainActivity : FragmentActivity() {
 

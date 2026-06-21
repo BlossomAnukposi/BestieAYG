@@ -1,12 +1,11 @@
-package com.bayg.screens
+package com.bayg.ui.screens
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.TextField
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.bayg.services.storage.UserSettingsViewModel
+import com.bayg.ui.viewmodel.UserSettingsViewModel
 import com.bayg.services.storage.Authenticator
-import com.bayg.services.storage.entities.UserSettings
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -47,13 +46,11 @@ import androidx.navigation.NavController
 import bayg
 import com.bayg.R
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import com.bayg.widgets.NavBar
 
 // ── Input validation ─────────────────────────────────────────────────────────
@@ -101,7 +98,7 @@ fun ProfileSettings(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            androidx.compose.material3.CircularProgressIndicator()
+            CircularProgressIndicator()
         }
         return
     }
@@ -277,7 +274,7 @@ fun ProfileSettings(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 24.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = spacedBy(12.dp)
             ) {
                 Button(
                     onClick = {
@@ -287,7 +284,7 @@ fun ProfileSettings(
                         .weight(1f)
                         .padding(horizontal = 8.dp),
                     enabled = !isSaving && editedSettings != settings,
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.bayg.outline,
                         contentColor = MaterialTheme.bayg.white
                     )
@@ -311,7 +308,7 @@ fun ProfileSettings(
                         .weight(1f)
                         .padding(horizontal = 8.dp),
                     enabled = !isSaving && editedSettings != settings,
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.bayg.green,
                         contentColor = MaterialTheme.bayg.black
                     )
