@@ -61,6 +61,7 @@ import com.bayg.TouchGrassActivity
 import com.bayg.location.DeviceLocationProvider
 import com.bayg.services.NoAsAService
 import com.bayg.services.storage.StreakViewModel
+import com.bayg.services.storage.sync.SyncWorker
 import com.bayg.ui.viewmodel.UserSettingsViewModel
 import com.bayg.ui.viewmodel.NearestParkViewModel
 import com.bayg.ui.viewmodel.StatsUiState
@@ -363,12 +364,6 @@ private fun InfoCardsRow() {
         modifier = Modifier.width(435.dp).horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-//        SmallInfoCard(
-//            number = "5",
-//            title = "Parks\nnear you",
-//            body = listOf("Parc Sandur", "Emmen Centrum Park"),
-//            footer = "and 3 more..."
-//        )
         NearestParkInfoCard()
         WeatherInfoCard()
     }

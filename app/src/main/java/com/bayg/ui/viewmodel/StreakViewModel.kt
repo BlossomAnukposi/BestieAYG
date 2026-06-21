@@ -3,6 +3,7 @@ package com.bayg.services.storage
 import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
@@ -23,7 +24,7 @@ import java.time.temporal.TemporalAdjusters
 class StreakViewModel(application: Application) : AndroidViewModel(application) {
     private val db = AppDatabase.getInstance(application)
 
-    var streakCount by mutableStateOf(0)
+    var streakCount by mutableIntStateOf(0)
         private set
 
     var activeStreakDays by mutableStateOf(BooleanArray(7) { false })
