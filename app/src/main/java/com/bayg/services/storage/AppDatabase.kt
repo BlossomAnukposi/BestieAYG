@@ -27,7 +27,7 @@ import java.io.File
         BlockEvent::class,
         DailyUsage::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -44,14 +44,6 @@ abstract class AppDatabase : RoomDatabase() {
 
         @Volatile
         private var INSTANCE: AppDatabase? = null
-
-        private val MIGRATION_2_3 = object : Migration(2, 3) {
-            override fun migrate(db: SupportSQLiteDatabase) {
-                // Streak is no longer a stored/synced entity, it's computed on
-                // demand by using data from BlockEvent now.
-                db.execSQL("DROP TABLE IF EXISTS `streak`")
-            }
-        }
 
         private val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
@@ -88,6 +80,54 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Streak is no longer a stored/synced entity, it's computed on
+                // demand by using data from BlockEvent now.
+                db.execSQL("DROP TABLE IF EXISTS `streak`")
+            }
+        }
+
+        private val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE block_events_new (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        firebaseId TEXT,
+                        syncedAt INTEGER,
+                        userId TEXT NOT NULL,
+                        triggeredAt INTEGER NOT NULL,
+                        blockDurationMinutes INTEGER NOT NULL,
+                        label TEXT NOT NULL DEFAULT 'Daily limit exceeded',
+                        severity TEXT NOT NULL DEFAULT 'RED',
+                        detail TEXT,
+                        FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                    """.trimIndent()
+                )
+
+                // Collapse existing duplicates from the bug: one row per real
+                // firebaseId, and every never-synced ('' firebaseId) row kept as-is.
+                db.execSQL(
+                    """
+                        INSERT INTO block_events_new
+                        SELECT id, NULLIF(firebaseId, ''), syncedAt, userId, triggeredAt,
+                               blockDurationMinutes, label, severity, detail
+                        FROM block_events
+                        GROUP BY CASE WHEN firebaseId = '' THEN id ELSE firebaseId END
+                    """.trimIndent()
+                )
+
+                db.execSQL("DROP TABLE block_events")
+                db.execSQL("ALTER TABLE block_events_new RENAME TO block_events")
+
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_block_events_userId ON block_events(userId)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_block_events_triggeredAt ON block_events(triggeredAt)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_block_events_firebaseId ON block_events(firebaseId)")
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: buildEncryptedDatabase(context.applicationContext)
@@ -116,7 +156,7 @@ abstract class AppDatabase : RoomDatabase() {
             val factory = SupportOpenHelperFactory(passphrase)
             return Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
                 .openHelperFactory(factory)
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                 .build()
         }
 

@@ -15,12 +15,16 @@ import androidx.room.PrimaryKey
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index("userId"), Index("triggeredAt")]
+    indices = [
+        Index("userId"),
+        Index("triggeredAt"),
+        Index("firebaseId", unique = true)
+    ]
 )
 data class BlockEvent(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val firebaseId: String = "",
+    val firebaseId: String? = null,
     val syncedAt: Long? = null,
     val userId: String,
     val triggeredAt: Long = System.currentTimeMillis(),

@@ -22,8 +22,8 @@ class PushToFirestore (db: AppDatabase) : SyncRepository(db) {
         ).await()
     }
 
-    suspend fun pushBlockEvent(event: BlockEvent) {
-        Firebase.firestore.collection("block_events")
+    suspend fun pushBlockEvent(event: BlockEvent): String {
+        val ref = Firebase.firestore.collection("block_events")
             .add(
                 mapOf(
                     "blockDurationMinutes" to event.blockDurationMinutes,
@@ -32,5 +32,6 @@ class PushToFirestore (db: AppDatabase) : SyncRepository(db) {
                 )
             )
             .await()
+        return ref.id
     }
 }

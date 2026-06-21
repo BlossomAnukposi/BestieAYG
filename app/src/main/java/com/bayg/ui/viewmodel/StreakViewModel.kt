@@ -65,7 +65,6 @@ class StreakViewModel(application: Application) : AndroidViewModel(application) 
             day = day.minusDays(1)
         }
 
-        Log.d(TAG, "computeStreak: events=${timestamps.size}, daysWithEvents=$daysWithEvents, floor=$floor, streak=$streak")
         return streak
     }
 
@@ -91,7 +90,6 @@ class StreakViewModel(application: Application) : AndroidViewModel(application) 
             activeDays[dayOffset] = date in activeDates
         }
 
-        Log.d(TAG, "calculateActiveStreakDays: weekStart=$weekStart, activeDates=$activeDates, result=${activeDays.toList()}")
         return activeDays
     }
 
@@ -106,12 +104,8 @@ class StreakViewModel(application: Application) : AndroidViewModel(application) 
                 val blockEvents = db.blockEventDao().getAllBlockEvents(fbUser.uid)
                 val timestamps = db.blockEventDao().getAllTriggeredTimestamps(fbUser.uid)
 
-                Log.d(TAG, "loadStreak: uid=${fbUser.uid}, profileCreatedAt=$profileCreatedAt, blockEvents=${blockEvents.size}, timestamps=$timestamps")
-
                 streakCount = computeStreak(timestamps, profileCreatedAt)
                 activeStreakDays = calculateActiveStreakDays(blockEvents)
-
-                Log.d(TAG, "loadStreak result: streakCount=$streakCount, activeStreakDays=${activeStreakDays.toList()}")
             } catch (e: Exception) {
                 Log.e(TAG, "Error loading streak", e)
             }

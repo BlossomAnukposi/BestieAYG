@@ -2,6 +2,7 @@ package com.bayg.services.storage.daos
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.bayg.services.storage.entities.BlockEvent
 import kotlinx.coroutines.flow.Flow
@@ -27,12 +28,15 @@ interface BlockEventDao {
     """)
     suspend fun getUnsyncedBlockEvents(userId: String): List<BlockEvent>
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertIgnoringDuplicates(event: BlockEvent): Long
+
     @Query("""
         UPDATE block_events
-        SET syncedAt = :syncedAt
+        SET syncedAt = :syncedAt, firebaseId = :firebaseId
         WHERE id = :eventId
     """)
-    suspend fun markSynced(eventId: Long, syncedAt: Long)
+    suspend fun markSynced(eventId: Long, syncedAt: Long, firebaseId: String)
 
     /**
      * IMPORTANT! Make sure you call SyncWorker.runOnce everytime you have made an insert or update
