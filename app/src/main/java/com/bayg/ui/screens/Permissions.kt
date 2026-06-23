@@ -1,4 +1,4 @@
-package com.bayg.screens
+package com.bayg.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import bayg
 import com.bayg.R
-import com.bayg.permissions.PermissionManager
+import com.bayg.managers.PermissionManager
 import com.bayg.widgets.Caption
 import com.bayg.widgets.GreenArrowButton
 import com.bayg.widgets.GreenButton
@@ -33,7 +33,6 @@ import com.bayg.widgets.Paragraph
 import com.bayg.widgets.ProgressBar
 import com.bayg.widgets.RedTagCard
 import com.bayg.widgets.Subtitle
-import com.bayg.widgets.Toggle
 import com.bayg.widgets.PermissionToggle
 import kotlinx.coroutines.delay
 
@@ -45,6 +44,7 @@ fun Permissions(navController: NavController, permissionManager: PermissionManag
     // Track permission states
     val locationGranted = remember { mutableStateOf(permissionManager.hasLocationPermission()) }
     val usageStatsGranted = remember { mutableStateOf(permissionManager.hasUsageStatsPermission()) }
+    val notificationsGranted = remember { mutableStateOf(permissionManager.hasNotificationsPermission()) }
 
     // Periodically re-check permissions (in case user granted them externally)
     LaunchedEffect(Unit) {
@@ -52,6 +52,7 @@ fun Permissions(navController: NavController, permissionManager: PermissionManag
             delay(PERMISSION_CHECK_INTERVAL_MS)
             locationGranted.value = permissionManager.hasLocationPermission()
             usageStatsGranted.value = permissionManager.hasUsageStatsPermission()
+            notificationsGranted.value = permissionManager.hasNotificationsPermission()
         }
     }
 
@@ -94,8 +95,10 @@ fun Permissions(navController: NavController, permissionManager: PermissionManag
                 isGranted = locationGranted.value,
                 onToggle = { permissionManager.requestLocationPermissions() }
             )
-            CalendarCard()
-            NotificationsCard()
+            NotificationsCard(
+                isGranted = notificationsGranted.value,
+                onToggle = { permissionManager.requestNotificationsPermission() }
+            )
         }
     }
 
@@ -172,38 +175,7 @@ fun LocationCard(isGranted: Boolean, onToggle: () -> Unit) {
 }
 
 @Composable
-fun CalendarCard() {
-    GreyOutlinedCard() {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = painterResource(id = R.drawable.calendar),
-                contentDescription = "Calendar icon",
-                modifier = Modifier.size(40.dp)
-            )
-
-            Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                Row(
-                    modifier = Modifier.width(300.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Paragraph("Google Calendar", bold = true)
-                    OrangeTagCard("RECOMMENDED")
-                }
-
-                Row(
-                    modifier = Modifier.width(250.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Caption("Detect exams, deadlines & projects to tighten limits.", 180.dp)
-                    Toggle(false)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun NotificationsCard() {
+fun NotificationsCard(isGranted: Boolean, onToggle: () -> Unit) {
     GreyOutlinedCard() {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
@@ -218,7 +190,7 @@ fun NotificationsCard() {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Paragraph("Notifications", bold = true)
-                    RedTagCard("REQUIRED")
+                    OrangeTagCard("RECOMMENDED")
                 }
 
                 Row(
@@ -226,7 +198,7 @@ fun NotificationsCard() {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Caption("Alert you when you've crashed out. Intentionally loud.", 180.dp)
-                    Toggle(true)
+                    PermissionToggle(isGranted = isGranted, onToggle = { onToggle() })
                 }
             }
         }

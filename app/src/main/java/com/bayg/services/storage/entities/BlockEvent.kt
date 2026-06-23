@@ -5,27 +5,18 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-enum class BlockEventSeverity {
-    RED,
-    ORANGE
-}
-
 @Entity(
     tableName = "block_events",
-    foreignKeys = [
-        ForeignKey(
-            entity = User::class,
-            parentColumns = ["id"],
-            childColumns = ["userId"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ],
-    indices = [Index("userId"), Index("triggeredAt")]
+    indices = [
+        Index("userId"),
+        Index("triggeredAt"),
+        Index("firebaseId", unique = true)
+    ]
 )
 data class BlockEvent(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val firebaseId: String = "",
+    val firebaseId: String? = null,
     val syncedAt: Long? = null,
     val userId: String,
     val triggeredAt: Long = System.currentTimeMillis(),

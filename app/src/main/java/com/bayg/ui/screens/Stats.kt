@@ -1,4 +1,4 @@
-package com.bayg.screens
+package com.bayg.ui.screens
 
 import android.content.Context
 import androidx.compose.foundation.Canvas
@@ -31,17 +31,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -51,12 +47,11 @@ import com.bayg.ui.viewmodel.DayUsage
 import com.bayg.ui.viewmodel.StatsPeriod
 import com.bayg.ui.viewmodel.StatsUiState
 import com.bayg.ui.viewmodel.StatsViewModel
-import com.bayg.widgets.Heading3
-import com.bayg.widgets.Heading4
 import com.bayg.widgets.NavBar
 import com.bayg.widgets.Paragraph
 import com.bayg.services.storage.entities.BlockEventSeverity
 import com.bayg.ui.viewmodel.StatsViewModelFactory
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun Stats(navController: NavController) {
@@ -110,7 +105,7 @@ fun Stats(navController: NavController) {
                     SummaryCard(state)
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    if (state.dailyUsage.isNotEmpty()) {
+                    if (state.period != StatsPeriod.ALL_TIME && state.dailyUsage.isNotEmpty()) {
                         DailyUsageChart(state.dailyUsage, state.dailyLimitMinutes)
                         Spacer(modifier = Modifier.height(34.dp))
                     }
@@ -153,7 +148,7 @@ fun Stats(navController: NavController) {
  * Placeholder — wire up to your actual auth source.
  */
 private fun currentUserId(context: Context): String {
-    return com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    return FirebaseAuth.getInstance().currentUser?.uid ?: ""
 }
 
 // ── Period tabs ─────────────────────────────────────────────────────────
@@ -250,6 +245,8 @@ private fun DailyUsageChart(days: List<DayUsage>, dailyLimitMinutes: Int) {
         val chartHeight = 180.dp
         val barColorNormal = MaterialTheme.bayg.outline
         val barColorOver = MaterialTheme.bayg.lightRed
+        val barColorWarn = MaterialTheme.bayg.lightOrange
+        val barColorToday = MaterialTheme.bayg.green
         val limitLineColor = MaterialTheme.bayg.lightRed
 
         Box(modifier = Modifier.fillMaxWidth().height(chartHeight)) {
@@ -272,6 +269,7 @@ private fun DailyUsageChart(days: List<DayUsage>, dailyLimitMinutes: Int) {
             ) {
                 days.forEach { day ->
                     val isOverLimit = day.minutes > dailyLimitMinutes
+                    val isCloseToLimit = day.minutes > dailyLimitMinutes * 0.9
                     val barFraction = (day.minutes.toFloat() / maxValue.toFloat()).coerceIn(0f, 1f)
                     val barHeight = chartHeight * barFraction
                     val minHeight = 28.dp
@@ -281,7 +279,11 @@ private fun DailyUsageChart(days: List<DayUsage>, dailyLimitMinutes: Int) {
                             .width(28.dp)
                             .height(maxOf(barHeight, minHeight))
                             .clip(RoundedCornerShape(8.dp))
-                            .background(if (isOverLimit) barColorOver else barColorNormal)
+                            .background(
+                                if (isOverLimit) barColorOver
+                                else if (isCloseToLimit) barColorWarn
+                                else if (day.isToday) barColorToday
+                                else barColorNormal)
                     )
                 }
             }

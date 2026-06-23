@@ -1,6 +1,8 @@
 package com.bayg
 
 import BAYGTheme
+import android.annotation.SuppressLint
+import android.content.Context
 import android.Manifest
 import android.os.Build
 import android.os.Bundle
@@ -19,17 +21,17 @@ import androidx.navigation.compose.rememberNavController
 import com.bayg.auth.AuthNavigation
 import com.bayg.auth.BiometricUnlockGate
 import com.bayg.auth.requiresBiometricUnlock
-import com.bayg.permissions.PermissionManager
-import com.bayg.screens.AppSetup
-import com.bayg.screens.Dashboard
-import com.bayg.screens.Login
-import com.bayg.screens.OnboardingStart
-import com.bayg.screens.Permissions
-import com.bayg.screens.ProfileSettings
-import com.bayg.screens.SignUp
-import com.bayg.screens.VerifyEmail
+import com.bayg.managers.PermissionManager
+import com.bayg.ui.screens.AppSetup
+import com.bayg.ui.screens.Dashboard
+import com.bayg.ui.screens.Login
+import com.bayg.ui.screens.OnboardingStart
+import com.bayg.ui.screens.Permissions
+import com.bayg.ui.screens.ProfileSettings
+import com.bayg.ui.screens.SignUp
+import com.bayg.ui.screens.VerifyEmail
 import com.bayg.services.storage.sync.SyncWorker
-import com.bayg.screens.Stats
+import com.bayg.ui.screens.Stats
 
 class MainActivity : FragmentActivity() {
 
@@ -71,7 +73,7 @@ class MainActivity : FragmentActivity() {
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) {
-            scheduleScreenTimeWorker()
+            scheduleScreenTimeWorker(this)
         }
     }
 
@@ -81,6 +83,7 @@ class MainActivity : FragmentActivity() {
 
         permissionManager = PermissionManager(this)
         permissionManager.initialize(
+            notificationPermissionLauncher,
             locationPermissionLauncher,
             usageStatsLauncher,
             accessibilityLauncher
@@ -89,8 +92,9 @@ class MainActivity : FragmentActivity() {
         // Register notification channel early (no-op if already exists)
         TouchGrassNotifier.createChannel(this)
 
-        // Request notification permission on Android 13+, then schedule worker
-        requestNotificationPermissionAndSchedule()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            scheduleScreenTimeWorker(this)
+        }
 
         SyncWorker.schedule(this)
         SyncWorker.runOnce(this)
@@ -137,17 +141,9 @@ class MainActivity : FragmentActivity() {
         }
     }
 
-    private fun requestNotificationPermissionAndSchedule() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        } else {
-            scheduleScreenTimeWorker()
-        }
-    }
-
-    private fun scheduleScreenTimeWorker() {
+    private fun scheduleScreenTimeWorker(context: Context) {
         if (permissionManager.hasUsageStatsPermission()) {
-            ScreenTimeWorker.schedule(this)
+            ScreenTimeWorker.schedule(context)
         }
         // If usage stats aren't granted yet, schedule() is called again
         // inside onUsageStatsPermissionGranted() below.

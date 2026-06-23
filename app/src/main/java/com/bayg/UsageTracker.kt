@@ -20,7 +20,9 @@ object UsageTracker {
 
     private const val PREFS_NAME = "bayg_usage_prefs"
     private const val KEY_DAILY_LIMIT_MS = "instagram_daily_limit_ms"
-    private const val DEFAULT_LIMIT_MS = 30L * 60L * 1000L // 30 minutes
+    // 45 minutes — matches the default in UserSettings.dailyLimitMinutes so
+    // the two stores agree before the first save.
+    private const val DEFAULT_LIMIT_MS = 45L * 60L * 1000L
 
     // ── Public API ────────────────────────────────────────────────────────────
 

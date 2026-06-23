@@ -10,13 +10,9 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.bayg.security.DbPassphraseProvider
 import com.bayg.services.storage.daos.BlockEventDao
-import com.bayg.services.storage.daos.DailyUsageDao
-import com.bayg.services.storage.daos.StreakDao
 import com.bayg.services.storage.daos.UserDao
 import com.bayg.services.storage.daos.UserSettingsDao
 import com.bayg.services.storage.entities.BlockEvent
-import com.bayg.services.storage.entities.DailyUsage
-import com.bayg.services.storage.entities.Streak
 import com.bayg.services.storage.entities.User
 import com.bayg.services.storage.entities.UserSettings
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
@@ -27,10 +23,8 @@ import java.io.File
         User::class,
         UserSettings::class,
         BlockEvent::class,
-        Streak::class,
-        DailyUsage::class
     ],
-    version = 2,
+    version = 6,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -39,8 +33,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun userSettingsDao(): UserSettingsDao
     abstract fun blockEventDao(): BlockEventDao
-    abstract fun streakDao(): StreakDao
-    abstract fun dailyUsageDao(): DailyUsageDao
 
     companion object {
         private const val TAG = "AppDatabase"
@@ -84,6 +76,105 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Streak is no longer a stored/synced entity, it's computed on
+                // demand by using data from BlockEvent now.
+                db.execSQL("DROP TABLE IF EXISTS `streak`")
+            }
+        }
+
+        private val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE block_events_new (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        firebaseId TEXT,
+                        syncedAt INTEGER,
+                        userId TEXT NOT NULL,
+                        triggeredAt INTEGER NOT NULL,
+                        blockDurationMinutes INTEGER NOT NULL,
+                        label TEXT NOT NULL DEFAULT 'Daily limit exceeded',
+                        severity TEXT NOT NULL DEFAULT 'RED',
+                        detail TEXT,
+                        FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                    """.trimIndent()
+                )
+
+                // Collapse existing duplicates from the bug: one row per real
+                // firebaseId, and every never-synced ('' firebaseId) row kept as-is.
+                db.execSQL(
+                    """
+                        INSERT INTO block_events_new
+                        SELECT id, NULLIF(firebaseId, ''), syncedAt, userId, triggeredAt,
+                               blockDurationMinutes, label, severity, detail
+                        FROM block_events
+                        GROUP BY CASE WHEN firebaseId = '' THEN id ELSE firebaseId END
+                    """.trimIndent()
+                )
+
+                db.execSQL("DROP TABLE block_events")
+                db.execSQL("ALTER TABLE block_events_new RENAME TO block_events")
+
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_block_events_userId ON block_events(userId)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_block_events_triggeredAt ON block_events(triggeredAt)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_block_events_firebaseId ON block_events(firebaseId)")
+            }
+        }
+
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Stats now reads live from UsageStatsManager instead of caching
+                // daily Instagram totals in Room. The table was never written to
+                // by any code path, so dropping it is safe.
+                db.execSQL("DROP TABLE IF EXISTS `daily_usage`")
+                db.execSQL("DROP INDEX IF EXISTS `index_daily_usage_userId`")
+                db.execSQL("DROP INDEX IF EXISTS `index_daily_usage_userId_date`")
+            }
+        }
+
+        private val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // block_events.userId is a Firebase UID (TEXT), but the historical
+                // schema (introduced in MIGRATION_3_4) carried a foreign key
+                // referencing users.id (INTEGER). That FK rejects every insert
+                // because no users row matches a Firebase UID string. SQLite has no
+                // DROP CONSTRAINT, so rebuild the table without the FK while
+                // carrying all existing rows forward unchanged.
+                db.execSQL(
+                    """
+                    CREATE TABLE block_events_new (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        firebaseId TEXT,
+                        syncedAt INTEGER,
+                        userId TEXT NOT NULL,
+                        triggeredAt INTEGER NOT NULL,
+                        blockDurationMinutes INTEGER NOT NULL,
+                        label TEXT NOT NULL DEFAULT 'Daily limit exceeded',
+                        severity TEXT NOT NULL DEFAULT 'RED',
+                        detail TEXT
+                    )
+                    """.trimIndent()
+                )
+                db.execSQL(
+                    """
+                    INSERT INTO block_events_new
+                    SELECT id, firebaseId, syncedAt, userId, triggeredAt,
+                           blockDurationMinutes, label, severity, detail
+                    FROM block_events
+                    """.trimIndent()
+                )
+                db.execSQL("DROP TABLE block_events")
+                db.execSQL("ALTER TABLE block_events_new RENAME TO block_events")
+
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_block_events_userId ON block_events(userId)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_block_events_triggeredAt ON block_events(triggeredAt)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_block_events_firebaseId ON block_events(firebaseId)")
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: buildEncryptedDatabase(context.applicationContext)
@@ -112,7 +203,7 @@ abstract class AppDatabase : RoomDatabase() {
             val factory = SupportOpenHelperFactory(passphrase)
             return Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
                 .openHelperFactory(factory)
-                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
                 .build()
         }
 

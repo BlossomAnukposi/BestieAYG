@@ -2,7 +2,6 @@ package com.bayg.services.storage.sync
 
 import com.bayg.services.storage.AppDatabase
 import com.bayg.services.storage.entities.BlockEvent
-import com.bayg.services.storage.entities.Streak
 import com.bayg.services.storage.entities.User
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -23,8 +22,8 @@ class PushToFirestore (db: AppDatabase) : SyncRepository(db) {
         ).await()
     }
 
-    suspend fun pushBlockEvent(event: BlockEvent) {
-        Firebase.firestore.collection("block_events")
+    suspend fun pushBlockEvent(event: BlockEvent): String {
+        val ref = Firebase.firestore.collection("block_events")
             .add(
                 mapOf(
                     "blockDurationMinutes" to event.blockDurationMinutes,
@@ -33,17 +32,6 @@ class PushToFirestore (db: AppDatabase) : SyncRepository(db) {
                 )
             )
             .await()
-    }
-
-    suspend fun pushStreak(streak: Streak) {
-        Firebase.firestore.collection("streaks").document(streak.firebaseId)
-            .set(
-                mapOf(
-                    "currentStreak" to streak.currentStreak,
-                    "lastStreakDate" to streak.lastStreakDate,
-                    "userId" to streak.userId
-                ),
-                SetOptions.merge()
-            ).await()
+        return ref.id
     }
 }
