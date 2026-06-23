@@ -15,13 +15,8 @@ data class AppSettings(
     val notificationsEnabled: Boolean = true,
     val weatherNudgesEnabled: Boolean = true,
     val parkNudgesEnabled: Boolean = true,
-
-    /** Empty list means usage tracking is disabled. */
     val monitoredPackages: List<String> = emptyList(),
-
-    /** Per-package soft-cap in minutes. Crossing the cap triggers a nudge. */
     val dailyCapMinutes: Map<String, Int> = emptyMap(),
-
     val examModeActive: Boolean = false,
 ) {
     companion object {

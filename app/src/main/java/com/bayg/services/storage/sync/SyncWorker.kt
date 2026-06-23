@@ -15,9 +15,7 @@ import com.google.firebase.auth.FirebaseAuth
 import java.util.concurrent.TimeUnit
 
 private const val SYNC_RETRY_LIMIT = 3
-
 private const val REPEAT_INTERVAL : Long = 15
-
 private const val DELAY : Long = 30
 
 class SyncWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params) {
@@ -34,13 +32,14 @@ class SyncWorker(appContext: Context, params: WorkerParameters) : CoroutineWorke
         return try {
             syncPull.pullAll(localUid)
 
-            val streak = db.streakDao().getByUserId(uid)
-            if (streak != null) syncPush.pushStreak(streak)
-
             val blockEvents = db.blockEventDao().getUnsyncedBlockEvents(uid)
             for (event in blockEvents) {
-                syncPush.pushBlockEvent(event)
-                db.blockEventDao().markSynced(eventId = event.id, syncedAt = System.currentTimeMillis())
+                val firebaseId = syncPush.pushBlockEvent(event)
+                db.blockEventDao().markSynced(
+                    eventId = event.id,
+                    syncedAt = System.currentTimeMillis(),
+                    firebaseId = firebaseId
+                )
             }
 
             Result.success()

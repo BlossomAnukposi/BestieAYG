@@ -30,7 +30,6 @@ class BackgroundService : Service() {
         appUsageManager = AppUsageManager(this)
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-        // Set startTime if not already set (first time user "accepts" usage tracking)
         if (!sharedPreferences.contains(KEY_START_TIME)) {
             sharedPreferences.edit {
                 putLong(KEY_START_TIME, System.currentTimeMillis())
@@ -49,18 +48,10 @@ class BackgroundService : Service() {
 
         startForeground(NOTIFICATION_ID, notification)
 
-        // Get stored startTime (when user accepted usage tracking)
         val startTime = sharedPreferences.getLong(KEY_START_TIME, System.currentTimeMillis())
-        // endTime is current time (when fetched for dashboard/logic)
         val endTime = System.currentTimeMillis()
-
         val instagramTime = appUsageManager.getInstagramUsageTime(startTime, endTime)
         val hours = instagramTime / MILLISECONDS_PER_HOUR
-
-        Log.d(LOG_TAG, "Instagram usage since start: $hours hours")
-
-        // Data is now ready for dashboard integration
-        // This will be handled by your colleagues through the UI layer
 
         return START_STICKY
     }
