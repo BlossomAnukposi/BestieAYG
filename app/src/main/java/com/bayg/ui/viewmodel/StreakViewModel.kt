@@ -1,4 +1,4 @@
-package com.bayg.services.storage
+package com.bayg.ui.viewmodel
 
 import android.app.Application
 import android.util.Log
@@ -8,9 +8,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.bayg.services.storage.AppDatabase
 import com.bayg.services.storage.entities.BlockEvent
-import com.bayg.services.storage.entities.UserSettings
-import com.bayg.services.storage.sync.SyncWorker
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

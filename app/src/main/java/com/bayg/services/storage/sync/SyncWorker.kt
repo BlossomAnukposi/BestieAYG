@@ -15,9 +15,7 @@ import com.google.firebase.auth.FirebaseAuth
 import java.util.concurrent.TimeUnit
 
 private const val SYNC_RETRY_LIMIT = 3
-
 private const val REPEAT_INTERVAL : Long = 15
-
 private const val DELAY : Long = 30
 
 class SyncWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params) {

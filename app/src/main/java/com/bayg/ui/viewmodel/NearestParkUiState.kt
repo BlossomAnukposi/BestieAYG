@@ -62,9 +62,7 @@ class UserSettingsViewModel(application: Application) : AndroidViewModel(applica
 
                 displayName = fullName
                 email = roomUser.email
-            } catch (e: Exception) {
-                // Fail silently; profile won't load but settings will still work
-            }
+            } catch (e: Exception) { /* ignore */ }
         }
     }
 
@@ -76,10 +74,8 @@ class UserSettingsViewModel(application: Application) : AndroidViewModel(applica
                 repository.update(settings)
                 this@UserSettingsViewModel.settings = settings
 
-                // Sync to Firestore after update
                 SyncWorker.Companion.runOnce(getApplication())
             } catch (e: Exception) {
-                // Log error but still close dialog
                 Log.e("UserSettingsViewModel", "Error saving settings", e)
             } finally {
                 isSaving = false

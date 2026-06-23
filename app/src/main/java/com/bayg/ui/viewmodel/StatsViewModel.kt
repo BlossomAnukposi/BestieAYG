@@ -49,7 +49,7 @@ sealed class StatsUiState {
         val period: StatsPeriod,
         val summary: StatsSummary,
         val dailyLimitMinutes: Int,
-        val dailyUsage: List<DayUsage>, // empty for ALL_TIME (no bar chart)
+        val dailyUsage: List<DayUsage>,
         val blockEvents: List<BlockEventUi>,
     ) : StatsUiState()
     data class Error(val message: String) : StatsUiState()
@@ -59,13 +59,10 @@ internal class StatsViewModel(
     private val context: Context,
     private val userId: String,
 ) : ViewModel() {
-
     private val db = AppDatabase.getInstance(context)
     private val appUsageManager = AppUsageManager(context)
-
     private val _uiState = MutableStateFlow<StatsUiState>(StatsUiState.Loading)
     val uiState: StateFlow<StatsUiState> = _uiState
-
     private var roomUserId: Long? = null
 
     init {
@@ -85,13 +82,9 @@ internal class StatsViewModel(
 
                 val settings = db.userSettingsDao().getByUserId(roomUser.id)
                 val dailyLimitMinutes = settings?.dailyLimitMinutes ?: 45
-
                 val (rangeStart, rangeEnd) = rangeFor(period)
-
                 val dailyUsage = loadDailyUsage(rangeStart, rangeEnd, period)
-
                 val blockEvents = loadBlockEvents(rangeStart, rangeEnd)
-
                 val totalMinutes = dailyUsage.sumOf { it.minutes }
                 val dayCount = dailyUsage.size.takeIf { it > 0 } ?: 1
                 val avgMinutes = totalMinutes / dayCount
@@ -117,7 +110,6 @@ internal class StatsViewModel(
 
     // ── Range helpers ────────────────────────────────────────────────────
 
-    /** Returns start/end millis for the given period (end is "now"). */
     private fun rangeFor(period: StatsPeriod): Pair<Long, Long> {
         val now = Calendar.getInstance()
         val end = now.timeInMillis
@@ -125,7 +117,6 @@ internal class StatsViewModel(
         val start = Calendar.getInstance()
         when (period) {
             StatsPeriod.WEEK -> {
-                // Start of this week (Monday)
                 start.firstDayOfWeek = Calendar.MONDAY
                 val dayOfWeek = start.get(Calendar.DAY_OF_WEEK)
                 val daysFromMonday = (dayOfWeek - Calendar.MONDAY + 7) % 7
@@ -137,7 +128,7 @@ internal class StatsViewModel(
                 clearToStartOfDay(start)
             }
             StatsPeriod.ALL_TIME -> {
-                start.add(Calendar.YEAR, -10) // effectively "all"
+                start.add(Calendar.YEAR, -10)
                 clearToStartOfDay(start)
             }
         }
@@ -171,11 +162,8 @@ internal class StatsViewModel(
         val todayKey = dateKeyFormat.format(today.time)
 
         val labelFormat = when (period) {
-            // single-letter day, e.g. "M","T","W"
             StatsPeriod.WEEK -> SimpleDateFormat("EEEEE", Locale.ENGLISH)
-            // day-of-month number for Month view
             StatsPeriod.MONTH -> SimpleDateFormat("d", Locale.ENGLISH)
-            // full label so a chart could read sensibly if rendered
             StatsPeriod.ALL_TIME -> SimpleDateFormat("MMM d", Locale.ENGLISH)
         }
 
@@ -188,7 +176,6 @@ internal class StatsViewModel(
 
         when (period) {
             StatsPeriod.WEEK -> {
-                // Always 7 days Mon..Sun, regardless of where "today" falls.
                 val cal = Calendar.getInstance().apply { timeInMillis = rangeStart }
                 val result = mutableListOf<DayUsage>()
                 for (i in 0 until 7) {
@@ -225,15 +212,19 @@ internal class StatsViewModel(
                 // or once Android has clearly stopped returning data.
                 val now = System.currentTimeMillis()
                 val todayCal = Calendar.getInstance()
+
                 clearToStartOfDay(todayCal)
                 val todayMidnight = todayCal.timeInMillis
                 val cursor = Calendar.getInstance().apply { timeInMillis = todayMidnight }
                 var consecutiveZero = 0
                 val result = mutableListOf<DayUsage>()
+
                 while (result.size < ALL_TIME_DAY_CAP) {
                     val dayStart = cursor.timeInMillis
+
                     if (dayStart < rangeStart) break
                     val dayEnd = (dayStart + DAY_MS).coerceAtMost(now)
+
                     if (dayStart >= dayEnd) break
                     val minutes = dayMinutes(dayStart)
                     result.add(
@@ -243,13 +234,14 @@ internal class StatsViewModel(
                             isToday = dateKeyFormat.format(cursor.time) == todayKey,
                         )
                     )
+
                     if (minutes == 0) consecutiveZero++ else consecutiveZero = 0
                     if (consecutiveZero >= ALL_TIME_ZERO_EXIT_THRESHOLD &&
                         result.size > ALL_TIME_ZERO_EXIT_THRESHOLD
                     ) break
                     cursor.add(Calendar.DAY_OF_MONTH, -1)
                 }
-                result.asReversed() // walked backward; UI wants ascending order
+                result.asReversed()
             }
         }
     }
@@ -294,16 +286,8 @@ internal class StatsViewModel(
     }
 
     companion object {
-        // Hard cap on how far back ALL_TIME walks. Pills an Android-only
-        // quirk: per-day aggregates from UsageStatsManager are not retained
-        // for longer than a few weeks on most devices, so walking further
-        // only adds latency.
         private const val ALL_TIME_DAY_CAP = 365
-
-        // Stop walking once we've seen this many consecutive zero-day rows
-        // past the head — the OS has clearly stopped retaining data.
         private const val ALL_TIME_ZERO_EXIT_THRESHOLD = 7
-
         private const val DAY_MS = 24L * 60L * 60L * 1000L
     }
 }

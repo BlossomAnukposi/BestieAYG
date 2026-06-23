@@ -18,11 +18,7 @@ object ScreenTimeChecker {
     private const val PREFS_NAME = "bayg_screentime_prefs"
     private const val KEY_TOTAL_LIMIT_MS = "total_daily_limit_ms"
     private const val KEY_NOTIFICATION_SENT_DATE = "notification_sent_date"
-
-    // Default: notify after 2 hours of total screen time
     private const val DEFAULT_TOTAL_LIMIT_MS = 2L * 60L * 60L * 1000L
-
-    // Packages to exclude from total (launcher, system UI, etc.)
     private val EXCLUDED_PACKAGES = setOf(
         "com.android.systemui",
         "com.android.launcher",
@@ -31,7 +27,7 @@ object ScreenTimeChecker {
         "com.miui.home",
         "com.sec.android.app.launcher",
         "com.huawei.android.launcher",
-        "com.bayg" // exclude our own app
+        "com.bayg"
     )
 
     // ── Public API ────────────────────────────────────────────────────────────

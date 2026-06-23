@@ -4,9 +4,7 @@ import com.bayg.services.storage.AppDatabase
 import com.bayg.services.storage.entities.BlockEvent
 import com.bayg.services.storage.entities.User
 import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
 

@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -34,6 +37,7 @@ import com.bayg.widgets.ProgressBar
 import com.bayg.widgets.RedTagCard
 import com.bayg.widgets.Subtitle
 import com.bayg.widgets.PermissionToggle
+import com.bayg.widgets.PermissionsCard
 import kotlinx.coroutines.delay
 
 private const val PROGRESS_BAR_67_PERCENT = 0.67f
@@ -41,18 +45,18 @@ private const val PERMISSION_CHECK_INTERVAL_MS = 1000L
 
 @Composable
 fun Permissions(navController: NavController, permissionManager: PermissionManager) {
-    // Track permission states
     val locationGranted = remember { mutableStateOf(permissionManager.hasLocationPermission()) }
     val usageStatsGranted = remember { mutableStateOf(permissionManager.hasUsageStatsPermission()) }
     val notificationsGranted = remember { mutableStateOf(permissionManager.hasNotificationsPermission()) }
+    val accessibilityGranted = remember { mutableStateOf(permissionManager.hasAccessibilityPermission()) }
 
-    // Periodically re-check permissions (in case user granted them externally)
     LaunchedEffect(Unit) {
         while (true) {
             delay(PERMISSION_CHECK_INTERVAL_MS)
             locationGranted.value = permissionManager.hasLocationPermission()
             usageStatsGranted.value = permissionManager.hasUsageStatsPermission()
             notificationsGranted.value = permissionManager.hasNotificationsPermission()
+            accessibilityGranted.value = permissionManager.hasAccessibilityPermission()
         }
     }
 
@@ -64,7 +68,6 @@ fun Permissions(navController: NavController, permissionManager: PermissionManag
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(30.dp)
     ) {
-        // Section One
         Column {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -79,25 +82,48 @@ fun Permissions(navController: NavController, permissionManager: PermissionManag
             ProgressBar(MaterialTheme.bayg.green, PROGRESS_BAR_67_PERCENT)
         }
 
-        // SECTION TWO
         Column {
             Heading2("one-time\nsetup", MaterialTheme.bayg.white)
             Subtitle("Crashout needs these to work. We never sell your data. Ever.")
         }
 
-        // SETUP CARDS
-        Column(verticalArrangement = Arrangement.spacedBy(15.dp)) {
-            InstagramUsageCard(
+        Column(verticalArrangement = Arrangement.spacedBy(15.dp),
+            modifier = Modifier.verticalScroll(rememberScrollState())) {
+            PermissionsCard(
                 isGranted = usageStatsGranted.value,
-                onToggle = { permissionManager.requestUsageStatsPermission() }
+                onToggle = { permissionManager.requestUsageStatsPermission() },
+                contentDescription = "Track time in Instagram. Required for blocking.",
+                painterResource = painterResource(id = R.drawable.phone),
+                title = "Usage Stats",
+                caption = "Track time in Instagram. Required for blocking.",
+                tagCard = { RedTagCard("REQUIRED") }
             )
-            LocationCard(
+            PermissionsCard(
                 isGranted = locationGranted.value,
-                onToggle = { permissionManager.requestLocationPermissions() }
+                onToggle = { permissionManager.requestLocationPermissions() },
+                contentDescription = "Find nearby parks for touch-grass alerts.",
+                painterResource = painterResource(id = R.drawable.location),
+                title = "Location",
+                caption = "Find nearby parks for touch-grass alerts.",
+                tagCard = { RedTagCard("REQUIRED") }
             )
-            NotificationsCard(
+            PermissionsCard(
                 isGranted = notificationsGranted.value,
-                onToggle = { permissionManager.requestNotificationsPermission() }
+                onToggle = { permissionManager.requestNotificationsPermission() },
+                contentDescription = "Alert you when you've crashed out. Intentionally loud.",
+                painterResource = painterResource(id = R.drawable.phone),
+                title = "Notifications",
+                caption = "Alert you when you've crashed out. Intentionally loud.",
+                tagCard = { OrangeTagCard("RECOMMENDED") }
+            )
+            PermissionsCard(
+                isGranted = accessibilityGranted.value,
+                onToggle = { permissionManager.requestAccessibilityPermission() },
+                contentDescription = "Allow Crashout to block Instagram usage",
+                painterResource = painterResource(id = R.drawable.settings),
+                title = "Accessibility",
+                caption = "Allow Crashout to block Instagram usage",
+                tagCard = { OrangeTagCard("RECOMMENDED") }
             )
         }
     }
@@ -109,98 +135,5 @@ fun Permissions(navController: NavController, permissionManager: PermissionManag
             .padding(bottom = 50.dp)
     ) {
         GreenButton(navController, "appSetup", "Grant & continue")
-    }
-}
-
-@Composable
-fun InstagramUsageCard(isGranted: Boolean, onToggle: () -> Unit) {
-    GreyOutlinedCard() {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = painterResource(id = R.drawable.phone),
-                contentDescription = "Phone icon",
-                modifier = Modifier.size(40.dp)
-            )
-
-            Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                Row(
-                    modifier = Modifier.width(300.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Paragraph("Usage Access", bold = true)
-                    RedTagCard("REQUIRED")
-                }
-
-                Row(
-                    modifier = Modifier.width(250.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Caption("Track time in Instagram. Required for blocking.", 180.dp)
-                    PermissionToggle(isGranted = isGranted, onToggle = { onToggle() })
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun LocationCard(isGranted: Boolean, onToggle: () -> Unit) {
-    GreyOutlinedCard() {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = painterResource(id = R.drawable.location),
-                contentDescription = "Location icon",
-                modifier = Modifier.size(40.dp)
-            )
-
-            Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                Row(
-                    modifier = Modifier.width(300.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Paragraph("Location", bold = true)
-                    RedTagCard("REQUIRED")
-                }
-
-                Row(
-                    modifier = Modifier.width(250.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Caption("Find nearby parks for touch-grass alerts.", 180.dp)
-                    PermissionToggle(isGranted = isGranted, onToggle = { onToggle() })
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun NotificationsCard(isGranted: Boolean, onToggle: () -> Unit) {
-    GreyOutlinedCard() {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = painterResource(id = R.drawable.phone),
-                contentDescription = "Phone icon",
-                modifier = Modifier.size(40.dp)
-            )
-
-            Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                Row(
-                    modifier = Modifier.width(300.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Paragraph("Notifications", bold = true)
-                    OrangeTagCard("RECOMMENDED")
-                }
-
-                Row(
-                    modifier = Modifier.width(250.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Caption("Alert you when you've crashed out. Intentionally loud.", 180.dp)
-                    PermissionToggle(isGranted = isGranted, onToggle = { onToggle() })
-                }
-            }
-        }
     }
 }

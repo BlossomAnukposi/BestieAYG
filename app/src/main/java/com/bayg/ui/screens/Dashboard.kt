@@ -39,7 +39,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,25 +48,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.PlatformTextStyle
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import com.bayg.TouchGrassActivity
 import com.bayg.location.DeviceLocationProvider
 import com.bayg.services.NoAsAService
-import com.bayg.services.storage.StreakViewModel
-import com.bayg.services.storage.sync.SyncWorker
 import com.bayg.ui.viewmodel.UserSettingsViewModel
 import com.bayg.ui.viewmodel.NearestParkViewModel
 import com.bayg.ui.viewmodel.StatsUiState
 import com.bayg.ui.viewmodel.StatsViewModel
 import com.bayg.ui.viewmodel.StatsViewModelFactory
 import com.bayg.ui.viewmodel.NearestParkUiState
+import com.bayg.ui.viewmodel.StreakViewModel
 import com.bayg.ui.viewmodel.WeatherUiState
 import com.bayg.ui.viewmodel.WeatherViewModel
 import com.bayg.widgets.GreenButton
@@ -79,7 +75,6 @@ import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.collections.get
 
 @Composable
 fun Dashboard(navController: NavController) {
@@ -189,7 +184,7 @@ private fun TopUsageCard(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start
                 ) {
-                    UsageCircle(usageMinutes, dailyLimitMinutes)  // ← fixed
+                    UsageCircle(usageMinutes, dailyLimitMinutes)
                     Spacer(modifier = Modifier.weight(1f))
 
                     Column(horizontalAlignment = Alignment.End) {

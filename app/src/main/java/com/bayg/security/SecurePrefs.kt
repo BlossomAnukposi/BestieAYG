@@ -42,7 +42,6 @@ class SecurePrefs(context: Context) {
     fun getBoolean(key: Key, default: Boolean = false): Boolean =
         prefs.getBoolean(key.raw, default)
 
-    /** For per-user keys such as onboarding flags. Prefer [Key] for fixed entries. */
     fun putBoolean(rawKey: String, value: Boolean) {
         prefs.edit().putBoolean(rawKey, value).apply()
     }

@@ -1,6 +1,7 @@
 package com.bayg.widgets
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -41,7 +43,7 @@ import androidx.compose.ui.unit.sp
 import bayg
 
 @Composable
-fun GreyOutlinedCard(minHeight: Dp = 94.dp, content: @Composable () -> Unit) {
+fun GreyOutlinedCard(minHeight: Dp = 70.dp, content: @Composable () -> Unit) {
     OutlinedCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.bayg.card),
         border = BorderStroke(1.dp, MaterialTheme.bayg.outline),
@@ -211,6 +213,44 @@ fun SmallInfoCard(
             }
 
             Caption(footer, fontStyle = FontStyle.Italic)
+        }
+    }
+}
+
+@Composable
+fun PermissionsCard(isGranted: Boolean,
+                    onToggle: () -> Unit,
+                    contentDescription: String,
+                    painterResource: Painter,
+                    title: String,
+                    caption: String,
+                    tagCard: @Composable () -> Unit,
+) {
+    GreyOutlinedCard() {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                painter = painterResource,
+                contentDescription = contentDescription,
+                modifier = Modifier.size(40.dp)
+            )
+
+            Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                Row(
+                    modifier = Modifier.width(300.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Paragraph(title, bold = true)
+                    tagCard()
+                }
+
+                Row(
+                    modifier = Modifier.width(250.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Caption(caption, 180.dp)
+                    PermissionToggle(isGranted = isGranted, onToggle = { onToggle() })
+                }
+            }
         }
     }
 }

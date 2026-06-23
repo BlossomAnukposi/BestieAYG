@@ -20,24 +20,16 @@ object UsageTracker {
 
     private const val PREFS_NAME = "bayg_usage_prefs"
     private const val KEY_DAILY_LIMIT_MS = "instagram_daily_limit_ms"
-    // 45 minutes — matches the default in UserSettings.dailyLimitMinutes so
-    // the two stores agree before the first save.
     private const val DEFAULT_LIMIT_MS = 45L * 60L * 1000L
 
     // ── Public API ────────────────────────────────────────────────────────────
 
-    /**
-     * Returns true if the user has exceeded their Instagram limit today.
-     */
     fun isLimitExceeded(context: Context): Boolean {
         val used = getTodayUsageMs(context)
         val limit = getDailyLimitMs(context)
         return used >= limit
     }
 
-    /**
-     * Returns milliseconds Instagram has been used today (since midnight).
-     */
     fun getTodayUsageMs(context: Context): Long {
         val usm = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
 
@@ -54,23 +46,13 @@ object UsageTracker {
         return stats[INSTAGRAM_PACKAGE]?.totalTimeInForeground ?: 0L
     }
 
-    /**
-     * Returns the configured daily limit in milliseconds.
-     */
     fun getDailyLimitMs(context: Context): Long =
         prefs(context).getLong(KEY_DAILY_LIMIT_MS, DEFAULT_LIMIT_MS)
 
-    /**
-     * Sets a new daily limit. Pass milliseconds.
-     * Example: setDailyLimitMs(context, 20 * 60 * 1000L) for 20 minutes.
-     */
     fun setDailyLimitMs(context: Context, limitMs: Long) {
         prefs(context).edit().putLong(KEY_DAILY_LIMIT_MS, limitMs).apply()
     }
 
-    /**
-     * Formats milliseconds as "X h Y min" or "Y min" for display.
-     */
     fun formatDuration(ms: Long): String {
         val totalSeconds = ms / 1000
         val hours = totalSeconds / 3600
@@ -80,8 +62,6 @@ object UsageTracker {
             else -> "${minutes}min"
         }
     }
-
-    // ── Private ───────────────────────────────────────────────────────────────
 
     private fun prefs(context: Context): SharedPreferences =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)

@@ -43,17 +43,11 @@ class ProfileSettingsViewModel(
 
                 val roomUserId = roomUser.id
 
-                // Now call DAO with the Room user id (Long)
                 val settings = userSettingsDao.getByUserId(roomUserId)
                 if (settings != null) {
-                    // Even on a fresh read (not just insert), mirror the canonical
-                    // Room value into SharedPreferences so the AccessibilityService
-                    // pick up whatever the user has configured previously. This
-                    // covers existing installs that pre-date the mirror-on-save fix.
                     UsageTracker.setDailyLimitMs(context, settings.dailyLimitMinutes * 60_000L)
                     _settingsState.value = SettingsUiState.Success(settings)
                 } else {
-                    // Create default settings referencing the Room user id (Long)
                     val defaultSettings = UserSettings(
                         userId = roomUserId,
                         dailyLimitMinutes = 45,
@@ -63,11 +57,6 @@ class ProfileSettingsViewModel(
                         notificationsEnabled = true
                     )
                     userSettingsDao.insert(defaultSettings)
-                    // Mirror the default daily limit to SharedPreferences so the
-                    // AccessibilityService and BlockedActivity (which read via
-                    // UsageTracker.getDailyLimitMs) see the same canonical cap
-                    // the Room default implies — covered here because this VM
-                    // bypasses UserSettingsRepository and writes to the DAO directly.
                     UsageTracker.setDailyLimitMs(context, defaultSettings.dailyLimitMinutes * 60_000L)
                     _settingsState.value = SettingsUiState.Success(defaultSettings)
                 }
@@ -85,15 +74,9 @@ class ProfileSettingsViewModel(
 
                 val updated = currentSettings.copy(dailyLimitMinutes = minutes)
                 userSettingsDao.update(updated)
-                // Mirror the change to SharedPreferences so the AccessibilityService
-                // reads the new cap on its next poll. Same coverage gap as in
-                // loadSettings — this VM uses the DAO directly, so the
-                // repository-level mirror in UserSettingsRepository.update does
-                // not fire for this code path.
                 UsageTracker.setDailyLimitMs(context, minutes * 60_000L)
                 _settingsState.value = SettingsUiState.Success(updated)
 
-                // Trigger sync to Firestore
                 SyncWorker.runOnce(context)
             } catch (e: Exception) {
                 _settingsState.value = SettingsUiState.Error(e.message ?: "Update failed")
@@ -111,7 +94,6 @@ class ProfileSettingsViewModel(
                 userSettingsDao.update(updated)
                 _settingsState.value = SettingsUiState.Success(updated)
 
-                // Trigger sync to Firestore
                 SyncWorker.runOnce(context)
             } catch (e: Exception) {
                 _settingsState.value = SettingsUiState.Error(e.message ?: "Update failed")

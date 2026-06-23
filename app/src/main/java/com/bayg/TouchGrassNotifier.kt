@@ -59,7 +59,6 @@ object TouchGrassNotifier {
      * permission on Android 13+ before attempting to notify.
      */
     fun notify(context: Context) {
-        // Deep link intent — tapping opens TouchGrassActivity
         val tapIntent = Intent(context, TouchGrassActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
@@ -75,7 +74,7 @@ object TouchGrassNotifier {
         val message = MESSAGES.random()
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_dialog_info) // replace with your own icon
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle("Time to touch grass 🌿")
             .setContentText("$usedFormatted on your phone today.")
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))

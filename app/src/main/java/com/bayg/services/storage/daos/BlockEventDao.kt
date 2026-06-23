@@ -5,7 +5,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.bayg.services.storage.entities.BlockEvent
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BlockEventDao {
@@ -38,11 +37,6 @@ interface BlockEventDao {
     """)
     suspend fun markSynced(eventId: Long, syncedAt: Long, firebaseId: String)
 
-    /**
-     * IMPORTANT! Make sure you call SyncWorker.runOnce everytime you have made an insert or update
-     * call from the Room Dao. This reduces the chances of abusers taking advantage of
-     * sync time
-     */
     @Insert
     suspend fun insert(event: BlockEvent): Long
 

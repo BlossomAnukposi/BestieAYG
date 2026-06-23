@@ -103,8 +103,6 @@ abstract class AppDatabase : RoomDatabase() {
                     """.trimIndent()
                 )
 
-                // Collapse existing duplicates from the bug: one row per real
-                // firebaseId, and every never-synced ('' firebaseId) row kept as-is.
                 db.execSQL(
                     """
                         INSERT INTO block_events_new
@@ -126,9 +124,6 @@ abstract class AppDatabase : RoomDatabase() {
 
         private val MIGRATION_4_5 = object : Migration(4, 5) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // Stats now reads live from UsageStatsManager instead of caching
-                // daily Instagram totals in Room. The table was never written to
-                // by any code path, so dropping it is safe.
                 db.execSQL("DROP TABLE IF EXISTS `daily_usage`")
                 db.execSQL("DROP INDEX IF EXISTS `index_daily_usage_userId`")
                 db.execSQL("DROP INDEX IF EXISTS `index_daily_usage_userId_date`")
@@ -137,12 +132,6 @@ abstract class AppDatabase : RoomDatabase() {
 
         private val MIGRATION_5_6 = object : Migration(5, 6) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // block_events.userId is a Firebase UID (TEXT), but the historical
-                // schema (introduced in MIGRATION_3_4) carried a foreign key
-                // referencing users.id (INTEGER). That FK rejects every insert
-                // because no users row matches a Firebase UID string. SQLite has no
-                // DROP CONSTRAINT, so rebuild the table without the FK while
-                // carrying all existing rows forward unchanged.
                 db.execSQL(
                     """
                     CREATE TABLE block_events_new (

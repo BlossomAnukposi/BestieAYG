@@ -122,7 +122,6 @@ fun ProfileSettings(
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            // Profile card
             OutlinedCard(
                 modifier = Modifier
                     .fillMaxWidth()

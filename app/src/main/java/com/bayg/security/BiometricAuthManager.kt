@@ -126,14 +126,6 @@ class BiometricAuthManager(private val context: Context) {
         cont.invokeOnCancellation { prompt.cancelAuthentication() }
     }
 
-    /** Test helper. Wipes any data encrypted under the old key. */
-    fun deleteBiometricKey() {
-        val keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER).apply { load(null) }
-        if (keyStore.containsAlias(BIOMETRIC_KEY_ALIAS)) {
-            keyStore.deleteEntry(BIOMETRIC_KEY_ALIAS)
-        }
-    }
-
     private fun getOrCreateBiometricKey(): SecretKey {
         val keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER).apply { load(null) }
         val existing = keyStore.getKey(BIOMETRIC_KEY_ALIAS, null) as? SecretKey
@@ -151,9 +143,7 @@ class BiometricAuthManager(private val context: Context) {
             .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
             .setKeySize(AES_KEY_SIZE_BITS)
             .setRandomizedEncryptionRequired(true)
-            // Key is released only after a successful Class 3 biometric.
             .setUserAuthenticationRequired(true)
-            // Adding a new fingerprint or face invalidates this key.
             .setInvalidatedByBiometricEnrollment(true)
             .build()
         keyGenerator.init(spec)

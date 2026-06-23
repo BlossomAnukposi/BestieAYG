@@ -12,7 +12,6 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
-import com.bayg.ScreenTimeWorker
 import com.bayg.services.InstagramBlockerService
 
 class PermissionManager(private val activity: ComponentActivity) {
@@ -20,7 +19,7 @@ class PermissionManager(private val activity: ComponentActivity) {
     private var locationPermissionLauncher: ActivityResultLauncher<Array<String>>? = null
     private var usageStatsLauncher: ActivityResultLauncher<Intent>? = null
     private var notificationsPermissionLauncher: ActivityResultLauncher<String>? = null
-    private var accessibilityLauncher: ActivityResultLauncher<Intent>? = null  // NEW
+    private var accessibilityLauncher: ActivityResultLauncher<Intent>? = null
 
     companion object {
         private const val PERMISSION_CHECK_WINDOW_MS = 24 * 60 * 60 * 1000L
@@ -31,7 +30,7 @@ class PermissionManager(private val activity: ComponentActivity) {
         notificationsPermissionLauncher: ActivityResultLauncher<String>,
         locationPermissionLauncher: ActivityResultLauncher<Array<String>>,
         usageStatsLauncher: ActivityResultLauncher<Intent>,
-        accessibilityLauncher: ActivityResultLauncher<Intent>? = null  // NEW (optional so existing callers don't break)
+        accessibilityLauncher: ActivityResultLauncher<Intent>? = null
     ) {
         this.notificationsPermissionLauncher = notificationsPermissionLauncher
         this.locationPermissionLauncher = locationPermissionLauncher
@@ -77,14 +76,13 @@ class PermissionManager(private val activity: ComponentActivity) {
         activity.startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
     }
 
-    // NEW — sends user to Accessibility Settings to enable the blocker service
     fun requestAccessibilityPermission() {
         if (hasAccessibilityPermission()) {
             openAccessibilitySettings()
         } else {
             val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
             accessibilityLauncher?.launch(intent)
-                ?: activity.startActivity(intent) // fallback if launcher not registered
+                ?: activity.startActivity(intent)
         }
     }
 
@@ -128,12 +126,10 @@ class PermissionManager(private val activity: ComponentActivity) {
         }
     }
 
-    // NEW — checks if the AccessibilityService is enabled in device settings
     fun hasAccessibilityPermission(): Boolean {
         return InstagramBlockerService.Companion.isEnabled(activity)
     }
 
-    // NEW — true only when ALL permissions required for blocking are granted
     fun hasAllBlockingPermissions(): Boolean {
         return hasUsageStatsPermission() && hasAccessibilityPermission()
     }
@@ -143,7 +139,7 @@ class PermissionManager(private val activity: ComponentActivity) {
             openNotificationSettings()
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             notificationsPermissionLauncher?.launch(Manifest.permission.POST_NOTIFICATIONS)
-                ?: openNotificationSettings() // fallback if launcher not registered
+                ?: openNotificationSettings()
         }
     }
 

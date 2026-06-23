@@ -250,7 +250,6 @@ private fun DailyUsageChart(days: List<DayUsage>, dailyLimitMinutes: Int) {
         val limitLineColor = MaterialTheme.bayg.lightRed
 
         Box(modifier = Modifier.fillMaxWidth().height(chartHeight)) {
-            // Limit line + label, drawn behind the bars
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val limitY = size.height * (1f - dailyLimitMinutes.toFloat() / maxValue.toFloat())
                 drawLine(
@@ -288,10 +287,6 @@ private fun DailyUsageChart(days: List<DayUsage>, dailyLimitMinutes: Int) {
                 }
             }
 
-            // "45m" style label for the limit line. Use `offset` (not `padding`)
-            // for the upward nudge: Compose rejects negative values in `padding`
-            // at runtime, but `offset` accepts them and is the correct API for
-            // visually translating an element off its layout position.
             Text(
                 text = "${dailyLimitMinutes}m",
                 fontSize = 13.sp,

@@ -74,7 +74,6 @@ class TouchGrassActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Required for osmdroid tile caching
         Configuration.getInstance().load(this, getPreferences(MODE_PRIVATE))
 
         setContentView(R.layout.activity_touch_grass)
@@ -92,15 +91,11 @@ class TouchGrassActivity : AppCompatActivity() {
         tvWeatherLocation = findViewById(R.id.tv_weather_location)
         tvWeatherNudge = findViewById(R.id.tv_weather_nudge)
         layoutEmptyState = findViewById(R.id.layout_empty_state)
-
-        // RecyclerView setup
         rvParks.layoutManager = LinearLayoutManager(this)
         rvParks.isNestedScrollingEnabled = false
 
-        // Map setup
         setupMap()
 
-        // Get location then load data
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         fetchLocationAndLoad()
     }
@@ -112,7 +107,6 @@ class TouchGrassActivity : AppCompatActivity() {
     }
 
     private fun fetchLocationAndLoad() {
-        // Request location permission before this call (use ActivityResultLauncher in production)
         try {
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                 if (location != null) {
@@ -215,14 +209,12 @@ class TouchGrassActivity : AppCompatActivity() {
         if (intent.resolveActivity(packageManager) != null) {
             startActivity(intent)
         } else {
-            // Fallback: open in browser maps
             startActivity(Intent(Intent.ACTION_VIEW,
                 Uri.parse("https://maps.google.com/?q=${Uri.encode(park.name)}&ll=${park.lat},${park.lon}")))
         }
     }
 
     // ── Weather from Open-Meteo ──────────────────────────────────────────────
-    // Open-Meteo is free, no API key needed.
 
     private suspend fun fetchWeather(lat: Double, lon: Double) = withContext(Dispatchers.IO) {
         try {

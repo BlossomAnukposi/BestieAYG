@@ -26,7 +26,6 @@ import androidx.navigation.NavController
 import bayg
 import com.bayg.auth.OnboardingStore
 import com.bayg.ui.viewmodel.UserSettingsViewModel
-import com.google.firebase.auth.FirebaseAuth
 import com.bayg.widgets.Caption
 import com.bayg.widgets.GreenArrowButton
 import com.bayg.widgets.GreenButton
@@ -65,7 +64,6 @@ fun AppSetup(
     var isPreset by remember { mutableStateOf(true) }
     var limitValue by remember { mutableFloatStateOf(DEFAULT_APP_LIMIT) }
     var blockValue by remember { mutableFloatStateOf(DEFAULT_BLOCK_TIME) }
-    var customKeywords by remember { mutableStateOf(listOf<String>()) }
 
     LaunchedEffect(settingsViewModel.settings) {
         settingsViewModel.settings?.let { settings ->
@@ -82,7 +80,6 @@ fun AppSetup(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(30.dp)
     ) {
-        // TOP SECTION
         Column {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -95,13 +92,11 @@ fun AppSetup(
             ProgressBar(MaterialTheme.bayg.green, 1f)
         }
 
-        // TITLE
         Column {
             Heading2("customise\nyour limits", MaterialTheme.bayg.white)
             Subtitle("Set how Crashout decides when to intervene. You can always change this later.")
         }
 
-        // CARDS
         Column(verticalArrangement = Arrangement.spacedBy(15.dp)) {
             AppLimitSection(isPreset, limitValue) { limitValue = it }
             AppBlockSection(isPreset, blockValue) { blockValue = it }

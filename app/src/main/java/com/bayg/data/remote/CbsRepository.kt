@@ -9,7 +9,6 @@ import java.io.IOException
 class CbsRepository {
 
     companion object {
-        // Average daily social media usage in the Netherlands in minutes.
         // Source: Newcom National Social Media Research 2024
         const val NL_AVERAGE_SOCIAL_MEDIA_MINUTES = 138
     }

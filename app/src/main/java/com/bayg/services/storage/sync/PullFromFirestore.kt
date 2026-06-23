@@ -52,7 +52,7 @@ class PullFromFirestore(db: AppDatabase) : SyncRepository(db) {
                 userId = uid,
                 triggeredAt = doc.getLong("triggeredAt") ?: return@forEach,
                 blockDurationMinutes = (doc.getLong("blockDurationMinutes") ?: 30).toInt(),
-                syncedAt = System.currentTimeMillis(), // it came from Firestore, it's already synced
+                syncedAt = System.currentTimeMillis(),
             )
             db.blockEventDao().insertIgnoringDuplicates(event)
         }

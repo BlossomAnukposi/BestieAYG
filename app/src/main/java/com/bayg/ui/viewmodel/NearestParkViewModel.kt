@@ -40,14 +40,14 @@ class NearestParkViewModel : ViewModel() {
     private suspend fun fetchFromOverpass(lat: Double, lon: Double): Pair<Park, Int>? =
         withContext(Dispatchers.IO) {
             val query = """
-            [out:json][timeout:25];
-            (
-              node[leisure=park](around:$searchRadiusMeters,$lat,$lon);
-              way[leisure=park](around:$searchRadiusMeters,$lat,$lon);
-              relation[leisure=park](around:$searchRadiusMeters,$lat,$lon);
-            );
-            out center;
-        """.trimIndent()
+                [out:json][timeout:25];
+                (
+                  node[leisure=park](around:$searchRadiusMeters,$lat,$lon);
+                  way[leisure=park](around:$searchRadiusMeters,$lat,$lon);
+                  relation[leisure=park](around:$searchRadiusMeters,$lat,$lon);
+                );
+                out center;
+            """.trimIndent()
 
             val encoded = URLEncoder.encode(query, "UTF-8")
             val response = java.net.URL("$overpassUrl?data=$encoded").readText()

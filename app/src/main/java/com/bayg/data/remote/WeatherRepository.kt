@@ -82,9 +82,6 @@ class WeatherRepository : WeatherDataSource {
         // lives only inside the Worker (Cloudflare encrypted env).
         private const val PROXY_BASE_URL =
             "https://bayg-weather-proxy.bayg-weather-proxy.workers.dev/"
-
-        // Sent on every /weather request; matches REQUIRED_CLIENT_VALUE
-        // in proxy/src/index.js.
         private const val CLIENT_HEADER_NAME = "X-Bayg-Client"
         private const val CLIENT_HEADER_VALUE = "bayg-android"
     }

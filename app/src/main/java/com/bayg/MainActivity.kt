@@ -1,9 +1,7 @@
 package com.bayg
 
 import BAYGTheme
-import android.annotation.SuppressLint
 import android.content.Context
-import android.Manifest
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -41,15 +39,9 @@ class MainActivity : FragmentActivity() {
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         when {
-            permissions[android.Manifest.permission.ACCESS_FINE_LOCATION] ?: false -> {
-                onLocationPermissionGranted()
-            }
-            permissions[android.Manifest.permission.ACCESS_COARSE_LOCATION] ?: false -> {
-                onLocationPermissionGranted()
-            }
-            else -> {
-                // Permission denied
-            }
+            permissions[android.Manifest.permission.ACCESS_FINE_LOCATION] ?: false -> { /* na */ }
+            permissions[android.Manifest.permission.ACCESS_COARSE_LOCATION] ?: false -> { /* na */}
+            else -> { /* Permission denied */ }
         }
     }
 
@@ -64,9 +56,7 @@ class MainActivity : FragmentActivity() {
     private val accessibilityLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { _ ->
-        if (permissionManager.hasAccessibilityPermission()) {
-            onAccessibilityPermissionGranted()
-        }
+        if (permissionManager.hasAccessibilityPermission()) { /* na */ }
     }
 
     private val notificationPermissionLauncher = registerForActivityResult(
@@ -149,9 +139,6 @@ class MainActivity : FragmentActivity() {
         // inside onUsageStatsPermissionGranted() below.
     }
 
-    private fun onLocationPermissionGranted() {
-        // Location logic will be added later
-    }
 
     private fun onUsageStatsPermissionGranted() {
         ScreenTimeWorker.schedule(this)
@@ -159,9 +146,5 @@ class MainActivity : FragmentActivity() {
         if (!permissionManager.hasAccessibilityPermission()) {
             permissionManager.requestAccessibilityPermission()
         }
-    }
-
-    private fun onAccessibilityPermissionGranted() {
-        // Instagram blocker is now active — nothing else needed
     }
 }

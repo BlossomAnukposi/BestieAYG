@@ -61,11 +61,6 @@ class BlockedActivity : ComponentActivity() {
         val limitMs = UsageTracker.getDailyLimitMs(this)
         val usedFormatted = UsageTracker.formatDuration(usedMs)
         val limitFormatted = UsageTracker.formatDuration(limitMs)
-
-        // Record this block locally so it surfaces in Stats and so the
-        // sync layer pushes it to Firestore on its next run. Fire-and-
-        // forget on the IO dispatcher — a write failure must not break
-        // the block screen itself.
         recordBlockEvent(usedMs, limitMs)
 
         setContent {
@@ -140,9 +135,9 @@ private fun BlockedScreen(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF1B4332), // Deep forest green
-                        Color(0xFF2D6A4F), // Mid green
-                        Color(0xFF40916C)  // Light green
+                        Color(0xFF1B4332),
+                        Color(0xFF2D6A4F),
+                        Color(0xFF40916C)
                     )
                 )
             ),
@@ -156,13 +151,11 @@ private fun BlockedScreen(
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
 
-            // Big emoji
             Text(
                 text = "🌿",
                 fontSize = 80.sp
             )
 
-            // Headline
             Text(
                 text = "Put the phone down.",
                 fontSize = 28.sp,
@@ -171,7 +164,6 @@ private fun BlockedScreen(
                 textAlign = TextAlign.Center
             )
 
-            // Subtext
             Text(
                 text = "You've spent $usedFormatted on Instagram today.\nYour limit is $limitFormatted.\n\nThere's a whole world out there.",
                 fontSize = 16.sp,
@@ -182,7 +174,6 @@ private fun BlockedScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Primary CTA — find a park
             Button(
                 onClick = onGoTouchGrass,
                 modifier = Modifier
@@ -201,7 +192,6 @@ private fun BlockedScreen(
                 )
             }
 
-            // Secondary — just go home
             OutlinedButton(
                 onClick = onGoHome,
                 modifier = Modifier
