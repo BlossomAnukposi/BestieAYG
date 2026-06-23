@@ -92,10 +92,10 @@ class InstagramBlockerService : AccessibilityService() {
             lastBlockLaunchedMs > 0 &&
             sinceLast < MIN_RELAUNCH_GAP_MS
         ) {
-            Log.i(LOG_TAG, "poll-skip: last launch ${sinceLast}ms ago")
+            Log.i(LOG_TAG, "poll-skip")
             return
         }
-        Log.i(LOG_TAG, "launching BlockedActivity reason=$reason")
+        Log.i(LOG_TAG, "launching BlockedActivity")
         lastBlockLaunchedMs = now
         val intent = Intent(this, BlockedActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

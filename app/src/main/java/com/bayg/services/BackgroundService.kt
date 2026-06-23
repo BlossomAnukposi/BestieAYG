@@ -53,8 +53,6 @@ class BackgroundService : Service() {
         val instagramTime = appUsageManager.getInstagramUsageTime(startTime, endTime)
         val hours = instagramTime / MILLISECONDS_PER_HOUR
 
-        Log.d(LOG_TAG, "Instagram usage since start: $hours hours")
-
         return START_STICKY
     }
 

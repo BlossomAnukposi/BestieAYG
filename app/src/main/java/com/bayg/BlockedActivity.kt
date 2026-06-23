@@ -100,7 +100,7 @@ class BlockedActivity : ComponentActivity() {
                     syncedAt = null,
                 )
                 withContext(Dispatchers.IO) { db.blockEventDao().insert(event) }
-                Log.i("BlockedActivity", "blockEvent inserted uid=$uid dur=${blockDuration}m")
+                Log.i("BlockedActivity", "blockEvent inserted")
             } catch (e: Exception) {
                 Log.e("BlockedActivity", "blockEvent insert failed", e)
             }
