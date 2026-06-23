@@ -105,7 +105,7 @@ fun Stats(navController: NavController) {
                     SummaryCard(state)
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    if (state.dailyUsage.isNotEmpty()) {
+                    if (state.period != StatsPeriod.ALL_TIME && state.dailyUsage.isNotEmpty()) {
                         DailyUsageChart(state.dailyUsage, state.dailyLimitMinutes)
                         Spacer(modifier = Modifier.height(34.dp))
                     }
@@ -245,6 +245,8 @@ private fun DailyUsageChart(days: List<DayUsage>, dailyLimitMinutes: Int) {
         val chartHeight = 180.dp
         val barColorNormal = MaterialTheme.bayg.outline
         val barColorOver = MaterialTheme.bayg.lightRed
+        val barColorWarn = MaterialTheme.bayg.lightOrange
+        val barColorToday = MaterialTheme.bayg.green
         val limitLineColor = MaterialTheme.bayg.lightRed
 
         Box(modifier = Modifier.fillMaxWidth().height(chartHeight)) {
@@ -267,6 +269,7 @@ private fun DailyUsageChart(days: List<DayUsage>, dailyLimitMinutes: Int) {
             ) {
                 days.forEach { day ->
                     val isOverLimit = day.minutes > dailyLimitMinutes
+                    val isCloseToLimit = day.minutes > dailyLimitMinutes * 0.9
                     val barFraction = (day.minutes.toFloat() / maxValue.toFloat()).coerceIn(0f, 1f)
                     val barHeight = chartHeight * barFraction
                     val minHeight = 28.dp
@@ -276,7 +279,11 @@ private fun DailyUsageChart(days: List<DayUsage>, dailyLimitMinutes: Int) {
                             .width(28.dp)
                             .height(maxOf(barHeight, minHeight))
                             .clip(RoundedCornerShape(8.dp))
-                            .background(if (isOverLimit) barColorOver else barColorNormal)
+                            .background(
+                                if (isOverLimit) barColorOver
+                                else if (isCloseToLimit) barColorWarn
+                                else if (day.isToday) barColorToday
+                                else barColorNormal)
                     )
                 }
             }

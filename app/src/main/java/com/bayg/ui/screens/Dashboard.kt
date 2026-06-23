@@ -250,7 +250,7 @@ private fun StreakDays(modifier: Modifier = Modifier, viewModel: StreakViewModel
             .background(MaterialTheme.bayg.black)
             .padding(7.dp, 10.dp, 10.dp, 7.dp)
     ) {
-        listOf("S", "M", "T", "W", "T", "F", "S").forEachIndexed { index, day ->
+        listOf("M", "T", "W", "T", "F", "S", "S").forEachIndexed { index, day ->
             if (index == todayIdx) {
                 TodayDot(day)
             } else {

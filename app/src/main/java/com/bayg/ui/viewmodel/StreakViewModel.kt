@@ -46,7 +46,7 @@ class StreakViewModel(application: Application) : AndroidViewModel(application) 
 
     public fun todayIndex(): Int {
         val today = LocalDate.now(ZoneId.systemDefault())
-        return today.dayOfWeek.value % 7
+        return today.dayOfWeek.ordinal
     }
 
     private fun computeStreak(timestamps: List<Long>, profileCreatedAt: Long): Int {
@@ -77,7 +77,7 @@ class StreakViewModel(application: Application) : AndroidViewModel(application) 
             .toSet()
 
         val today = LocalDate.now(zone)
-        val weekStart = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY))
+        val weekStart = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
 
         val activeDates = mutableSetOf<LocalDate>()
         var day = today.minusDays(1)
