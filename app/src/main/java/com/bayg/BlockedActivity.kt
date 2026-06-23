@@ -106,7 +106,7 @@ class BlockedActivity : ComponentActivity() {
             }
         }
     }
-    
+
     private fun goHome() {
         val homeIntent = Intent(Intent.ACTION_MAIN).apply {
             addCategory(Intent.CATEGORY_HOME)

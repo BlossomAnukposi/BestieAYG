@@ -24,6 +24,9 @@
     <!-- Read the user's local calendar (no Google Sign-In required) -->
     <uses-permission android:name="android.permission.READ_CALENDAR" />
 
+    <!-- NO-AS-A-SERVICE Network permission -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
