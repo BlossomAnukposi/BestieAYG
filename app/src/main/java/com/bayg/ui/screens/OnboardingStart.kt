@@ -1,4 +1,4 @@
-package com.bayg.screens
+package com.bayg.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,7 +31,6 @@ fun OnboardingStart(navController: NavController) {
             .padding(40.dp, 50.dp),
         verticalArrangement = Arrangement.spacedBy(30.dp)
     ) {
-        // Section One
         Column(Modifier.padding(top = 50.dp).width(334.dp)) {
             Title("CRASH", MaterialTheme.bayg.green)
             Title("OUT.", MaterialTheme.bayg.white)
@@ -39,7 +38,6 @@ fun OnboardingStart(navController: NavController) {
             Subtitle("your bestie that actually calls you out")
         }
 
-        // Section Two
         Column(Modifier.padding(top = 50.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Box(
                 modifier = Modifier
@@ -55,7 +53,6 @@ fun OnboardingStart(navController: NavController) {
         }
     }
 
-    // Bottom Section
     Box(
         contentAlignment = Alignment.BottomCenter,
         modifier = Modifier

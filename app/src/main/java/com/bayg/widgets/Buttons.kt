@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.Alignment
 import androidx.navigation.NavController
 import bayg
 import kotlin.math.roundToInt
@@ -172,7 +171,6 @@ fun PermissionToggle(isGranted: Boolean, onToggle: () -> Unit) {
             checkedTrackColor = MaterialTheme.bayg.green,
             uncheckedTrackColor = MaterialTheme.bayg.textGrey
         ),
-        modifier = Modifier.width(36.dp),
-        enabled = !isGranted // Disable toggle once permission is granted (optional)
+        modifier = Modifier.width(36.dp)
     )
 }

@@ -3,6 +3,7 @@ package com.bayg
 import BAYGTheme
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -30,6 +31,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
+import com.bayg.services.storage.AppDatabase
+import com.bayg.services.storage.entities.BlockEvent
+import com.bayg.services.storage.entities.BlockEventSeverity
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * BlockedActivity
@@ -52,6 +61,7 @@ class BlockedActivity : ComponentActivity() {
         val limitMs = UsageTracker.getDailyLimitMs(this)
         val usedFormatted = UsageTracker.formatDuration(usedMs)
         val limitFormatted = UsageTracker.formatDuration(limitMs)
+        recordBlockEvent(usedMs, limitMs)
 
         setContent {
             BAYGTheme {
@@ -70,7 +80,33 @@ class BlockedActivity : ComponentActivity() {
             }
         })
     }
-    
+
+    private fun recordBlockEvent(usedMs: Long, limitMs: Long) {
+        lifecycleScope.launch {
+            val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+            try {
+                val db = AppDatabase.getInstance(this@BlockedActivity)
+                val user = db.userDao().getByFirebaseUid(uid) ?: return@launch
+                val settings = db.userSettingsDao().getByUserId(user.id)
+                val blockDuration = settings?.blockDurationMinutes ?: 30
+                val event = BlockEvent(
+                    userId = uid,
+                    triggeredAt = System.currentTimeMillis(),
+                    blockDurationMinutes = blockDuration,
+                    label = "Daily limit exceeded",
+                    severity = BlockEventSeverity.RED,
+                    detail = "Used ${UsageTracker.formatDuration(usedMs)} of ${UsageTracker.formatDuration(limitMs)}",
+                    firebaseId = null,
+                    syncedAt = null,
+                )
+                withContext(Dispatchers.IO) { db.blockEventDao().insert(event) }
+                Log.i("BlockedActivity", "blockEvent inserted")
+            } catch (e: Exception) {
+                Log.e("BlockedActivity", "blockEvent insert failed", e)
+            }
+        }
+    }
+
     private fun goHome() {
         val homeIntent = Intent(Intent.ACTION_MAIN).apply {
             addCategory(Intent.CATEGORY_HOME)
@@ -99,9 +135,9 @@ private fun BlockedScreen(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF1B4332), // Deep forest green
-                        Color(0xFF2D6A4F), // Mid green
-                        Color(0xFF40916C)  // Light green
+                        Color(0xFF1B4332),
+                        Color(0xFF2D6A4F),
+                        Color(0xFF40916C)
                     )
                 )
             ),
@@ -115,13 +151,11 @@ private fun BlockedScreen(
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
 
-            // Big emoji
             Text(
                 text = "🌿",
                 fontSize = 80.sp
             )
 
-            // Headline
             Text(
                 text = "Put the phone down.",
                 fontSize = 28.sp,
@@ -130,7 +164,6 @@ private fun BlockedScreen(
                 textAlign = TextAlign.Center
             )
 
-            // Subtext
             Text(
                 text = "You've spent $usedFormatted on Instagram today.\nYour limit is $limitFormatted.\n\nThere's a whole world out there.",
                 fontSize = 16.sp,
@@ -141,7 +174,6 @@ private fun BlockedScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Primary CTA — find a park
             Button(
                 onClick = onGoTouchGrass,
                 modifier = Modifier
@@ -160,7 +192,6 @@ private fun BlockedScreen(
                 )
             }
 
-            // Secondary — just go home
             OutlinedButton(
                 onClick = onGoHome,
                 modifier = Modifier

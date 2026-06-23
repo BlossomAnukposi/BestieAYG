@@ -2,7 +2,6 @@ package com.bayg.services.storage.sync
 
 import com.bayg.services.storage.AppDatabase
 import com.bayg.services.storage.entities.BlockEvent
-import com.bayg.services.storage.entities.Streak
 import com.bayg.services.storage.entities.User
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
@@ -13,7 +12,6 @@ class PullFromFirestore(db: AppDatabase) : SyncRepository(db) {
     suspend fun pullAll(localUserId: Long) {
         pullProfile(localUserId)
         pullBlockEvents()
-        pullStreak()
     }
 
     /**
@@ -54,29 +52,9 @@ class PullFromFirestore(db: AppDatabase) : SyncRepository(db) {
                 userId = uid,
                 triggeredAt = doc.getLong("triggeredAt") ?: return@forEach,
                 blockDurationMinutes = (doc.getLong("blockDurationMinutes") ?: 30).toInt(),
+                syncedAt = System.currentTimeMillis(),
             )
-            db.blockEventDao().insert(event)
+            db.blockEventDao().insertIgnoringDuplicates(event)
         }
-    }
-
-    private suspend fun pullStreak() {
-        val snap = Firebase.firestore.collection("streaks")
-            .whereEqualTo("userId", uid)
-            .limit(1)
-            .get()
-            .await()
-            .documents
-            .firstOrNull()
-            ?: return
-
-        val existing = db.streakDao().getByUserId(uid)
-        val streak = Streak(
-            id = existing?.id ?: 0,
-            firebaseId = snap.id,
-            userId = uid,
-            currentStreak = (snap.getLong("currentStreak") ?: 0).toInt(),
-            lastStreakDate = snap.getLong("lastStreakDate"),
-        )
-        db.streakDao().insert(streak)
     }
 }

@@ -3,6 +3,7 @@ package com.bayg.ui.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bayg.UsageTracker
 import com.bayg.services.storage.AppDatabase
 import com.bayg.services.storage.entities.UserSettings
 import com.bayg.services.storage.sync.SyncWorker
@@ -42,12 +43,11 @@ class ProfileSettingsViewModel(
 
                 val roomUserId = roomUser.id
 
-                // Now call DAO with the Room user id (Long)
                 val settings = userSettingsDao.getByUserId(roomUserId)
                 if (settings != null) {
+                    UsageTracker.setDailyLimitMs(context, settings.dailyLimitMinutes * 60_000L)
                     _settingsState.value = SettingsUiState.Success(settings)
                 } else {
-                    // Create default settings referencing the Room user id (Long)
                     val defaultSettings = UserSettings(
                         userId = roomUserId,
                         dailyLimitMinutes = 45,
@@ -57,6 +57,7 @@ class ProfileSettingsViewModel(
                         notificationsEnabled = true
                     )
                     userSettingsDao.insert(defaultSettings)
+                    UsageTracker.setDailyLimitMs(context, defaultSettings.dailyLimitMinutes * 60_000L)
                     _settingsState.value = SettingsUiState.Success(defaultSettings)
                 }
             } catch (e: Exception) {
@@ -73,9 +74,9 @@ class ProfileSettingsViewModel(
 
                 val updated = currentSettings.copy(dailyLimitMinutes = minutes)
                 userSettingsDao.update(updated)
+                UsageTracker.setDailyLimitMs(context, minutes * 60_000L)
                 _settingsState.value = SettingsUiState.Success(updated)
 
-                // Trigger sync to Firestore
                 SyncWorker.runOnce(context)
             } catch (e: Exception) {
                 _settingsState.value = SettingsUiState.Error(e.message ?: "Update failed")
@@ -93,7 +94,6 @@ class ProfileSettingsViewModel(
                 userSettingsDao.update(updated)
                 _settingsState.value = SettingsUiState.Success(updated)
 
-                // Trigger sync to Firestore
                 SyncWorker.runOnce(context)
             } catch (e: Exception) {
                 _settingsState.value = SettingsUiState.Error(e.message ?: "Update failed")

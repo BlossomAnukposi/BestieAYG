@@ -1,6 +1,5 @@
-package com.bayg.screens
+package com.bayg.ui.screens
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,14 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,13 +21,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import bayg
 import com.bayg.auth.OnboardingStore
-import com.bayg.services.storage.UserSettingsViewModel
+import com.bayg.ui.viewmodel.UserSettingsViewModel
 import com.bayg.widgets.Caption
 import com.bayg.widgets.GreenArrowButton
 import com.bayg.widgets.GreenButton
@@ -46,7 +36,6 @@ import com.bayg.widgets.Heading3
 import com.bayg.widgets.LimitSlider
 import com.bayg.widgets.Paragraph
 import com.bayg.widgets.ProgressBar
-import com.bayg.widgets.SelectableCard
 import com.bayg.widgets.Subtitle
 import com.bayg.widgets.ToggleCard
 import kotlin.math.roundToInt
@@ -75,7 +64,6 @@ fun AppSetup(
     var isPreset by remember { mutableStateOf(true) }
     var limitValue by remember { mutableFloatStateOf(DEFAULT_APP_LIMIT) }
     var blockValue by remember { mutableFloatStateOf(DEFAULT_BLOCK_TIME) }
-    var customKeywords by remember { mutableStateOf(listOf<String>()) }
 
     LaunchedEffect(settingsViewModel.settings) {
         settingsViewModel.settings?.let { settings ->
@@ -92,7 +80,6 @@ fun AppSetup(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(30.dp)
     ) {
-        // TOP SECTION
         Column {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -105,20 +92,17 @@ fun AppSetup(
             ProgressBar(MaterialTheme.bayg.green, 1f)
         }
 
-        // TITLE
         Column {
             Heading2("customise\nyour limits", MaterialTheme.bayg.white)
             Subtitle("Set how Crashout decides when to intervene. You can always change this later.")
         }
 
-        // CARDS
         Column(verticalArrangement = Arrangement.spacedBy(15.dp)) {
             AppLimitSection(isPreset, limitValue) { limitValue = it }
             AppBlockSection(isPreset, blockValue) { blockValue = it }
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(15.dp)) {
-            KeywordsSection(isPreset, customKeywords) { customKeywords = it }
             ModeSection(isPreset) { isPreset = it }
         }
 
@@ -193,67 +177,6 @@ fun AppBlockSection(isPreset: Boolean, value: Float, onValueChange: (Float) -> U
                 Column(Modifier.fillMaxWidth()) {
                     LimitSlider(MaterialTheme.bayg.lightRed, value,
                         BLOCK_TIME_OPTIONS_COUNT, 0f..FOUR_HOURS_LIMIT, onValueChange)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun KeywordsSection(
-    isPreset: Boolean,
-    customKeywords: List<String>,
-    onKeywordsChange: (List<String>) -> Unit
-) {
-    var showDialog by remember(isPreset) { mutableStateOf(false) }
-    var inputText by remember(isPreset) { mutableStateOf("") }
-
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text("Add keyword") },
-            text = {
-                TextField(
-                    value = inputText,
-                    onValueChange = { inputText = it },
-                    placeholder = { Text("e.g. Interview") },
-                    singleLine = true
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    if (inputText.isNotBlank()) onKeywordsChange(customKeywords + inputText.trim())
-                    inputText = ""
-                    showDialog = false
-                }) { Text("Add") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDialog = false }) { Text("Cancel") }
-            }
-        )
-    }
-
-    Column {
-        Paragraph("Event Keywords", bold = true)
-        Paragraph("Crashout watches for these in your Calendar", MaterialTheme.bayg.textGrey)
-
-        Row {
-            if (isPreset) {
-                SelectableCard("Exam", initialSelected = true)
-                SelectableCard("Deadline", initialSelected = true)
-            } else {
-                customKeywords.forEach { SelectableCard(it) }
-                OutlinedCard(
-                    onClick = { showDialog = true },
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.bayg.card),
-                    shape = RoundedCornerShape(3.dp),
-                    border = BorderStroke(1.dp, MaterialTheme.bayg.outline),
-                ) {
-                    Text(
-                        text = "+ Add keyword",
-                        style = TextStyle(fontSize = 15.sp, color = MaterialTheme.bayg.textGrey),
-                        modifier = Modifier.padding(10.dp)
-                    )
                 }
             }
         }
